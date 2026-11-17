@@ -64,8 +64,8 @@
 
 		if (squish && slot?.parentElement) {
 			const target = slot.parentElement;
-			// Lets base.css dip the card's content while it's pressed (the glass itself is
-			// squished by the spring below; it can't be scaled with CSS without misaligning).
+			// Lets base.css hide the card's own outline while the glass squishes, so only the
+			// glass rim (which squishes with it) shows as the edge.
 			target.dataset.pressable = '';
 			let cancelled = false;
 			loadGlass()
@@ -74,12 +74,21 @@
 					if (cancelled) return;
 					// Wider and shorter while pressed, then a soft wobble back on release. x stays
 					// within the panel's 4px bleed so the squished rim is never clipped.
+					// data-pressed stays on from the press until the spring comes to rest (it reports
+					// exactly 0 then), wobble included, so base.css hides the card's outline for as long
+					// as the glass is out of shape. Not :active, which iOS Safari often skips on a tap.
 					const spring = createSpring(
 						0,
-						(p) => panel?.surface?.setDelta({ x: -4 * p, y: 2.5 * p, w: 8 * p, h: -5 * p }),
+						(p) => {
+							panel?.surface?.setDelta({ x: -4 * p, y: 2.5 * p, w: 8 * p, h: -5 * p });
+							target.toggleAttribute('data-pressed', p !== 0);
+						},
 						{ stiffness: 520, damping: 20 }
 					);
-					const press = () => spring.set(1);
+					const press = () => {
+						target.setAttribute('data-pressed', '');
+						spring.set(1);
+					};
 					const release = () => spring.set(0);
 					target.addEventListener('pointerdown', press);
 					for (const type of ['pointerup', 'pointercancel', 'pointerleave'] as const) {

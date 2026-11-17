@@ -15,7 +15,7 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 
 ## Motion
 
-- Presses squish (wider and shorter) on `--duration-press`, then spring back on `--spring-bouncy` over `--duration-release`. Glass cards squish their glass with a JS spring and dip their content via `[data-pressable]` in base.css; never scale glass with CSS `transform: scale()`.
+- Presses squish (wider and shorter) on `--duration-press`, then spring back on `--spring-bouncy` over `--duration-release`. Glass cards squish their glass with a JS spring; their content layer's outline is hidden from press until the spring settles (`data-pressed`, set by GlassSurface from the spring, not `:active`, which iOS skips) so it can't separate from the moving glass rim. Never scale glass, or the layer carrying its outline, with CSS `transform: scale()`.
 - Page transitions use the View Transitions API (`src/lib/ui/page-transitions.ts`, motion in base.css). Only the element named `page` moves; the tab bar and backdrop stay still. Direction follows tab order (`src/lib/ui/tabs.ts`) and path depth. Query-only changes don't animate.
 - Everything collapses to a quick fade or nothing under `prefers-reduced-motion`.
 

@@ -77,17 +77,23 @@ lg-navbar:not(:defined) {
 }
 
 /*
- * Glass cards that squish (GlassSurface squish) also dip their content while pressed. The glass
- * itself is squished by its own spring: scaling it with CSS would misalign the refraction.
+ * Glass cards that squish (GlassSurface squish). The glass squishes on its own spring and its
+ * rim moves with it, but a card's thin outline is drawn by its content layer, which can't follow
+ * that shape: left in place, the two edges separate into a doubled border. So the outline fades
+ * out the moment the card is pressed, leaving the glass rim as the only edge, and fades back once
+ * the spring has settled. The content itself isn't scaled, for the same reason.
+ *
+ * GlassSurface sets data-pressed from the spring itself. The !important beats each card's own
+ * outline rule (a highlighted card's accent edge is more specific than this). Only the outline is
+ * forced: cards that set their own transition keep it.
  */
 [data-pressable] > :not(.glass-slot) {
-	transition: transform var(--duration-release) var(--spring-bouncy);
+	transition: box-shadow 240ms var(--ease-out);
 }
 
-[data-pressable]:active > :not(.glass-slot) {
-	transform: scale(0.97);
-	transition-duration: var(--duration-press);
-	transition-timing-function: var(--ease-out);
+[data-pressable][data-pressed] > :not(.glass-slot) {
+	box-shadow: none !important;
+	transition-duration: 80ms;
 }
 
 /*
