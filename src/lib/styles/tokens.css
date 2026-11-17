@@ -1,0 +1,224 @@
+/*
+ * home base design tokens.
+ * Names describe what a value is for, so components read like plain English.
+ * The palette shifts through the day via <html data-daypart="morning|day|evening">,
+ * set before first paint by the inline script in app.html.
+ */
+
+:root {
+	/* Type */
+	--font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--text-caption: 0.8125rem; /* 13px */
+	--text-small: 0.9375rem; /* 15px */
+	--text-body: 1.0625rem; /* 17px */
+	--text-control-value: 1.625rem; /* 26px */
+	--text-page-title: 1.75rem; /* 28px */
+	--text-event-title: 2.125rem; /* 34px, the largest text on Today */
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-strong: 600;
+	--tracking-tight: -0.025em;
+	--tracking-label: 0.02em;
+
+	/* Spacing */
+	--space-xs: 4px;
+	--space-s: 8px;
+	--space-m: 16px;
+	--space-l: 24px;
+	--space-xl: 32px;
+	--space-2xl: 48px;
+	--page-gutter: 22px;
+	--tap-target: 44px;
+	--row-height: 56px;
+
+	/* Shape */
+	--radius-card: 28px;
+	--radius-tile: 24px;
+	--radius-field: 18px;
+	--radius-pill: 999px;
+
+	/* Colour: text */
+	--colour-text: #f5ede6;
+	--colour-text-muted: rgb(245 237 230 / 0.66);
+	--colour-text-faint: rgb(245 237 230 / 0.45);
+	--colour-on-accent: #1a0f08;
+
+	/* Colour: surfaces */
+	--colour-hairline: rgb(255 255 255 / 0.08);
+	--colour-hairline-strong: rgb(255 255 255 / 0.14);
+	/* Light enough for the backdrop to show through the glass; text keeps 4.5:1 above it. */
+	--glass-smoke: rgb(14 11 10 / 0.26);
+	--glass-smoke-fallback: rgb(20 16 14 / 0.62);
+	--glass-blur: blur(24px) saturate(150%);
+	--glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+	--shadow-lift: 0 18px 40px -16px rgb(0 0 0 / 0.65);
+
+	/* Original monochrome grain, tiled over the mesh */
+	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.75 0 0 0 -0.36'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	--grain-size: 240px;
+
+	/* Evening palette (default): oxblood and ember */
+	--colour-ground: #0b0807;
+	--colour-accent: #f4a86e;
+	--colour-accent-soft: rgb(255 172 112 / 0.1);
+	--colour-accent-edge: rgb(255 192 142 / 0.26);
+	--glow-event: 0 24px 60px -18px rgb(232 112 44 / 0.5);
+	--mesh-one: radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%);
+	--mesh-two: radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%);
+	--mesh-three: radial-gradient(70% 36% at 60% 104%, rgb(160 72 30 / 0.28), transparent 72%);
+
+	/*
+	 * Charts: one colour per expense category. A colour-blind-safe set validated against the dark
+	 * background (lightness, chroma, CVD separation and contrast all pass). "Other" is a neutral
+	 * grey rather than a ninth hue. Charts always label categories by name too.
+	 */
+	--chart-1: #3987e5;
+	--chart-2: #d95926;
+	--chart-3: #199e70;
+	--chart-4: #c98500;
+	--chart-5: #d55181;
+	--chart-6: #0ca30c;
+	--chart-7: #9085e9;
+	--chart-8: #e66767;
+	--chart-other: #8d8a86;
+
+	/* Motion */
+	--ease-spring: cubic-bezier(0.3, 1.4, 0.5, 1);
+	/*
+	 * Real damped springs traced with linear(). Bouncy (damping ratio 0.45, about 20% overshoot)
+	 * is for releasing a press; soft (0.75, about 3%) is for pages settling into place.
+	 * Browsers without linear() fall back to plain ease.
+	 */
+	--spring-bouncy: linear(
+		0,
+		0.061,
+		0.214,
+		0.414,
+		0.625,
+		0.82,
+		0.98,
+		1.097,
+		1.17,
+		1.202,
+		1.202,
+		1.178,
+		1.14,
+		1.097,
+		1.055,
+		1.019,
+		0.99,
+		0.971,
+		0.961,
+		0.958,
+		0.961,
+		0.967,
+		0.976,
+		0.985,
+		0.993,
+		0.999,
+		1.004,
+		1.007,
+		1.009,
+		1.008,
+		1.007,
+		1.006,
+		1.004,
+		1.002,
+		1.001,
+		1,
+		0.999,
+		0.998,
+		0.998,
+		0.998,
+		1
+	);
+	--spring-soft: linear(
+		0,
+		0.022,
+		0.079,
+		0.159,
+		0.251,
+		0.348,
+		0.446,
+		0.539,
+		0.624,
+		0.702,
+		0.77,
+		0.828,
+		0.877,
+		0.917,
+		0.949,
+		0.975,
+		0.994,
+		1.008,
+		1.017,
+		1.024,
+		1.027,
+		1.028,
+		1.028,
+		1.027,
+		1.025,
+		1.022,
+		1.019,
+		1.017,
+		1.014,
+		1.011,
+		1.009,
+		1.007,
+		1.005,
+		1.004,
+		1.003,
+		1.002,
+		1.001,
+		1,
+		1,
+		1,
+		1
+	);
+	--duration-press: 110ms;
+	--duration-release: 620ms;
+	--ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--duration-quick: 180ms;
+	--duration-settle: 280ms;
+
+	/* liquidglass.dev theme */
+	--lg-on-glass: var(--colour-text-muted);
+	--lg-text: var(--colour-accent);
+	--lg-tint: var(--glass-smoke);
+	--lg-indicator: rgb(255 240 228 / 0.1);
+	--lg-shadow-1: 0 6px 18px rgb(0 0 0 / 0.38), 0 1px 3px rgb(0 0 0 / 0.3);
+	--lg-shadow-2: var(--shadow-lift);
+	--lg-fallback: var(--glass-blur);
+	--lg-focus: var(--colour-accent);
+	--lg-surface: transparent;
+}
+
+:root[data-daypart='morning'] {
+	--colour-ground: #080b0f;
+	--colour-accent: #a6cbec;
+	--colour-accent-soft: rgb(160 205 240 / 0.1);
+	--colour-accent-edge: rgb(170 212 242 / 0.24);
+	--glow-event: 0 24px 60px -18px rgb(80 140 205 / 0.45);
+	--mesh-one: radial-gradient(70% 42% at 8% 0%, rgb(64 112 168 / 0.58), transparent 72%);
+	--mesh-two: radial-gradient(55% 40% at 100% 34%, rgb(52 122 106 / 0.42), transparent 70%);
+	--mesh-three: radial-gradient(70% 38% at 55% 104%, rgb(200 152 82 / 0.26), transparent 72%);
+}
+
+:root[data-daypart='day'] {
+	--colour-ground: #0a0909;
+	--colour-accent: #efc49c;
+	--colour-accent-soft: rgb(240 200 160 / 0.1);
+	--colour-accent-edge: rgb(240 205 170 / 0.24);
+	--glow-event: 0 24px 60px -18px rgb(200 130 80 / 0.42);
+	--mesh-one: radial-gradient(65% 40% at 80% 4%, rgb(176 112 76 / 0.46), transparent 72%);
+	--mesh-two: radial-gradient(60% 42% at 0% 64%, rgb(84 52 64 / 0.48), transparent 70%);
+	--mesh-three: radial-gradient(70% 36% at 55% 104%, rgb(120 96 72 / 0.24), transparent 72%);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+	:root {
+		--glass-smoke: rgb(20 16 14 / 0.88);
+		--glass-smoke-fallback: rgb(20 16 14 / 0.94);
+		--colour-text-muted: rgb(245 237 230 / 0.8);
+	}
+}

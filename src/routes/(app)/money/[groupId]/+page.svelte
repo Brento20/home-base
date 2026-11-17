@@ -1,0 +1,205 @@
+<script lang="ts">
+	import ActivityRow from '#lib/features/expenses/ActivityRow.svelte';
+	import {
+		describeBetween,
+		describeDebt,
+		describeMyBalance,
+		onlyOther
+	} from '#lib/features/expenses/describe.js';
+	import GlassCard from '#lib/ui/GlassCard.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import RoundButton from '#lib/ui/RoundButton.svelte';
+	import type { ExpenseActivity } from '#lib/types.js';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+
+	const me = $derived(data.me.id);
+	const myNet = $derived(data.balances.find((b) => b.profileId === me)?.netCents ?? 0);
+	const other = $derived(onlyOther(data.people, me));
+	// Two people: one sentence says it all ("You owe Brenton $2.50"). More: your position, then
+	// the fewest repayments that would settle the group.
+	const headline = $derived(
+		other ? describeBetween(myNet, other.displayName) : describeMyBalance(myNet)
+	);
+	// Debts involving you first, then the rest of the group.
+	const debts = $derived(
+		[...data.debts].sort(
+			(a, b) => Number(b.from === me || b.to === me) - Number(a.from === me || a.to === me)
+		)
+	);
+
+	const MONTHS = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
+
+	/** History in month sections, newest first. */
+	const months = $derived.by(() => {
+		const sections: { key: string; label: string; items: ExpenseActivity[] }[] = [];
+		for (const item of data.activity) {
+			const key = item.date.slice(0, 7);
+			let section = sections.at(-1);
+			if (section?.key !== key) {
+				section = {
+					key,
+					label: `${MONTHS[Number(key.slice(5, 7)) - 1]} ${key.slice(0, 4)}`,
+					items: []
+				};
+				sections.push(section);
+			}
+			section.items.push(item);
+		}
+		return sections;
+	});
+</script>
+
+<svelte:head>
+	<title>{data.group.name} · home base</title>
+</svelte:head>
+
+<PageHeader title={data.group.name}>
+	{#snippet lead()}
+		<a class="button-quiet" href="/money"><Icon name="back" size={18} /> Money</a>
+	{/snippet}
+	{#snippet action()}
+		<RoundButton icon="plus" label="Add expense" href="/money/{data.group.id}/expenses/new" />
+	{/snippet}
+</PageHeader>
+
+<GlassCard glow={myNet !== 0}>
+	<div class="summary">
+		<p class="headline" class:owed={myNet > 0}>{headline}</p>
+		{#if debts.length > 0 && !other}
+			<ul class="debts">
+				{#each debts as debt (debt.from + debt.to)}
+					<li>{describeDebt(debt, data.people, me)}</li>
+				{/each}
+			</ul>
+		{:else if !other && debts.length === 0 && data.activity.length > 0}
+			<p class="quiet">Nobody owes anything right now.</p>
+		{/if}
+		<div class="actions">
+			<a class="button-primary" href="/money/{data.group.id}/expenses/new">Add expense</a>
+			{#if debts.length > 0}
+				<a class="button-secondary" href="/money/{data.group.id}/settle">Settle up</a>
+			{/if}
+		</div>
+	</div>
+</GlassCard>
+
+<nav class="links" aria-label="Group">
+	<a href="/money/{data.group.id}/reports">Reports</a>
+	<a href="/money/{data.group.id}/settings">Group settings</a>
+</nav>
+
+{#if months.length === 0}
+	<p class="empty">
+		No expenses yet. Add the first one and everyone’s share is worked out for you.
+	</p>
+{:else}
+	{#each months as month (month.key)}
+		<section class="month" aria-labelledby="month-{month.key}">
+			<h2 id="month-{month.key}" class="section-label">{month.label}</h2>
+			<ul>
+				{#each month.items as item (item.kind === 'expense' ? item.expense.id : item.settlement.id)}
+					<ActivityRow {item} groupId={data.group.id} people={data.people} {me} />
+				{/each}
+			</ul>
+		</section>
+	{/each}
+{/if}
+
+<style>
+	.summary {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-s);
+	}
+
+	.headline {
+		font-size: 1.5rem;
+		line-height: 1.15;
+		font-weight: var(--weight-strong);
+		letter-spacing: var(--tracking-tight);
+	}
+
+	.headline.owed {
+		color: var(--colour-accent);
+	}
+
+	.debts {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 0;
+		list-style: none;
+		color: var(--colour-text-muted);
+	}
+
+	.quiet {
+		color: var(--colour-text-muted);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: var(--space-s);
+	}
+
+	.actions > * {
+		flex: 1;
+		min-height: 46px;
+		padding: 0 16px;
+		white-space: nowrap;
+	}
+
+	.links {
+		display: flex;
+		gap: var(--space-l);
+		margin: var(--space-m) 0 var(--space-s);
+	}
+
+	.links a {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap-target);
+		font-size: var(--text-small);
+		color: var(--colour-text-muted);
+	}
+
+	.empty {
+		max-width: 32ch;
+		margin-top: var(--space-l);
+		color: var(--colour-text-muted);
+	}
+
+	.month {
+		margin-top: var(--space-l);
+	}
+
+	.section-label {
+		margin-bottom: var(--space-xs);
+		font-size: var(--text-caption);
+		font-weight: var(--weight-medium);
+		letter-spacing: var(--tracking-label);
+		color: var(--colour-text-muted);
+	}
+
+	.month ul {
+		margin: 0;
+		padding: 0;
+	}
+</style>

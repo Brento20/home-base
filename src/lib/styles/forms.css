@@ -1,0 +1,241 @@
+/*
+ * Form pieces shared by every feature. A handful of plain class names,
+ * each named for what it is.
+ */
+
+.form-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-l);
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+
+.field-label {
+	padding: 0;
+	font-size: var(--text-caption);
+	font-weight: var(--weight-medium);
+	letter-spacing: var(--tracking-label);
+	color: var(--colour-text-muted);
+}
+
+.field-input {
+	width: 100%;
+	min-height: 50px;
+	padding: 12px 14px;
+	border: 1px solid var(--colour-hairline-strong);
+	border-radius: 14px;
+	background: rgb(0 0 0 / 0.28);
+	font-size: var(--text-body);
+	line-height: 1.35;
+	color: var(--colour-text);
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+textarea.field-input {
+	min-height: 96px;
+	resize: vertical;
+}
+
+.field-input::placeholder {
+	color: var(--colour-text-faint);
+}
+
+.field-input:focus {
+	outline: none;
+	border-color: var(--colour-accent-edge);
+	box-shadow: 0 0 0 3px var(--colour-accent-soft);
+}
+
+.field-input[aria-invalid='true'] {
+	border-color: var(--colour-accent);
+}
+
+/* iOS renders date and time inputs with its own picker; keep them the same height. */
+.field-input[type='date'],
+.field-input[type='time'] {
+	display: flex;
+	align-items: center;
+	color-scheme: dark;
+}
+
+.field-error {
+	font-size: var(--text-caption);
+	color: var(--colour-accent);
+}
+
+.field-row {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+}
+
+/*
+ * Pills sit 10px under their label, a touch more than a text field's 6px since the pills have
+ * their own outline. A fieldset's <legend> isn't part of the flex gap, so it carries the space
+ * itself; a plain label adds to the 6px gap.
+ */
+legend.field-label {
+	margin-bottom: 10px;
+}
+
+.field > :not(legend).field-label + .choice-pills {
+	margin-top: 4px;
+}
+
+/* Radio choices drawn as a row of pills. */
+.choice-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-s);
+}
+
+.choice-pill {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-s);
+	min-height: 40px;
+	padding: 0 16px;
+	border-radius: var(--radius-pill);
+	border: 1px solid var(--colour-hairline-strong);
+	font-size: var(--text-small);
+	color: var(--colour-text-muted);
+	cursor: pointer;
+	transition:
+		background-color var(--duration-quick) var(--ease-out),
+		color var(--duration-quick) var(--ease-out),
+		border-color var(--duration-quick) var(--ease-out),
+		transform var(--duration-release) var(--spring-bouncy);
+}
+
+.choice-pill input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.choice-pill:has(input:checked) {
+	border-color: var(--colour-accent-edge);
+	background: var(--colour-accent-soft);
+	color: var(--colour-text);
+}
+
+.choice-pill:has(input:focus-visible) {
+	outline: 2px solid var(--colour-accent);
+	outline-offset: 2px;
+}
+
+.button-primary {
+	display: inline-grid;
+	place-items: center;
+	min-height: 50px;
+	padding: 0 24px;
+	border: 0;
+	border-radius: var(--radius-pill);
+	background: var(--colour-accent);
+	color: var(--colour-on-accent);
+	font-weight: var(--weight-strong);
+	text-decoration: none;
+	transition: transform var(--duration-release) var(--spring-bouncy);
+}
+
+.button-primary:disabled {
+	opacity: 0.6;
+}
+
+.button-quiet {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-s);
+	min-height: var(--tap-target);
+	padding: 0 4px;
+	border: 0;
+	background: none;
+	font-size: var(--text-small);
+	color: var(--colour-text-muted);
+	text-decoration: none;
+}
+
+.form-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-m);
+	margin-top: var(--space-s);
+}
+
+/* A full-width primary button, and the quiet glass one that sits beside it. */
+.button-block {
+	width: 100%;
+}
+
+.button-secondary {
+	display: inline-grid;
+	place-items: center;
+	min-height: 50px;
+	padding: 0 24px;
+	border: 1px solid var(--colour-hairline-strong);
+	border-radius: var(--radius-pill);
+	background: rgb(255 255 255 / 0.04);
+	color: var(--colour-text);
+	font-weight: var(--weight-medium);
+	text-decoration: none;
+	transition: transform var(--duration-release) var(--spring-bouncy);
+}
+
+.form-message {
+	font-size: var(--text-small);
+	color: var(--colour-accent);
+}
+
+.form-success {
+	font-size: var(--text-small);
+	color: var(--colour-text);
+}
+
+.field-hint {
+	font-size: var(--text-caption);
+	color: var(--colour-text-faint);
+}
+
+/* An amount field with a $ in front. */
+.money-input {
+	position: relative;
+	display: block;
+}
+
+.money-input .currency {
+	position: absolute;
+	top: 50%;
+	left: 14px;
+	transform: translateY(-50%);
+	color: var(--colour-text-muted);
+	pointer-events: none;
+}
+
+.money-input .field-input {
+	padding-left: 28px;
+	font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Liquid press: pressed buttons and pills squish (wider and shorter) quickly, then spring back
+ * with a little wobble when released, like the liquid glass controls.
+ */
+.button-primary:active,
+.button-secondary:active,
+.choice-pill:active {
+	transform: scale(1.04, 0.92);
+	transition-duration: var(--duration-press);
+	transition-timing-function: var(--ease-out);
+}

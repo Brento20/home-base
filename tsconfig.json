@@ -1,0 +1,8 @@
+{
+	"extends": "$app/tsconfig",
+	"compilerOptions": {
+		"strict": true
+	},
+	"include": ["src", "vite.config.ts", "prettier.config.js"],
+	"exclude": ["node_modules", "src/lib/vendor/**/*.js", "src/service-worker"]
+}

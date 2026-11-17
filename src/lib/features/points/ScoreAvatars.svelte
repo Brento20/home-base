@@ -1,0 +1,52 @@
+<script lang="ts">
+	import Avatar from '#lib/ui/Avatar.svelte';
+	import type { Profile, Score } from '#lib/types.js';
+
+	interface Props {
+		people: Profile[];
+		scores: Score[];
+	}
+
+	let { people, scores }: Props = $props();
+
+	const weekOf = (id: string) => scores.find((score) => score.profileId === id)?.thisWeek ?? 0;
+	const label = $derived(
+		`Scores this week: ${people.map((person) => `${person.displayName} ${weekOf(person.id)}`).join(', ')}`
+	);
+</script>
+
+<!-- Each avatar with this week's points; tap for the scoreboard. -->
+<a class="score-avatars" href="/points" aria-label={label}>
+	{#each people as person (person.id)}
+		<span class="person">
+			<Avatar {person} />
+			<span class="points">{weekOf(person.id)}</span>
+		</span>
+	{/each}
+</a>
+
+<style>
+	.score-avatars {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-height: var(--tap-target);
+		margin-right: -4px;
+		padding: 0 4px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.person {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.points {
+		min-width: 1ch;
+		font-size: var(--text-body);
+		font-weight: var(--weight-strong);
+		font-variant-numeric: tabular-nums;
+	}
+</style>

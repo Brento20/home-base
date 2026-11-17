@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en-AU">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#0b0807" />
+		<meta name="color-scheme" content="dark" />
+		<title>Offline · home base</title>
+		<!--
+			Shown by the service worker when there's no signal and this page hasn't been saved yet.
+			Self-contained: no scripts or fonts from the network.
+		-->
+		<style>
+			html {
+				background: #0b0807;
+				color-scheme: dark;
+			}
+
+			body {
+				display: flex;
+				min-height: 100dvh;
+				margin: 0;
+				padding: calc(env(safe-area-inset-top) + 32px) 22px calc(env(safe-area-inset-bottom) + 32px);
+				box-sizing: border-box;
+				background:
+					radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%),
+					radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%),
+					#0b0807;
+				font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+				color: #f5ede6;
+			}
+
+			main {
+				max-width: 380px;
+				margin: auto;
+			}
+
+			.wordmark {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: #f4a86e;
+			}
+
+			h1 {
+				margin: 12px 0 0;
+				font-size: 2.125rem;
+				line-height: 1.1;
+				letter-spacing: -0.025em;
+			}
+
+			p {
+				margin: 12px 0 0;
+				color: rgb(245 237 230 / 0.66);
+				line-height: 1.45;
+			}
+
+			.actions {
+				display: flex;
+				gap: 10px;
+				margin-top: 28px;
+			}
+
+			button,
+			a {
+				display: inline-grid;
+				place-items: center;
+				min-height: 50px;
+				padding: 0 24px;
+				border-radius: 999px;
+				font: inherit;
+				font-weight: 600;
+				text-decoration: none;
+			}
+
+			button {
+				border: 0;
+				background: #f4a86e;
+				color: #1a0f08;
+			}
+
+			a {
+				border: 1px solid rgb(255 255 255 / 0.14);
+				color: #f5ede6;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p class="wordmark">home base</p>
+			<h1>You’re offline</h1>
+			<p>
+				Pages you’ve opened recently still work without signal. This one hasn’t been saved yet,
+				so it needs a connection.
+			</p>
+			<div class="actions">
+				<button type="button" onclick="location.reload()">Try again</button>
+				<a href="/">Today</a>
+			</div>
+		</main>
+	</body>
+</html>

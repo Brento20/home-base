@@ -1,0 +1,25 @@
+import type { SupabaseClient, User } from '@supabase/supabase-js';
+
+// See https://svelte.dev/docs/kit/types#app.d.ts
+declare global {
+	namespace App {
+		interface Locals {
+			/** Null while Supabase isn't configured: the app runs on sample data. */
+			supabase: SupabaseClient | null;
+			/** The signed-in Supabase user, validated with the auth server. */
+			user: User | null;
+			/** True when running on in-memory sample data. */
+			sampleMode: boolean;
+			/** Where the signed-in person is in sign-up; decides which pages they can open. */
+			stage: import('#lib/features/account/stage.js').Stage;
+			/** The home the signed-in person belongs to, once they've built or joined one. */
+			householdId: string | null;
+		}
+		// interface Error {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
+	}
+}
+
+export {};

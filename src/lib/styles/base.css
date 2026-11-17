@@ -1,0 +1,209 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	background: var(--colour-ground);
+	color-scheme: dark;
+	/* App, not web page: no double-tap zoom delay, no bounce glow past the edges. */
+	touch-action: manipulation;
+	overscroll-behavior: none;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	margin: 0;
+	min-height: 100dvh;
+	font-family: var(--font-sans);
+	font-size: var(--text-body);
+	line-height: 1.4;
+	color: var(--colour-text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+p {
+	margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+	color: inherit;
+}
+
+button {
+	cursor: pointer;
+}
+
+a {
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--colour-accent);
+	outline-offset: 3px;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/*
+ * Glass bodies before liquidglass.dev upgrades them (server render, slow networks,
+ * or JavaScript off): quiet frosted smoke so nothing looks broken.
+ */
+lg-panel:not(:defined),
+lg-navbar:not(:defined) {
+	background: var(--glass-smoke-fallback);
+	-webkit-backdrop-filter: var(--glass-blur);
+	backdrop-filter: var(--glass-blur);
+}
+
+/*
+ * Glass cards that squish (GlassSurface squish) also dip their content while pressed. The glass
+ * itself is squished by its own spring: scaling it with CSS would misalign the refraction.
+ */
+[data-pressable] > :not(.glass-slot) {
+	transition: transform var(--duration-release) var(--spring-bouncy);
+}
+
+[data-pressable]:active > :not(.glass-slot) {
+	transform: scale(0.97);
+	transition-duration: var(--duration-press);
+	transition-timing-function: var(--ease-out);
+}
+
+/*
+ * Page transitions (src/lib/ui/page-transitions.ts). Only the page content moves: the backdrop
+ * stays put and the tab bar keeps its own live glass indicator. The new page slides in from the
+ * direction of travel and settles on a soft spring; the old one fades away quickly.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+}
+
+::view-transition-group(tab-bar),
+::view-transition-new(tab-bar) {
+	animation: none;
+}
+
+::view-transition-old(tab-bar) {
+	display: none;
+}
+
+::view-transition-group(page) {
+	animation-duration: 480ms;
+	animation-timing-function: var(--spring-soft);
+}
+
+::view-transition-old(page) {
+	animation: page-out 200ms var(--ease-out) both;
+}
+
+::view-transition-new(page) {
+	animation: page-in 480ms var(--spring-soft) both;
+}
+
+html[data-nav='tab-forward'] {
+	--page-from: 40px;
+	--page-to: -24px;
+}
+
+html[data-nav='tab-back'] {
+	--page-from: -40px;
+	--page-to: 24px;
+}
+
+html[data-nav='push'] {
+	--page-from: 64px;
+	--page-to: -24px;
+}
+
+html[data-nav='pop'] {
+	--page-from: -48px;
+	--page-to: 32px;
+}
+
+@keyframes page-in {
+	from {
+		opacity: 0;
+		transform: translateX(var(--page-from, 0)) scale(0.985);
+		filter: blur(6px);
+	}
+}
+
+@keyframes page-out {
+	to {
+		opacity: 0;
+		transform: translateX(var(--page-to, 0)) scale(0.985);
+		filter: blur(6px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(page) {
+		animation-duration: 0s;
+	}
+
+	::view-transition-old(page) {
+		animation: page-fade-out 120ms ease both;
+	}
+
+	::view-transition-new(page) {
+		animation: page-fade-in 160ms ease both;
+	}
+
+	@keyframes page-fade-out {
+		to {
+			opacity: 0;
+		}
+	}
+
+	@keyframes page-fade-in {
+		from {
+			opacity: 0;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 1ms !important;
+		animation-duration: 1ms !important;
+	}
+}
+
+/*
+ * Controls behave like an app's: a long press doesn't select their text or pop up a link
+ * preview. Text people might copy (notes, inputs) stays selectable.
+ */
+a,
+button,
+label,
+summary,
+lg-navbar,
+.choice-pill {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+}

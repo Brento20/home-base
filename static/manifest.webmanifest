@@ -1,0 +1,86 @@
+{
+	"id": "/",
+	"name": "home base",
+	"short_name": "home base",
+	"description": "Plans, chores, lists, money and notes for the people you live with.",
+	"lang": "en-AU",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"display_override": [
+		"standalone"
+	],
+	"orientation": "portrait",
+	"background_color": "#0b0807",
+	"theme_color": "#0b0807",
+	"categories": [
+		"lifestyle",
+		"productivity"
+	],
+	"launch_handler": {
+		"client_mode": "navigate-existing"
+	},
+	"prefer_related_applications": false,
+	"icons": [
+		{
+			"src": "/icons/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/icons/icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/icons/icon-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	],
+	"shortcuts": [
+		{
+			"name": "Today",
+			"url": "/",
+			"icons": [
+				{
+					"src": "/icons/icon-192.png",
+					"sizes": "192x192"
+				}
+			]
+		},
+		{
+			"name": "Lists",
+			"url": "/lists",
+			"icons": [
+				{
+					"src": "/icons/icon-192.png",
+					"sizes": "192x192"
+				}
+			]
+		},
+		{
+			"name": "Money",
+			"url": "/money",
+			"icons": [
+				{
+					"src": "/icons/icon-192.png",
+					"sizes": "192x192"
+				}
+			]
+		},
+		{
+			"name": "New plan",
+			"url": "/plans/new",
+			"icons": [
+				{
+					"src": "/icons/icon-192.png",
+					"sizes": "192x192"
+				}
+			]
+		}
+	]
+}
