@@ -33,7 +33,7 @@
 		}}
 >
 	<div class="title-row">
-		<GlassSurface radius={18} bezel={0.4} refraction={20} />
+		<GlassSurface radius={18} />
 		<label class="visually-hidden" for="task-title">New task</label>
 		<input
 			bind:this={input}

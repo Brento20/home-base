@@ -163,3 +163,22 @@ export function describeCountdown(startsAt: Date, now = new Date()) {
 	const hours = Math.round(minutes / 60);
 	return `in ${hours} ${hours === 1 ? 'hr' : 'hrs'}`;
 }
+
+/**
+ * When a feed post or reply was written: "Just now", "12 min ago", "Today 7:40 pm",
+ * "Yesterday 7:40 pm", "Mon 7:40 pm" within the week, else "12 Nov".
+ */
+export function formatPostTime(instant: Date, now = new Date()) {
+	const minutes = Math.floor((now.getTime() - instant.getTime()) / 60_000);
+	if (minutes < 1) return 'Just now';
+	if (minutes < 60) return `${minutes} min ago`;
+	const day = zonedParts(instant).date;
+	const offset = daysBetween(day, todayISO(now));
+	const clock = formatClock(instant);
+	if (offset === 0) return `Today ${clock}`;
+	if (offset === 1) return `Yesterday ${clock}`;
+	const date = asUtcDate(day);
+	if (offset < 7) return `${weekdayShort.format(date)} ${clock}`;
+	const sameYear = day.slice(0, 4) === todayISO(now).slice(0, 4);
+	return `${date.getUTCDate()} ${monthShort.format(date)}${sameYear ? '' : ` ${day.slice(0, 4)}`}`;
+}

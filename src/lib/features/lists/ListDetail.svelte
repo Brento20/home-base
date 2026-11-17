@@ -54,7 +54,7 @@
 			await update({ reset: true });
 		}}
 >
-	<GlassSurface radius={18} bezel={0.4} refraction={20} />
+	<GlassSurface radius={18} />
 	<label class="visually-hidden" for="new-item">Add to {list.name}</label>
 	<input
 		id="new-item"

@@ -12,26 +12,3 @@ export function loadGlass() {
 	});
 	return loading;
 }
-
-const waiting: (() => void)[] = [];
-let pumping = false;
-
-/**
- * Hands out one turn per animation frame, so cards that all want real glass at once (a page that
- * has just slid in) build it one at a time instead of in a single long frame.
- */
-export function glassTurn() {
-	return new Promise<void>((resolve) => {
-		waiting.push(resolve);
-		if (!pumping) pump();
-	});
-}
-
-function pump() {
-	pumping = true;
-	requestAnimationFrame(() => {
-		waiting.shift()?.();
-		if (waiting.length) pump();
-		else pumping = false;
-	});
-}

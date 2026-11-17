@@ -29,7 +29,7 @@
 </script>
 
 <article class="note" aria-labelledby="note-{note.id}">
-	<GlassSurface radius={24} refraction={30} lazy />
+	<GlassSurface radius={24} />
 	<div class="body">
 		<a class="title" id="note-{note.id}" href="/home/notes/{note.id}">
 			<span>{note.title}</span>

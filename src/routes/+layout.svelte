@@ -26,7 +26,7 @@
 	<title>home base</title>
 </svelte:head>
 
-<!-- Glass elements refract an aligned copy of .app-backdrop, so it works in every browser. -->
+<!-- The tab bar's glass refracts an aligned copy of .app-backdrop; cards blur it. -->
 <div class="app" data-lg-backdrop=".app-backdrop">
 	<div class="app-backdrop" aria-hidden="true"></div>
 	{@render children()}

@@ -26,7 +26,7 @@
 
 <li>
 	<a class="list-card" class:past={list.completedAt} href="/lists/{list.id}">
-		<GlassSurface radius={22} refraction={28} squish lazy />
+		<GlassSurface radius={22} squish />
 		<span class="body">
 			<span class="name">{list.name}</span>
 			<span class="status">{status}</span>

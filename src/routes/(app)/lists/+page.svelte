@@ -18,7 +18,7 @@
 <ListsNav />
 
 <form class="new-list" method="POST" action="?/create" use:enhance>
-	<GlassSurface radius={18} bezel={0.4} refraction={20} />
+	<GlassSurface radius={18} />
 	<label class="visually-hidden" for="new-list-name">New list name</label>
 	<input
 		id="new-list-name"

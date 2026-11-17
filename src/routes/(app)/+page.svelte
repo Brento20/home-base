@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FeedSection from '#lib/features/feed/FeedSection.svelte';
 	import ScoreAvatars from '#lib/features/points/ScoreAvatars.svelte';
 	import HomeShortcuts from '#lib/features/today/HomeShortcuts.svelte';
 	import ComingUp from '#lib/features/today/ComingUp.svelte';
@@ -27,6 +28,13 @@
 	<ComingUp items={data.comingUp} people={data.household.members} today={data.today} />
 	<ListsGlance lists={data.lists} />
 	<HomeShortcuts />
+	<FeedSection
+		posts={data.feed.posts}
+		hasMore={data.feed.hasMore}
+		pageSize={data.feed.pageSize}
+		people={data.household.members}
+		me={data.me.id}
+	/>
 </div>
 
 <style>

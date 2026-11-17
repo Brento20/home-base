@@ -12,7 +12,11 @@
 		| 'chevron'
 		| 'back'
 		| 'repeat'
-		| 'close';
+		| 'close'
+		| 'compose'
+		| 'more'
+		| 'photo'
+		| 'reply';
 </script>
 
 <script lang="ts">
@@ -73,6 +77,20 @@
 		<path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" />
 	{:else if name === 'close'}
 		<path d="M6 6l12 12M18 6L6 18" />
+	{:else if name === 'compose'}
+		<path d="M20 11.5a7.5 7.5 0 0 1-11 6.6L4 19.5l1.4-4.3A7.5 7.5 0 1 1 20 11.5z" />
+		<path d="M9 11.5h6M12 8.5v6" />
+	{:else if name === 'more'}
+		<circle cx="6" cy="12" r="1.2" fill="currentColor" />
+		<circle cx="12" cy="12" r="1.2" fill="currentColor" />
+		<circle cx="18" cy="12" r="1.2" fill="currentColor" />
+	{:else if name === 'photo'}
+		<rect x="3.5" y="5" width="17" height="14" rx="3" />
+		<circle cx="9" cy="10" r="1.6" />
+		<path d="M4 17l4.5-4.5 3.5 3.5 3-3 5 5" />
+	{:else if name === 'reply'}
+		<path d="M10 7L5 12l5 5" />
+		<path d="M5.5 12H14a5 5 0 0 1 5 5v1" />
 	{/if}
 </svg>
 

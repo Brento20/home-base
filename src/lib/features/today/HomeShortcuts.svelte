@@ -1,12 +1,14 @@
 <script lang="ts">
-	/** Lights and aircon shortcuts on Today. Sample state until Home Assistant is connected. */
+	/**
+	 * Shortcuts on Today: the lights (sample state until Home Assistant is connected) and Post
+	 * update, which opens the feed composer.
+	 */
 	import { goto } from '$app/navigation';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 
 	// Sample state until Home Assistant is connected (step 7).
 	let lightsOn = $state(false);
-	const aircon = { temperature: 23, mode: 'Cooling' };
 
 	const HOLD_MS = 500;
 	let holdTimer: ReturnType<typeof setTimeout> | undefined;
@@ -45,7 +47,7 @@
 		onpointercancel={cancelHold}
 		oncontextmenu={(event) => event.preventDefault()}
 	>
-		<GlassSurface radius={24} refraction={28} squish />
+		<GlassSurface radius={24} squish />
 		<span class="tile-body">
 			<span class="icon"><Icon name="lightbulb" size={24} filled={lightsOn} /></span>
 			<span>
@@ -55,28 +57,16 @@
 		</span>
 	</button>
 
-	<button
-		type="button"
-		class="tile"
-		onclick={() => !held && goto('/home')}
-		onpointerdown={startHold}
-		onpointerup={cancelHold}
-		onpointerleave={cancelHold}
-		onpointercancel={cancelHold}
-		oncontextmenu={(event) => event.preventDefault()}
-	>
-		<GlassSurface radius={24} refraction={28} squish />
+	<a class="tile compose" href="/feed/new">
+		<GlassSurface radius={24} squish />
 		<span class="tile-body">
-			<span class="top-row">
-				<span class="icon"><Icon name="snowflake" size={24} /></span>
-				<span class="value">{aircon.temperature}°</span>
-			</span>
+			<span class="icon"><Icon name="compose" size={24} /></span>
 			<span>
-				<span class="label">Aircon</span>
-				<span class="state">{aircon.mode}</span>
+				<span class="label">Post update</span>
+				<span class="state">Share with home</span>
 			</span>
 		</span>
-	</button>
+	</a>
 </div>
 
 <style>
@@ -88,6 +78,9 @@
 
 	.tile {
 		position: relative;
+		display: block;
+		color: inherit;
+		text-decoration: none;
 		height: 108px;
 		padding: 0;
 		border: 0;
@@ -129,21 +122,9 @@
 		color: var(--colour-text-muted);
 	}
 
-	.on .icon {
+	.on .icon,
+	.compose .icon {
 		color: #f6b37a;
-	}
-
-	.top-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
-
-	.value {
-		font-size: var(--text-control-value);
-		line-height: 1;
-		font-weight: var(--weight-medium);
-		letter-spacing: -0.02em;
 	}
 
 	.label {

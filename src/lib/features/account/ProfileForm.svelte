@@ -5,7 +5,7 @@
 	 */
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
-	import { resizePhoto } from './resize-photo.js';
+	import { resizePhoto } from '#lib/ui/photo.js';
 	import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
 
 	interface Props {

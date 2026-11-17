@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
-import { samplePlans, sampleImportedUids } from '#lib/server/sample-data.js';
+import { sampleFeedPosts, samplePlans, sampleImportedUids } from '#lib/server/sample-data.js';
 import type { ImportedPlan } from './calendar-import.server.js';
 import {
 	addDays,
@@ -36,9 +36,10 @@ interface PlanRow {
 	starts_at: string;
 	ends_at: string | null;
 	all_day: boolean;
+	post_id: string | null;
 }
 
-const COLUMNS = 'id, title, notes, location, starts_at, ends_at, all_day';
+const COLUMNS = 'id, title, notes, location, starts_at, ends_at, all_day, post_id';
 
 const toPlan = (row: PlanRow): Plan => ({
 	id: row.id,
@@ -47,7 +48,8 @@ const toPlan = (row: PlanRow): Plan => ({
 	location: row.location,
 	startsAt: new Date(row.starts_at).toISOString(),
 	endsAt: row.ends_at ? new Date(row.ends_at).toISOString() : null,
-	allDay: row.all_day
+	allDay: row.all_day,
+	postId: row.post_id
 });
 
 /** A plan as editable form values, in household time. */
@@ -187,18 +189,28 @@ const toRow = (input: PlanInput) => ({
 	all_day: input.allDay
 });
 
-export async function createPlan(locals: App.Locals, input: PlanInput): Promise<string> {
+/**
+ * Saves a new plan and returns its id. `postId` links it to the feed post it was made from, so
+ * the post shows the plan and the plan links back to the conversation.
+ */
+export async function createPlan(
+	locals: App.Locals,
+	input: PlanInput,
+	postId: string | null = null
+): Promise<string> {
 	const { supabase } = locals;
 	if (!supabase) {
 		const id = crypto.randomUUID();
-		samplePlans.push({ id, ...input });
+		samplePlans.push({ id, ...input, postId });
+		const post = postId ? sampleFeedPosts.find((entry) => entry.id === postId) : null;
+		post?.plans.push({ id, title: input.title, startsAt: input.startsAt, allDay: input.allDay });
 		return id;
 	}
 
 	const householdId = await getHouseholdId(locals);
 	const { data, error: insertError } = await supabase
 		.from('plans')
-		.insert({ household_id: householdId, ...toRow(input) })
+		.insert({ household_id: householdId, post_id: postId, ...toRow(input) })
 		.select('id')
 		.single();
 	if (insertError) error(500, insertError.message);
@@ -211,6 +223,11 @@ export async function updatePlan(locals: App.Locals, id: string, input: PlanInpu
 		const plan = samplePlans.find((entry) => entry.id === id);
 		if (!plan) error(404, 'That plan doesn’t exist any more.');
 		Object.assign(plan, input);
+		for (const post of sampleFeedPosts) {
+			const link = post.plans.find((entry) => entry.id === id);
+			if (link)
+				Object.assign(link, { title: input.title, startsAt: input.startsAt, allDay: input.allDay });
+		}
 		return;
 	}
 
@@ -228,6 +245,7 @@ export async function deletePlan(locals: App.Locals, id: string) {
 	if (!supabase) {
 		const index = samplePlans.findIndex((entry) => entry.id === id);
 		if (index >= 0) samplePlans.splice(index, 1);
+		for (const post of sampleFeedPosts) post.plans = post.plans.filter((entry) => entry.id !== id);
 		return;
 	}
 

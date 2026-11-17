@@ -3,6 +3,7 @@ import type {
 	AccountDetails,
 	Expense,
 	ExpenseGroup,
+	FeedPost,
 	HomeNote,
 	Household,
 	Plan,
@@ -242,4 +243,59 @@ const sampleSettlement = (
 export const sampleSettlements: Settlement[] = [
 	sampleSettlement(place, 10, chris.id, brenton.id, 80000),
 	sampleSettlement(place, 40, chris.id, brenton.id, 85000)
+];
+
+const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
+
+// A stand-in for a photo, drawn rather than shipped, so sample mode has a photo post to lay out.
+const samplePhoto = `data:image/svg+xml,${encodeURIComponent(
+	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a2f22"/><stop offset="1" stop-color="#1c1411"/></linearGradient><radialGradient id="g" cx=".5" cy=".42" r=".5"><stop offset="0" stop-color="#ffd59a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd59a" stop-opacity="0"/></radialGradient></defs><rect width="400" height="300" fill="url(#w)"/><circle cx="200" cy="126" r="120" fill="url(#g)"/><path d="M150 140h100l-22-62h-56z" fill="#f2c48d"/><rect x="196" y="140" width="8" height="96" fill="#2a1d17"/><ellipse cx="200" cy="240" rx="46" ry="9" fill="#2a1d17"/><rect y="250" width="400" height="50" fill="#120d0b"/></svg>`
+)}`;
+
+/** The home feed in sample mode: newest last here, sorted when listed. */
+export const sampleFeedPosts: FeedPost[] = [
+	{
+		id: 'sample-post-lamp',
+		authorId: chris.id,
+		body: 'Found a lamp for the reading corner. Thoughts?',
+		photoUrl: samplePhoto,
+		createdAt: minutesAgo(60 * 26),
+		reactions: [{ profileId: brenton.id, reaction: 'heart' }],
+		replies: [
+			{
+				id: 'sample-reply-lamp',
+				authorId: brenton.id,
+				body: 'Love it. Goes with the rug too.',
+				createdAt: minutesAgo(60 * 25)
+			}
+		],
+		plans: []
+	},
+	{
+		id: 'sample-post-pasta',
+		authorId: brenton.id,
+		body: 'Made extra pasta. There’s a container for you in the fridge.',
+		photoUrl: null,
+		createdAt: minutesAgo(130),
+		reactions: [{ profileId: chris.id, reaction: 'heart' }],
+		replies: [
+			{
+				id: 'sample-reply-pasta',
+				authorId: chris.id,
+				body: 'Perfect, I’ll grab it after training.',
+				createdAt: minutesAgo(118)
+			}
+		],
+		plans: []
+	},
+	{
+		id: 'sample-post-dumplings',
+		authorId: brenton.id,
+		body: 'Anyone keen for dumplings Friday?',
+		photoUrl: null,
+		createdAt: minutesAgo(25),
+		reactions: [{ profileId: chris.id, reaction: 'thumbs_up' }],
+		replies: [],
+		plans: []
+	}
 ];

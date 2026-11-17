@@ -18,7 +18,7 @@
 
 <li>
 	<a class="plan-card" class:past href="/plans/{plan.id}">
-		<GlassSurface radius={22} refraction={28} squish lazy />
+		<GlassSurface radius={22} squish />
 		<span class="body">
 			<span class="time">{describePlanTime(plan)}</span>
 			<span class="title">{plan.title}</span>

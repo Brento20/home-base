@@ -122,7 +122,7 @@
 			<li class="slide slide-more" class:active={active === visible.length}>
 				<span class="slide-glow" aria-hidden="true"></span>
 				<div class="more">
-					<GlassSurface radius={28} refraction={28} squish />
+					<GlassSurface radius={28} squish />
 					<span class="more-body">
 						<a href="/plans">All plans <Icon name="chevron" size={18} /></a>
 						<a href="/lists/tasks">All tasks <Icon name="chevron" size={18} /></a>

@@ -30,7 +30,7 @@
 </script>
 
 <a class="group-card" href="/money/{group.id}">
-	<GlassSurface radius={24} refraction={30} squish lazy />
+	<GlassSurface radius={24} squish />
 	<span class="body">
 		<span class="text">
 			<span class="name">{group.name}</span>

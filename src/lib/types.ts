@@ -98,6 +98,8 @@ export interface Plan {
 	startsAt: string;
 	endsAt: string | null;
 	allDay: boolean;
+	/** The feed post this plan was made from, if any. */
+	postId?: string | null;
 }
 
 /** Field-level messages for a form that failed validation. */
@@ -160,3 +162,40 @@ export interface Settlement {
 export type ExpenseActivity =
 	| { kind: 'expense'; date: string; expense: Expense }
 	| { kind: 'settlement'; date: string; settlement: Settlement };
+
+/** The reactions a post can get, in the order they're offered. */
+export type FeedReaction = 'heart' | 'thumbs_up' | 'laugh' | 'thanks';
+
+export interface FeedReply {
+	id: string;
+	/** Null when the person has since left. */
+	authorId: string | null;
+	body: string;
+	/** ISO instant. */
+	createdAt: string;
+}
+
+/** A plan made from a post, shown on the post. */
+export interface FeedPlanLink {
+	id: string;
+	title: string;
+	/** ISO instant. */
+	startsAt: string;
+	allDay: boolean;
+}
+
+/** A post in the home feed: a message, a photo, or both. */
+export interface FeedPost {
+	id: string;
+	authorId: string | null;
+	body: string;
+	/** Same-site URL for the photo, or null. */
+	photoUrl: string | null;
+	/** ISO instant. */
+	createdAt: string;
+	/** Who reacted with what; one reaction each. */
+	reactions: { profileId: string; reaction: FeedReaction }[];
+	/** Oldest first. */
+	replies: FeedReply[];
+	plans: FeedPlanLink[];
+}

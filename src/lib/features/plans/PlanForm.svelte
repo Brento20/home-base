@@ -10,9 +10,11 @@
 		submitLabel: string;
 		/** Shows a Cancel link back to where you came from. */
 		cancelHref?: string;
+		/** The feed post this plan is being made from, kept with the plan when it's saved. */
+		postId?: string | null;
 	}
 
-	let { values, errors = {}, action, submitLabel, cancelHref }: Props = $props();
+	let { values, errors = {}, action, submitLabel, cancelHref, postId = null }: Props = $props();
 	let saving = $state(false);
 </script>
 
@@ -28,6 +30,8 @@
 		};
 	}}
 >
+	{#if postId}<input type="hidden" name="postId" value={postId} />{/if}
+
 	<label class="field">
 		<span class="field-label">What</span>
 		<input

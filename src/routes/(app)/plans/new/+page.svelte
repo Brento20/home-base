@@ -6,10 +6,11 @@
 
 	let { data, form }: PageProps = $props();
 
+	const postId = $derived(form?.postId ?? data.fromPost?.id ?? null);
 	const values = $derived(
 		form?.values ?? {
-			title: '',
-			notes: '',
+			title: data.fromPost?.title ?? '',
+			notes: data.fromPost?.notes ?? '',
 			location: '',
 			date: data.date,
 			allDay: false,
@@ -25,8 +26,24 @@
 
 <PageHeader title="New plan">
 	{#snippet lead()}
-		<a class="button-quiet" href="/plans"><Icon name="back" size={18} /> Plans</a>
+		{#if postId}
+			<a class="button-quiet" href="/feed/{postId}"><Icon name="back" size={18} /> Post</a>
+		{:else}
+			<a class="button-quiet" href="/plans"><Icon name="back" size={18} /> Plans</a>
+		{/if}
 	{/snippet}
 </PageHeader>
 
-<PlanForm {values} errors={form?.errors} action="" submitLabel="Add plan" />
+{#if postId}
+	<p class="from-post">From the home feed. Pick a time and it’ll show on the post too.</p>
+{/if}
+
+<PlanForm {values} errors={form?.errors} action="" submitLabel="Add plan" {postId} />
+
+<style>
+	.from-post {
+		margin: calc(-1 * var(--space-s)) 0 var(--space-l);
+		font-size: var(--text-small);
+		color: var(--colour-text-muted);
+	}
+</style>

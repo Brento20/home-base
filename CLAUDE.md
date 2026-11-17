@@ -6,19 +6,19 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 
 - Use the **liquid-glass-web** skill (liquidglass.dev) for every glass element. Read its SKILL.md before adding or changing glass. If it isn't installed, run `curl -fsSL https://liquidglass.dev/install-skill.sh | sh` (installs into `~/.claude/skills` and/or `~/.codex/skills`).
 - The engine and web components are vendored in `src/lib/vendor/liquid-glass/`, unchanged apart from one Safari fix marked `home base:` (its README explains it). Don't rewrite the filter code; the skill explains why. Chromium hides Safari-only glass bugs, so check glass changes in WebKit too.
-- Cards use `src/lib/ui/GlassSurface.svelte` (an empty `<lg-panel>` behind the content). Pass `squish` for anything tappable and `lazy` for cards in long lists, so a page stays within a few dozen live glass elements.
+- Cards use `src/lib/ui/GlassSurface.svelte`: frosted glass, not refraction. The backdrop is blurred through `backdrop-filter` (`--glass-blur`) under a darkened body (`--glass-body`), with a specular rim drawn in CSS (`--glass-rim`, bright top-left, soft bottom-right) and light inside the top edge (`--glass-inner-light`). Refracting cards were drawn on the CPU on iPhone and stuttered scrolling and page changes, so only the navigation pills still refract. Pass `squish` for anything tappable.
 - Navigation pills use `<lg-navbar>` (`TabBar.svelte`, `SegmentedNav.svelte`), with the active item driven by the URL.
-- Everything refracts the aligned copy of `.app-backdrop` (root layout, `data-lg-backdrop`), so glass works in Safari and Firefox, not only Chrome.
-- Card optics live in `GlassSurface.svelte` (refraction 32, bezel 0.55, curvature 4, chroma 0.22, specular 0.75, frost 1): stronger than the skill's card row so the rim visibly bends the backdrop. Small fields pass `bezel={0.4}` and a lower refraction. The tab bar is a glass rod (bezel 1, curvature 2.5); its indicator lens is tuned through `glass.update()` in `TabBar.svelte`.
-- `--glass-smoke` (26%) is the tint that keeps text at 4.5:1 over the brightest part of the backdrop. Recheck contrast before lightening it.
+- The pills refract the aligned copy of `.app-backdrop` (root layout, `data-lg-backdrop`), so their glass works in Safari and Firefox, not only Chrome.
+- The tab bar is a glass rod (bezel 1, curvature 2.5); its indicator lens is tuned through `glass.update()` in `TabBar.svelte`.
+- `--glass-body` (cards) and `--glass-smoke` (pills) are the tints that keep text at 4.5:1 over the brightest part of the backdrop. Recheck contrast before lightening them.
 - The warm glow is reserved for the next plan on Today.
 
 ## Motion
 
-- Presses squish (wider and shorter) on `--duration-press`, then spring back on `--spring-bouncy` over `--duration-release`. Glass cards squish their glass with a JS spring; their content layer's outline is hidden from press until the spring settles (`data-pressed`, set by GlassSurface from the spring, not `:active`, which iOS skips) so it can't separate from the moving glass rim. Never scale glass, or the layer carrying its outline, with CSS `transform: scale()`.
+- Presses squish (wider and shorter) on `--duration-press`, then spring back on `--spring-bouncy` over `--duration-release`. Glass cards squish as a whole (glass, rim and content together) through the Web Animations API on the `scale` property, started from pointer events (iOS often skips `:active`), so a card's own `transition` can't override the spring.
 - Page transitions use the View Transitions API (`src/lib/ui/page-transitions.ts`, motion in base.css). Only the element named `page` moves; the tab bar and backdrop stay still. Direction follows tab order (`src/lib/ui/tabs.ts`) and path depth. Query-only changes don't animate.
 - Everything collapses to a quick fade or nothing under `prefers-reduced-motion`.
-- Phones draw liquid glass on the CPU (Safari renders SVG filters in software), so keep it out of moving frames: page transitions animate only transform and opacity (no blur or scale); `GlassSurface` shows the frosted fallback until `transitionSettled()` resolves, then cards take turns (`glassTurn()`, one per frame) building real glass; the tab indicator's stretch is rounded so its lens map is reused from cache. Judge motion changes in a CPU-throttled browser (4×), not by eye on a laptop.
+- Phones draw refracting glass on the CPU (Safari renders SVG filters in software), so keep it out of moving frames: cards don't refract, page transitions animate only transform and opacity (no blur or scale), and the tab indicator's stretch is rounded so its lens map is reused from cache. Judge motion changes in a CPU-throttled browser (4×), not by eye on a laptop.
 
 ## Installed app (PWA)
 
@@ -39,4 +39,6 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 - Chart colours are the `--chart-*` tokens: a colour-blind-safe set validated against the dark background. Re-validate before changing them, and always label categories by name too.
 - Dates and times go through `src/lib/time.ts` (household time zone, Australia/Sydney).
 - With no `.env`, the app runs on in-memory sample data (`src/lib/server/sample-data.ts`); keep new features working in that mode.
+- A form that posts to another page's action (the feed's reactions and post menu post to `/feed/[id]`) passes `navigate: false` to `update()` in its `enhance` callback; SvelteKit 3 otherwise moves to that page, like a plain browser submit.
+- The home feed's photos live in the private `feed-photos` bucket under `<household id>/`, served through `routes/(app)/feed/photos/[postId]`; shrink photos in the browser with `src/lib/ui/photo.ts` before upload.
 - CSS: plain custom properties from `src/lib/styles/tokens.css`, named for what they're for. No utility-class frameworks. No all-caps text.

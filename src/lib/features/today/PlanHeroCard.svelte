@@ -27,7 +27,7 @@
 </script>
 
 <a class="hero-card" class:next class:highlighted href="/plans/{plan.id}" aria-label={label}>
-	<GlassSurface radius={28} refraction={next ? 38 : 32} squish />
+	<GlassSurface radius={28} squish />
 	<span class="body">
 		<span class="when"
 			>{when}{#if countdown}<span>{` · ${countdown}`}</span>{/if}</span

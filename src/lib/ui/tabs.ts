@@ -9,11 +9,15 @@ export const TABS: { href: string; label: string; icon: IconName }[] = [
 	{ href: '/home', label: 'Home', icon: 'home' }
 ];
 
+/** Pages that belong to a tab without living under its path: the feed is part of Today. */
+const ALSO_UNDER: Record<string, string[]> = { '/': ['/feed'] };
+
 /** Which tab a path belongs to, or -1 for pages outside the tab bar (sign up, setup). */
 export function tabIndexFor(pathname: string) {
+	const under = (prefix: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
 	return TABS.findIndex((tab) =>
 		tab.href === '/'
-			? pathname === '/'
-			: pathname === tab.href || pathname.startsWith(`${tab.href}/`)
+			? pathname === '/' || ALSO_UNDER['/'].some(under)
+			: under(tab.href) || (ALSO_UNDER[tab.href] ?? []).some(under)
 	);
 }

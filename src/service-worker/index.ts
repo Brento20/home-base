@@ -6,7 +6,7 @@
  * - Pages and their data are fetched from the network first. If that fails, or takes longer than
  *   a few seconds, the last saved copy is shown instead, so a shopping list still opens in a shop
  *   with no reception. Pages never seen before fall back to /offline.html.
- * - Profile photos are cached once fetched (their URLs change whenever the photo does).
+ * - Profile and feed photos are cached once fetched (their URLs change whenever the photo does).
  * - Built files that load later than install (some styles do) are kept the first time they load.
  * - Form submissions and anything that changes data always go to the network.
  * - Signing out deletes every saved page, so nothing personal is left on the phone.
@@ -69,7 +69,8 @@ self.addEventListener('fetch', (event) => {
 		return;
 	}
 
-	if (url.pathname.startsWith('/avatars/')) {
+	// Profile photos change URL with every new photo; a feed post's photo never changes.
+	if (url.pathname.startsWith('/avatars/') || url.pathname.startsWith('/feed/photos/')) {
 		event.respondWith(fromCacheFirst(request, PAGES));
 		return;
 	}

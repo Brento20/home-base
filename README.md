@@ -24,6 +24,7 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | `src/routes/(app)/`                        | The app itself: Today, Plans, Lists, Money, Home, plus the tab bar    |
 | `src/routes/auth/`, `account/`, `avatars/` | Email links, setting a new password, serving profile photos           |
 | `src/lib/features/<feature>/`              | Each feature's components and its `*.server.ts` data functions        |
+| `src/routes/(app)/feed/`                   | Post update, a post with its replies, and the photo route             |
 | `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, GlassCard, Avatar, Icon          |
 | `src/lib/styles/tokens.css`                | Type, spacing, colour, glass and the three day palettes               |
 | `src/lib/server/`                          | Server-only: Supabase client, sample data                             |
@@ -37,7 +38,8 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 
 ## Features so far
 
-- **Today**: a swipeable row of what's coming up, plans and due chores in date order, with a travelling glow and a Done button on chores. Below it, your open lists and the home shortcuts (sample until Home Assistant).
+- **Today**: a swipeable row of what's coming up, plans and due chores in date order, with a travelling glow and a Done button on chores. Below it, your open lists, the lights shortcut (sample until Home Assistant), Post update, and the home feed.
+- **Home feed**: quick updates and photos for everyone at home, on Today under the rest. Older posts load as you scroll. React with one of four reactions (one each) or open a post to reply; replies stay with the post. The post menu has **Create event**, which opens a plan draft with the post in its notes; the saved plan shows on the post and links back to it. Authors can delete their own posts and replies.
 - **Plans**: upcoming plans as glass cards; tap for a summary, then Edit. All-day and overnight plans. Import an Apple Calendar `.ics` at Plans › Import (one-time copy, re-importing skips duplicates).
 - **Lists › Lists**: as many named lists as you like. A list moves to Past lists once every item is ticked, and comes back if you untick or add one. Edit mode removes items, renames or deletes the list.
 - **Lists › Tasks**: household chores with who, when, and how often they repeat (once, weekly, every 2 weeks or monthly). Ticking one off moves it to Past tasks; a repeating chore gets its next occurrence straight away. Monthly chores keep their day (a chore on the 31st falls on the last day of shorter months). Undo from Past tasks.
@@ -94,6 +96,6 @@ redirect to `/offline` would break the service worker's offline page.
 
 ## Before calling the shell finished
 
-- Check the glass in Safari on a real iPhone, including the frosted fallback before it loads.
+- Check the glass in Safari on a real iPhone: the frosted cards, and the tab bar before and after its glass loads.
 - Check the tab bar clears the home indicator when launched from the Home Screen.
 - Check secondary text stays at 4.5:1 or better on all three palettes.

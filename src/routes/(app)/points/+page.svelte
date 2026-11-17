@@ -46,7 +46,7 @@
 			class:leading
 			aria-label="{row.person.displayName}: {row.thisWeek} this week, {row.allTime} all time"
 		>
-			<GlassSurface radius={24} glow={leading} refraction={30} />
+			<GlassSurface radius={24} glow={leading} />
 			<div class="body">
 				<span class="avatar"><Avatar person={row.person} size={36} /></span>
 				<span class="name">{row.person.displayName}</span>

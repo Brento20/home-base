@@ -23,14 +23,14 @@
 <nav class="top-bar" aria-label="Plan">
 	<a class="button-quiet back" href="/plans"><Icon name="back" size={18} /> Plans</a>
 	<a class="edit-button" href="/plans/{plan.id}/edit">
-		<GlassSurface radius={22} refraction={20} squish />
+		<GlassSurface radius={22} squish />
 		<span>Edit</span>
 	</a>
 </nav>
 
 <article class="summary">
 	<header class="hero">
-		<GlassSurface radius={28} refraction={34} />
+		<GlassSurface radius={28} />
 		<div class="hero-body">
 			{#if daysAway}<p class="days-away">{daysAway}</p>{/if}
 			<h1>{plan.title}</h1>
@@ -58,6 +58,17 @@
 			<h2 id="notes-heading" class="detail-label">Notes</h2>
 			<p class="detail-text notes"><LinkedText text={plan.notes} /></p>
 		</section>
+	{/if}
+
+	{#if plan.postId}
+		<a class="from-post" href="/feed/{plan.postId}">
+			<Icon name="compose" size={20} />
+			<span class="from-post-text">
+				<span class="from-post-title">From the home feed</span>
+				<span class="from-post-sub">See the conversation</span>
+			</span>
+			<Icon name="chevron" size={16} />
+		</a>
 	{/if}
 </article>
 
@@ -99,6 +110,46 @@
 			inset 0 0 0 1px var(--colour-hairline-strong),
 			var(--glass-highlight);
 		pointer-events: none;
+	}
+
+	.from-post {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		min-height: 60px;
+		padding: 10px 14px;
+		border-radius: 18px;
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.from-post:active {
+		background: rgb(255 255 255 / 0.04);
+	}
+
+	.from-post > :global(svg:first-child) {
+		color: var(--colour-accent);
+	}
+
+	.from-post > :global(svg:last-child) {
+		color: var(--colour-text-faint);
+	}
+
+	.from-post-text {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		line-height: 1.3;
+	}
+
+	.from-post-title {
+		font-weight: var(--weight-medium);
+	}
+
+	.from-post-sub {
+		font-size: var(--text-caption);
+		color: var(--colour-text-muted);
 	}
 
 	.summary {
