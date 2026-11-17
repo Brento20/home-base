@@ -5,7 +5,7 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 ## Glass
 
 - Use the **liquid-glass-web** skill (liquidglass.dev) for every glass element. Read its SKILL.md before adding or changing glass. If it isn't installed, run `curl -fsSL https://liquidglass.dev/install-skill.sh | sh` (installs into `~/.claude/skills` and/or `~/.codex/skills`).
-- The engine and web components are vendored unchanged in `src/lib/vendor/liquid-glass/`. Don't rewrite the filter code; the skill explains why.
+- The engine and web components are vendored in `src/lib/vendor/liquid-glass/`, unchanged apart from one Safari fix marked `home base:` (its README explains it). Don't rewrite the filter code; the skill explains why. Chromium hides Safari-only glass bugs, so check glass changes in WebKit too.
 - Cards use `src/lib/ui/GlassSurface.svelte` (an empty `<lg-panel>` behind the content). Pass `squish` for anything tappable and `lazy` for cards in long lists, so a page stays within a few dozen live glass elements.
 - Navigation pills use `<lg-navbar>` (`TabBar.svelte`, `SegmentedNav.svelte`), with the active item driven by the URL.
 - Everything refracts the aligned copy of `.app-backdrop` (root layout, `data-lg-backdrop`), so glass works in Safari and Firefox, not only Chrome.

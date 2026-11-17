@@ -281,10 +281,46 @@ function cloneBackdrop(source) {
     for (const k of ['backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat', 'backgroundOrigin', 'backgroundClip']) {
       copy.style[k] = cs[k];
     }
+    // home base: kept so align() can size the copy to the layer (see fitBackground).
+    copy.lgSizes = cs.backgroundSize.split(',').map((v) => v.trim());
+    copy.lgPositions = cs.backgroundPosition.split(',').map((v) => v.trim());
   }
   copy.classList.add('lg-surface__copy');
   copy.setAttribute('aria-hidden', 'true');
   return copy;
+}
+
+// home base: shows the part of a CSS-background backdrop that lies behind the layer, in a copy
+// exactly the layer's size. Each background layer's size and position are resolved against the
+// backdrop's box (where the originals were declared) and offset by where the layer sits over it.
+// Returns false, changing nothing, for anything it can't resolve (e.g. `cover`), and the caller
+// falls back to the page-sized copy.
+function fitBackground(copy, lr, sr) {
+  if (!copy.lgSizes) return false;
+  const px = (v, box) => (v.endsWith('%') ? (parseFloat(v) / 100) * box : v.endsWith('px') ? parseFloat(v) : NaN);
+  const dx = sr.left - lr.left;
+  const dy = sr.top - lr.top;
+  const sizes = [];
+  const positions = [];
+  for (let i = 0; i < copy.lgSizes.length; i++) {
+    const [sw, sh = sw] = copy.lgSizes[i].split(/\s+/);
+    const w = px(sw, sr.width);
+    const h = px(sh, sr.height);
+    const [pxv, pyv = '50%'] = (copy.lgPositions[i] ?? copy.lgPositions[0] ?? '0% 0%').split(/\s+/);
+    // A percentage position aligns that point of the image with the same point of the box.
+    const x = pxv.endsWith('%') ? (parseFloat(pxv) / 100) * (sr.width - w) : px(pxv, sr.width);
+    const y = pyv.endsWith('%') ? (parseFloat(pyv) / 100) * (sr.height - h) : px(pyv, sr.height);
+    if (![w, h, x, y].every(Number.isFinite)) return false;
+    sizes.push(`${w}px ${h}px`);
+    positions.push(`${x + dx}px ${y + dy}px`);
+  }
+  const st = copy.style;
+  st.width = `${lr.width}px`;
+  st.height = `${lr.height}px`;
+  st.transform = '';
+  st.backgroundSize = sizes.join(', ');
+  st.backgroundPosition = positions.join(', ');
+  return true;
 }
 
 const surfaces = new Set();
@@ -484,9 +520,14 @@ class Surface {
   // Keep the backdrop copy registered with the real backdrop. Scrolling usually moves both together,
   // so most calls change nothing and write nothing.
   align(lr, sr) {
-    const key = `${sr.width}|${sr.height}|${sr.left - lr.left}|${sr.top - lr.top}`;
+    const key = `${sr.width}|${sr.height}|${sr.left - lr.left}|${sr.top - lr.top}|${lr.width}|${lr.height}`;
     if (key === this.alignKey) return;
     this.alignKey = key;
+    // home base: a CSS-background copy is sized to the layer and its background shifted into
+    // place, instead of a page-sized copy moved behind the layer. WebKit sizes an
+    // objectBoundingBox filter from the element AND its descendants (overflow: hidden doesn't
+    // help), so a page-sized copy stretched every lens to the size of the page.
+    if (fitBackground(this.copy, lr, sr)) return;
     this.copy.style.width = `${sr.width}px`;
     this.copy.style.height = `${sr.height}px`;
     this.copy.style.transform = `translate(${sr.left - lr.left}px, ${sr.top - lr.top}px)`;

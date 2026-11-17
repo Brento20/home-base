@@ -27,7 +27,7 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, GlassCard, Avatar, Icon          |
 | `src/lib/styles/tokens.css`                | Type, spacing, colour, glass and the three day palettes               |
 | `src/lib/server/`                          | Server-only: Supabase client, sample data                             |
-| `src/lib/vendor/liquid-glass/`             | liquidglass.dev engine and web components, MIT, unchanged             |
+| `src/lib/vendor/liquid-glass/`             | liquidglass.dev engine and web components, MIT, one Safari fix        |
 | `src/service-worker/`                      | Offline support: app shell, saved pages, the update handover          |
 | `static/`                                  | Manifest, icons, iPhone launch screens, the offline page              |
 | `supabase/migrations/`                     | Tables, row-level security and the database functions                 |
