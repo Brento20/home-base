@@ -14,13 +14,14 @@ Thumbs.db
 
 # Env
 .env
+.dev.vars
 .env.*
 !.env.example
 !.env.test
 
-# Local cleanup files
-/_to_delete/
-
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Files waiting for you to delete
+_to_delete

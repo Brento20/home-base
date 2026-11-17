@@ -64,12 +64,33 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 
 ## Step 5: first milestone
 
-1. Pick a host that runs SvelteKit server routes (Vercel or Netlify work with `adapter-auto`),
-   add the two environment variables there, and deploy. Add the live address to Supabase's
-   Redirect URLs.
+1. Deploy to Cloudflare Workers (below). Add the live address to Supabase's Redirect URLs and
+   make it the Site URL.
 2. On each iPhone, open the site in Safari › Share › **Add to Home Screen**.
 3. Sign up on one phone and build a home; sign up on another and join it.
 4. Add **Limes** on one phone and check it off on the other. Done.
+
+## Hosting: Cloudflare Workers
+
+`@sveltejs/adapter-cloudflare` builds the app into `.svelte-kit/cloudflare`; `wrangler.jsonc`
+holds the deploy settings.
+
+- **Try the production build locally** on Cloudflare's runtime: put the two Supabase values in
+  `.dev.vars` (same format as `.env`, ignored by git), then `npm run preview:cf` and open
+  http://localhost:8787.
+- **Deploy from your Mac**: `npx wrangler login` once, then `npm run deploy`. The app goes live
+  at `https://home-base.<your-subdomain>.workers.dev`.
+- **Environment variables**: in the Cloudflare dashboard, Workers › home-base › Settings ›
+  Variables and Secrets, add `SUPABASE_URL` (text) and `SUPABASE_PUBLISHABLE_KEY` (secret).
+  They're read when the worker starts, so no rebuild is needed after changing them. Without them
+  the live site runs on sample data.
+- **Your own domain**: Workers › home-base › Settings › Domains & Routes › Add › Custom domain
+  (the domain's DNS has to be on Cloudflare). Then update Supabase's Site URL and Redirect URLs.
+- **Deploy on every push** (optional): connect the GitHub repo under Workers › home-base ›
+  Settings › Builds, with build command `npm run build` and deploy command `npx wrangler deploy`.
+
+`assets.html_handling` is `none` so `/offline.html` is served as is; Cloudflare's default
+redirect to `/offline` would break the service worker's offline page.
 
 ## Before calling the shell finished
 
