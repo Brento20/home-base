@@ -9,6 +9,16 @@ import { tabIndexFor } from './tabs.js';
  * Query-only changes (a report's month or category) don't animate the whole page. Browsers
  * without view transitions just swap pages as before. Call once, from the root layout.
  */
+let settled: Promise<void> = Promise.resolve();
+
+/**
+ * Resolves once the current page transition has finished (straight away when none is running).
+ * Glass waits for it: building glass mid-slide blocks the frames that move the page.
+ */
+export function transitionSettled() {
+	return settled;
+}
+
 export function usePageTransitions() {
 	onNavigate((navigation) => {
 		const { from, to } = navigation;
@@ -23,6 +33,10 @@ export function usePageTransitions() {
 				resolve();
 				await navigation.complete;
 			});
+			settled = transition.finished.then(
+				() => undefined,
+				() => undefined
+			);
 			transition.finished.finally(() => delete root.dataset.nav);
 		});
 	});

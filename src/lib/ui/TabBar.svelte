@@ -14,6 +14,9 @@
 	type NavbarElement = HTMLElement & {
 		setCurrent?: (index: number) => void;
 		glass?: { update(options: Record<string, number>): void } | null;
+		/** The indicator spring's current speed, and the method that draws it (liquid-glass internals). */
+		v: number;
+		render: () => void;
 	};
 	let navbar = $state<NavbarElement>();
 
@@ -34,6 +37,17 @@
 		const tune = () => {
 			if (navbar?.glass) {
 				navbar.glass.update({ refraction: 11, bezel: 0.7, specular: 0.85, specularWidth: 2 });
+				// The indicator stretches with its speed. Left smooth, its size changes by a fraction
+				// of a pixel every frame, and each new size redraws the lens map from scratch, which
+				// stutters page changes on iPhone. Rounding the speed gives the stretch 4px steps:
+				// four sizes, each drawn once and then reused from the engine's cache.
+				const render = navbar.render.bind(navbar);
+				navbar.render = () => {
+					const speed = navbar!.v;
+					navbar!.v = Math.round(speed / 160) * 160;
+					render();
+					navbar!.v = speed;
+				};
 			} else if (tries++ < 120) {
 				frame = requestAnimationFrame(tune);
 			}

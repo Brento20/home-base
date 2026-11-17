@@ -9,7 +9,8 @@
 	 * sits above the glass, so it's never distorted.
 	 */
 	import { onMount, untrack } from 'svelte';
-	import { loadGlass } from './glass.js';
+	import { glassTurn, loadGlass } from './glass.js';
+	import { transitionSettled } from './page-transitions.js';
 
 	interface Props {
 		radius: number;
@@ -47,19 +48,32 @@
 	let panel = $state<
 		HTMLElement & { surface?: { setDelta(delta: Record<string, number>): void } }
 	>();
-	let visible = $state(untrack(() => !lazy));
+	// Real glass waits for the page transition to finish: building it mid-slide (lens maps, the
+	// backdrop copy, SVG filters) blocks the frames that move the page, which stutters on iPhone.
+	// Until then the card shows the frosted fallback, which looks the same while it's moving.
+	// Cards then take turns, one per frame, so the glass doesn't all build in one long frame.
+	let settled = $state(false);
+	let inView = $state(untrack(() => !lazy));
+	const visible = $derived(settled && inView);
 
 	onMount(() => {
 		const cleanups: (() => void)[] = [];
+		let unmounted = false;
+		cleanups.push(() => (unmounted = true));
+		transitionSettled()
+			.then(glassTurn)
+			.then(() => {
+				if (!unmounted) settled = true;
+			});
 
 		if (lazy && slot && 'IntersectionObserver' in window) {
-			const observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
+			const observer = new IntersectionObserver(([entry]) => (inView = entry.isIntersecting), {
 				rootMargin: '240px 0px'
 			});
 			observer.observe(slot);
 			cleanups.push(() => observer.disconnect());
 		} else {
-			visible = true;
+			inView = true;
 		}
 
 		if (squish && slot?.parentElement) {

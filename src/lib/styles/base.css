@@ -100,6 +100,9 @@ lg-navbar:not(:defined) {
  * Page transitions (src/lib/ui/page-transitions.ts). Only the page content moves: the backdrop
  * stays put and the tab bar keeps its own live glass indicator. The new page slides in from the
  * direction of travel and settles on a soft spring; the old one fades away quickly.
+ *
+ * Only transform and opacity animate: the phone's compositor moves those without repainting.
+ * A blur or scale here repaints a full-screen picture every frame, which stutters on iPhone.
  */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -116,16 +119,16 @@ lg-navbar:not(:defined) {
 }
 
 ::view-transition-group(page) {
-	animation-duration: 480ms;
+	animation-duration: 380ms;
 	animation-timing-function: var(--spring-soft);
 }
 
 ::view-transition-old(page) {
-	animation: page-out 200ms var(--ease-out) both;
+	animation: page-out 160ms var(--ease-out) both;
 }
 
 ::view-transition-new(page) {
-	animation: page-in 480ms var(--spring-soft) both;
+	animation: page-in 380ms var(--spring-soft) both;
 }
 
 html[data-nav='tab-forward'] {
@@ -151,16 +154,14 @@ html[data-nav='pop'] {
 @keyframes page-in {
 	from {
 		opacity: 0;
-		transform: translateX(var(--page-from, 0)) scale(0.985);
-		filter: blur(6px);
+		transform: translateX(var(--page-from, 0));
 	}
 }
 
 @keyframes page-out {
 	to {
 		opacity: 0;
-		transform: translateX(var(--page-to, 0)) scale(0.985);
-		filter: blur(6px);
+		transform: translateX(var(--page-to, 0));
 	}
 }
 
