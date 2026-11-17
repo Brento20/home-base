@@ -1,9 +1,10 @@
 // Cloudflare Workers deploy settings. `npm run build` writes the worker and static files into
 // .svelte-kit/cloudflare; `npm run deploy` builds and uploads them.
 //
-// SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are not set here: add them in the Cloudflare
-// dashboard (Workers › home-base › Settings › Variables and Secrets) so they stay out of git.
-// For a local `npm run preview:cf`, put them in .dev.vars (ignored by git).
+// SUPABASE_URL lives here because every deploy replaces plain variables with this file's `vars`.
+// SUPABASE_PUBLISHABLE_KEY is a secret, set once in the Cloudflare dashboard (Workers ›
+// home-base › Settings › Variables and Secrets); secrets survive deploys and stay out of git.
+// For a local `npm run preview:cf`, put both in .dev.vars (ignored by git).
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "home-base",
@@ -16,6 +17,9 @@
 		// Serve /offline.html as it is. Cloudflare would otherwise redirect it to /offline, and the
 		// service worker can't use a redirected response as the page it shows offline.
 		"html_handling": "none"
+	},
+	"vars": {
+		"SUPABASE_URL": "https://rpjqyjufjyzzkbikxtsa.supabase.co"
 	},
 	"observability": {
 		"enabled": true

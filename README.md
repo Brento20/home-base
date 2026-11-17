@@ -80,10 +80,10 @@ holds the deploy settings.
   http://localhost:8787.
 - **Deploy from your Mac**: `npx wrangler login` once, then `npm run deploy`. The app goes live
   at `https://home-base.<your-subdomain>.workers.dev`.
-- **Environment variables**: in the Cloudflare dashboard, Workers › home-base › Settings ›
-  Variables and Secrets, add `SUPABASE_URL` (text) and `SUPABASE_PUBLISHABLE_KEY` (secret).
-  They're read when the worker starts, so no rebuild is needed after changing them. Without them
-  the live site runs on sample data.
+- **Environment variables**: `SUPABASE_URL` is in `wrangler.jsonc`, since every deploy
+  replaces plain variables with that file's `vars`. `SUPABASE_PUBLISHABLE_KEY` is a secret: add
+  it once in the Cloudflare dashboard (Workers › home-base › Settings › Variables and Secrets,
+  type Secret). Secrets survive deploys. Without the key the live site runs on sample data.
 - **Your own domain**: Workers › home-base › Settings › Domains & Routes › Add › Custom domain
   (the domain's DNS has to be on Cloudflare). Then update Supabase's Site URL and Redirect URLs.
 - **Deploy on every push** (optional): connect the GitHub repo under Workers › home-base ›
