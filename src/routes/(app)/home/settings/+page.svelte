@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -8,6 +10,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.homeSettings);
 	let busy = $state<'rename' | 'password' | null>(null);
 
 	const submitting = (which: 'rename' | 'password') => () => {
@@ -23,7 +28,7 @@
 	<title>Home settings · home base</title>
 </svelte:head>
 
-<PageHeader title="Home settings">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/home"><Icon name="back" size={18} /> Home</a>
 	{/snippet}

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { describeDebt } from '#lib/features/expenses/describe.js';
@@ -10,6 +12,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.settleUp);
 
 	const start = untrack(() => form?.values ?? null);
 	const suggested = untrack(() => data.suggested);
@@ -32,7 +37,7 @@
 	<title>Settle up · home base</title>
 </svelte:head>
 
-<PageHeader title="Settle up">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/money/{data.group.id}"
 			><Icon name="back" size={18} /> {data.group.name}</a

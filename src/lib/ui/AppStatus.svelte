@@ -96,7 +96,6 @@
 		justify-content: center;
 		padding: 0 var(--page-gutter);
 		pointer-events: none;
-		view-transition-name: app-status;
 	}
 
 	.notice {

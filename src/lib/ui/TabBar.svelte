@@ -5,6 +5,7 @@
 	 * recommends for thin bars) and the indicator is a lens that visibly bends the icon under it.
 	 */
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import Icon from './Icon.svelte';
 	import { TABS, tabIndexFor } from './tabs.js';
@@ -23,6 +24,18 @@
 	// The URL owns the active tab; the glass indicator follows it after every navigation.
 	$effect(() => {
 		if (activeIndex >= 0) navbar?.setCurrent?.(activeIndex);
+	});
+
+	// It also sets off as soon as a change of tab starts (a tap moves it already; this covers
+	// swipes and links), rather than waiting for the next page's data. If that navigation
+	// doesn't happen, it goes back.
+	beforeNavigate((navigation) => {
+		const next = navigation.to ? tabIndexFor(navigation.to.url.pathname) : -1;
+		if (next < 0 || next === activeIndex) return;
+		navbar?.setCurrent?.(next);
+		navigation.complete.catch(() => {
+			if (activeIndex >= 0) navbar?.setCurrent?.(activeIndex);
+		});
 	});
 
 	/**
@@ -90,8 +103,6 @@
 		justify-content: center;
 		padding: 0 var(--page-gutter);
 		pointer-events: none;
-		/* Page transitions leave the bar where it is (see base.css). */
-		view-transition-name: tab-bar;
 	}
 
 	/* liquidglass.dev builds the copy layer at runtime, so these reach it with :global. */

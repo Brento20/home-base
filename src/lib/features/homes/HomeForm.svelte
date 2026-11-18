@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/** Home name and password, shared by Build a home and Join a home. */
 	import { enhance } from '$app/forms';
 	import PasswordField from '#lib/ui/PasswordField.svelte';
@@ -36,7 +38,8 @@
 			minlength="3"
 			maxlength="30"
 			autocomplete="off"
-			placeholder={building ? 'Something everyone will recognise' : ''}
+			placeholder={building ? PLACEHOLDERS.homeName[0] : ''}
+			use:placeholderReel={building ? PLACEHOLDERS.homeName : []}
 			required
 			aria-invalid={errors.name ? 'true' : undefined}
 		/>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/** A list's items and the add-item field. Ticks show straight away; the server catches up. */
 	import { enhance } from '$app/forms';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
@@ -59,7 +61,8 @@
 	<input
 		id="new-item"
 		name="name"
-		placeholder="Add an item"
+		placeholder={PLACEHOLDERS.listItem[0]}
+		use:placeholderReel={PLACEHOLDERS.listItem}
 		autocomplete="off"
 		enterkeyhint="done"
 		maxlength="120"

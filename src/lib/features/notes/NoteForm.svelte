@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/** Title, text and the Hide until tapped option, for adding or editing a home note. */
 	import { enhance } from '$app/forms';
 	import type { FieldErrors } from '#lib/types.js';
@@ -28,13 +30,14 @@
 	}}
 >
 	<label class="field">
-		<span class="field-label">Title</span>
+		<span class="field-label">Call it</span>
 		<input
 			class="field-input"
 			name="title"
 			value={values.title}
 			maxlength="60"
-			placeholder="Wifi"
+			placeholder={PLACEHOLDERS.noteTitle[0]}
+			use:placeholderReel={PLACEHOLDERS.noteTitle}
 			required
 			aria-invalid={errors.title ? 'true' : undefined}
 		/>
@@ -42,13 +45,14 @@
 	</label>
 
 	<label class="field">
-		<span class="field-label">Note</span>
+		<span class="field-label">The details</span>
 		<textarea
 			class="field-input"
 			name="body"
 			rows="5"
 			maxlength="2000"
-			placeholder="Network name and password"
+			placeholder={PLACEHOLDERS.noteBody[0]}
+			use:placeholderReel={PLACEHOLDERS.noteBody}
 			aria-invalid={errors.body ? 'true' : undefined}>{values.body}</textarea
 		>
 		{#if errors.body}<span class="field-error">{errors.body}</span>{/if}

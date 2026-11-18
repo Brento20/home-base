@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { page } from '$app/state';
 	import CategoryBars from '#lib/features/expenses/CategoryBars.svelte';
 	import CompareBars from '#lib/features/expenses/CompareBars.svelte';
@@ -19,6 +21,9 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.reports);
 
 	const base = $derived(`/money/${data.group.id}/reports`);
 
@@ -47,7 +52,7 @@
 	<title>Reports · {data.group.name} · home base</title>
 </svelte:head>
 
-<PageHeader title="Reports">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/money/{data.group.id}"
 			><Icon name="back" size={18} /> {data.group.name}</a

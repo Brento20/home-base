@@ -6,7 +6,7 @@
 	<title>home base</title>
 </svelte:head>
 
-<main class="landing">
+<main class="landing" data-page>
 	<div class="hero">
 		<p class="wordmark">home base</p>
 		<h1>The plans, chores and lists for the people you live with.</h1>
@@ -25,7 +25,6 @@
 
 <style>
 	.landing {
-		view-transition-name: page;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;

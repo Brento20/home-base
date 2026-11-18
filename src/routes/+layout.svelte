@@ -4,6 +4,7 @@
 	import '#lib/styles/base.css';
 	import '#lib/styles/forms.css';
 	import { onMount } from 'svelte';
+	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
 	import { loadGlass } from '#lib/ui/glass.js';
@@ -15,6 +16,8 @@
 	usePageTransitions();
 
 	onMount(() => {
+		// From here on, each screen opened gets a fresh heading (src/lib/copy/pick.ts).
+		markHydrated();
 		loadGlass();
 		applyDaypart();
 		const timer = setInterval(applyDaypart, 5 * 60 * 1000);

@@ -105,6 +105,16 @@
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+		<!-- iPhones ignore the manifest's portrait lock, so a phone on its side gets this instead. -->
+		<div class="turn-upright">
+			<svg class="turn-upright-phone" width="34" height="34" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+				<rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
+				<path d="M10.5 18.5h3" />
+			</svg>
+			<p class="turn-upright-title">Turn me upright</p>
+			<p class="turn-upright-note">home base is made for holding in one hand.</p>
+		</div>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

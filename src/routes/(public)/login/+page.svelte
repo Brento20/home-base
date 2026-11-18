@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -7,6 +9,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.signIn);
 	let submitting = $state(false);
 </script>
 
@@ -14,7 +19,7 @@
 	<title>Sign in · home base</title>
 </svelte:head>
 
-<SoloScreen title="Sign in">
+<SoloScreen title={heading}>
 	{#snippet top()}
 		<a class="button-quiet" href="/welcome"><Icon name="back" size={18} /> Back</a>
 	{/snippet}

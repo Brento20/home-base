@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/**
 	 * Add or edit an expense in the order you'd say it: who paid, how much, and how it's divided.
 	 * Underneath, the result reads like the balance does ("Chris will owe you $10.00"), worked out
@@ -199,13 +201,14 @@
 	</fieldset>
 
 	<label class="field">
-		<span class="field-label">What for</span>
+		<span class="field-label">What was it for?</span>
 		<input
 			class="field-input"
 			name="description"
 			bind:value={description}
 			maxlength="80"
-			placeholder="Groceries"
+			placeholder={PLACEHOLDERS.expense[0]}
+			use:placeholderReel={PLACEHOLDERS.expense}
 			required
 			aria-invalid={errors.description ? 'true' : undefined}
 		/>

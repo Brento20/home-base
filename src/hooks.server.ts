@@ -17,9 +17,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	// getUser() checks the session with Supabase Auth rather than trusting the cookie.
-	const { data } = await locals.supabase.auth.getUser();
-	locals.user = data.user;
+	// getClaims() verifies the session token's signature and expiry against the project's public
+	// signing keys (fetched once, then cached), so most requests skip a round trip to Supabase
+	// Auth before any data is fetched. It never just trusts the cookie: with the older shared
+	// secret keys it asks the auth server instead, as getUser() did. A session signed out on
+	// another device lasts until its token expires (an hour at most).
+	const { data } = await locals.supabase.auth.getClaims();
+	const claims = data?.claims;
+	locals.user = claims?.sub ? { id: claims.sub, email: claims.email ?? null } : null;
 
 	let onboarded = false;
 	if (locals.user) {

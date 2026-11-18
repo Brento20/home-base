@@ -239,3 +239,65 @@ legend.field-label {
 	transition-duration: var(--duration-press);
 	transition-timing-function: var(--ease-out);
 }
+
+/*
+ * Scrolling placeholder suggestions (src/lib/ui/placeholder-reel.ts), drawn over an empty field
+ * in the same place and type as its own text. Each line slides up a little and fades; the
+ * box's top and bottom edges fade too, so lines dissolve rather than clip.
+ */
+.placeholder-reel {
+	position: absolute;
+	box-sizing: border-box;
+	overflow: hidden;
+	color: var(--colour-text-faint);
+	pointer-events: none;
+	transition: opacity 160ms var(--ease-out);
+	-webkit-mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+	mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+}
+
+.placeholder-reel.multiline {
+	-webkit-mask-image: none;
+	mask-image: none;
+}
+
+.placeholder-reel.hidden {
+	opacity: 0;
+}
+
+.placeholder-reel-line {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	padding: inherit;
+	/* Slow and soft: a drift, not a flick. Keep in step with SLIDE_MS in placeholder-reel.ts. */
+	transition:
+		transform 1000ms cubic-bezier(0.25, 0.8, 0.25, 1),
+		opacity 800ms ease-in-out;
+}
+
+.multiline .placeholder-reel-line {
+	align-items: flex-start;
+}
+
+.placeholder-reel-line > span {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.placeholder-reel-line.below {
+	transform: translateY(45%);
+	opacity: 0;
+}
+
+.placeholder-reel-line.above {
+	transform: translateY(-45%);
+	opacity: 0;
+}
+
+.placeholder-reel-line.instant {
+	transition: none;
+}

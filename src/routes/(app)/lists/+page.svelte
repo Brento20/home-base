@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { enhance } from '$app/forms';
 	import ListCard from '#lib/features/lists/ListCard.svelte';
 	import ListsNav from '#lib/features/lists/ListsNav.svelte';
@@ -8,6 +12,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.lists);
 </script>
 
 <svelte:head>
@@ -23,7 +30,8 @@
 	<input
 		id="new-list-name"
 		name="name"
-		placeholder="New list, e.g. Hardware run"
+		placeholder={PLACEHOLDERS.listName[0]}
+		use:placeholderReel={PLACEHOLDERS.listName}
 		autocomplete="off"
 		enterkeyhint="go"
 		maxlength="60"
@@ -35,7 +43,7 @@
 {#if form?.errors?.name}<p class="field-error">{form.errors.name}</p>{/if}
 
 {#if data.lists.length === 0}
-	<p class="empty">No lists on the go. Start one above.</p>
+	<p class="empty">{emptyLine}</p>
 {:else}
 	<ul class="cards">
 		{#each data.lists as list (list.id)}

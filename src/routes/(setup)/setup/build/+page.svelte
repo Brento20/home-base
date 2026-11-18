@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import HomeForm from '#lib/features/homes/HomeForm.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -6,6 +8,9 @@
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.buildHome);
 </script>
 
 <svelte:head>
@@ -13,7 +18,7 @@
 </svelte:head>
 
 <SoloScreen
-	title="Build a home"
+	title={heading}
 	lead="Give it a name and a password. Anyone you share both with can join."
 >
 	{#snippet top()}

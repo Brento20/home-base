@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { EMPTY } from '#lib/copy/voice.js';
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -7,6 +10,12 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.points);
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.scores);
 
 	const rows = $derived(
 		data.household.members.map((person) => {
@@ -30,7 +39,7 @@
 	<title>Scores · home base</title>
 </svelte:head>
 
-<PageHeader title="Scores">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/"><Icon name="back" size={18} /> Today</a>
 	{/snippet}
@@ -62,7 +71,7 @@
 <section class="recent" aria-labelledby="recent-heading">
 	<h2 id="recent-heading" class="section-label">Recent points</h2>
 	{#if data.recent.length === 0}
-		<p class="empty">Tick off a task to get on the board.</p>
+		<p class="empty">{emptyLine}</p>
 	{:else}
 		<ul>
 			{#each data.recent as task (task.id)}

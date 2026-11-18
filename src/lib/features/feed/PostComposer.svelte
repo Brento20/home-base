@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/**
 	 * Writing a feed post: a message, a photo, or both. The photo is shrunk in the browser before
 	 * it's sent (and loses its location data on the way).
@@ -71,15 +73,14 @@
 >
 	<label class="field">
 		<span class="visually-hidden">Message</span>
-		<!-- svelte-ignore a11y_autofocus -->
 		<textarea
 			class="field-input message"
 			name="body"
 			rows="5"
 			maxlength={maxLength}
-			placeholder="Left dinner in the fridge… anyone keen for dumplings Friday?"
+			placeholder={PLACEHOLDERS.post[0]}
+			use:placeholderReel={PLACEHOLDERS.post}
 			bind:value={body}
-			autofocus
 			aria-invalid={errors.body ? 'true' : undefined}></textarea>
 		{#if nearLimit}<span class="limit">{maxLength - body.length} left</span>{/if}
 		{#if errors.body}<span class="field-error">{errors.body}</span>{/if}

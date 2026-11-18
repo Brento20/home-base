@@ -16,7 +16,7 @@
 </script>
 
 <!-- One task per screen, centred, with no tab bar: sign up, sign in, profile, build or join. -->
-<main class="solo">
+<main class="solo" data-page>
 	<div class="column">
 		{#if top}<div class="top">{@render top()}</div>{/if}
 		<header>
@@ -30,7 +30,6 @@
 
 <style>
 	.solo {
-		view-transition-name: page;
 		display: flex;
 		min-height: 100dvh;
 		padding: calc(env(safe-area-inset-top) + 32px) var(--page-gutter)

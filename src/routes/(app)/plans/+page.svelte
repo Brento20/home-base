@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
 	import { groupPlansByDay } from '#lib/features/plans/describe.js';
 	import PlanRow from '#lib/features/plans/PlanRow.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -7,6 +9,9 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.plans);
 
 	const groups = $derived(groupPlansByDay(data.plans, data.today));
 
@@ -26,7 +31,7 @@
 
 {#if groups.length === 0}
 	<div class="empty">
-		<p>Nothing planned yet.</p>
+		<p>{emptyLine}</p>
 		<a class="button-quiet" href="/plans/import">Import from Apple Calendar</a>
 	</div>
 {:else}

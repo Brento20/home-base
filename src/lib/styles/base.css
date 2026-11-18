@@ -76,100 +76,69 @@ lg-navbar:not(:defined) {
 }
 
 /*
- * Page transitions (src/lib/ui/page-transitions.ts). Only the page content moves: the backdrop
- * stays put and the tab bar keeps its own live glass indicator. The new page slides in from the
- * direction of travel and settles on a soft spring; the old one fades away quickly.
- *
- * Only transform and opacity animate: the phone's compositor moves those without repainting.
- * A blur or scale here repaints a full-screen picture every frame, which stutters on iPhone.
+ * A phone turned on its side. Installed on Android, the manifest keeps the app portrait; iPhones
+ * ignore that, so a short landscape screen (a phone, not a tablet) shows this note and hides the
+ * app, which stays as it was underneath. Turning back picks up exactly where you were.
  */
-::view-transition-old(root),
-::view-transition-new(root) {
-	animation: none;
-}
-
-::view-transition-group(tab-bar),
-::view-transition-new(tab-bar) {
-	animation: none;
-}
-
-::view-transition-old(tab-bar) {
+.turn-upright {
 	display: none;
 }
 
-::view-transition-group(page) {
-	animation-duration: 380ms;
-	animation-timing-function: var(--spring-soft);
-}
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+	.turn-upright {
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 24px calc(env(safe-area-inset-right) + 24px) 24px
+			calc(env(safe-area-inset-left) + 24px);
+		background: var(--colour-ground);
+		text-align: center;
+	}
 
-::view-transition-old(page) {
-	animation: page-out 160ms var(--ease-out) both;
-}
+	.turn-upright ~ * {
+		visibility: hidden;
+	}
 
-::view-transition-new(page) {
-	animation: page-in 380ms var(--spring-soft) both;
-}
+	.turn-upright-phone {
+		margin-bottom: 10px;
+		color: var(--colour-accent);
+		animation: turn-upright 2.4s var(--ease-out) infinite;
+	}
 
-html[data-nav='tab-forward'] {
-	--page-from: 40px;
-	--page-to: -24px;
-}
+	.turn-upright-title {
+		margin: 0;
+		font-size: var(--text-body);
+		font-weight: 600;
+	}
 
-html[data-nav='tab-back'] {
-	--page-from: -40px;
-	--page-to: 24px;
-}
-
-html[data-nav='push'] {
-	--page-from: 64px;
-	--page-to: -24px;
-}
-
-html[data-nav='pop'] {
-	--page-from: -48px;
-	--page-to: 32px;
-}
-
-@keyframes page-in {
-	from {
-		opacity: 0;
-		transform: translateX(var(--page-from, 0));
+	.turn-upright-note {
+		margin: 0;
+		font-size: var(--text-small);
+		color: var(--colour-text-muted);
 	}
 }
 
-@keyframes page-out {
-	to {
-		opacity: 0;
-		transform: translateX(var(--page-to, 0));
+/* The phone turns back upright, rests, then does it again. */
+@keyframes turn-upright {
+	0%,
+	15% {
+		transform: rotate(-90deg);
+	}
+	45%,
+	100% {
+		transform: rotate(0deg);
 	}
 }
 
-@media (prefers-reduced-motion: reduce) {
-	::view-transition-group(page) {
-		animation-duration: 0s;
-	}
-
-	::view-transition-old(page) {
-		animation: page-fade-out 120ms ease both;
-	}
-
-	::view-transition-new(page) {
-		animation: page-fade-in 160ms ease both;
-	}
-
-	@keyframes page-fade-out {
-		to {
-			opacity: 0;
-		}
-	}
-
-	@keyframes page-fade-in {
-		from {
-			opacity: 0;
-		}
-	}
-}
-
+/*
+ * Page transitions live in src/lib/ui/page-transitions.ts: the element marked data-page slides
+ * and fades with the Web Animations API (transform and opacity only, no View Transitions).
+ */
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,

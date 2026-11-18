@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
 	/**
 	 * Today's swipeable row of plans and chores. Cards snap into place and a warm glow follows
 	 * the card you've swiped to. The last card links to all plans and tasks.
@@ -18,6 +20,10 @@
 	}
 
 	let { items, people, today }: Props = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyTitle = pick(EMPTY.comingUpTitle);
+	const emptyAction = pick(EMPTY.comingUpAction);
 
 	let track = $state<HTMLElement>();
 	let active = $state(0);
@@ -89,8 +95,8 @@
 
 {#if visible.length === 0}
 	<a class="empty" href="/plans/new">
-		<span class="empty-title">Nothing coming up</span>
-		<span class="empty-action">Add a plan</span>
+		<span class="empty-title">{emptyTitle}</span>
+		<span class="empty-action">{emptyAction}</span>
 	</a>
 {:else}
 	<section class="coming-up" aria-label="Coming up">

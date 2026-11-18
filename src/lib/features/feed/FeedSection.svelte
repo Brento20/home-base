@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
 	/**
 	 * The home feed on Today: the newest posts, then older ones as you scroll down. How many are
 	 * shown lives in the URL (?feed=15), so the server loads them all and the 20-second refresh
@@ -19,6 +21,9 @@
 	}
 
 	let { posts, hasMore, people, me, pageSize }: Props = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.feed);
 
 	let end = $state<HTMLElement>();
 	let loading = $state(false);
@@ -53,9 +58,7 @@
 	</div>
 
 	{#if posts.length === 0}
-		<p class="empty">
-			Nothing here yet. <a href="/feed/new">Share an update</a> and it’ll show here for everyone at home.
-		</p>
+		<p class="empty">{emptyLine} <a href="/feed/new">Post an update</a></p>
 	{:else}
 		<ol class="posts">
 			{#each posts as post (post.id)}

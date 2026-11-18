@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { enhance } from '$app/forms';
 	import PostCard from '#lib/features/feed/PostCard.svelte';
 	import LinkedText from '#lib/features/plans/LinkedText.svelte';
@@ -103,7 +105,8 @@
 			name="body"
 			rows="2"
 			maxlength={data.replyMax}
-			placeholder="Reply…"
+			placeholder={PLACEHOLDERS.reply[0]}
+			use:placeholderReel={PLACEHOLDERS.reply}
 			bind:value={reply}
 			aria-invalid={form?.replyProblem ? 'true' : undefined}></textarea>
 		<button class="button-primary send" disabled={sending || !reply.trim()}>

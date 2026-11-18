@@ -1,10 +1,15 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.importCalendar);
 	let importing = $state(false);
 
 	const months = $derived(Math.round(data.recurringWindowDays / 30));
@@ -14,7 +19,7 @@
 	<title>Import calendar · home base</title>
 </svelte:head>
 
-<PageHeader title="Import calendar">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/plans"><Icon name="back" size={18} /> Plans</a>
 	{/snippet}

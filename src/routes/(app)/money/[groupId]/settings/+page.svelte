@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -7,6 +9,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.groupSettings);
 	let busy = $state<'rename' | 'add' | null>(null);
 
 	const outsiders = $derived(
@@ -26,7 +31,7 @@
 	<title>Group settings · home base</title>
 </svelte:head>
 
-<PageHeader title="Group settings">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/money/{data.group.id}"
 			><Icon name="back" size={18} /> {data.group.name}</a

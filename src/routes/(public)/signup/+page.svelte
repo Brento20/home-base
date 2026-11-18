@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -8,6 +10,10 @@
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const sentHeading = pick(HEADINGS.checkEmail);
+	const heading = pick(HEADINGS.signUp);
 	let submitting = $state(false);
 	const errors: FieldErrors<'email' | 'password'> = $derived(
 		form && 'errors' in form ? (form.errors ?? {}) : {}
@@ -20,7 +26,7 @@
 
 {#if form && 'sent' in form && form.sent}
 	<SoloScreen
-		title="Check your email"
+		title={sentHeading}
 		lead="We sent a link to {form.email}. Open it on this phone to carry on."
 	>
 		<p class="aside">
@@ -28,7 +34,7 @@
 		</p>
 	</SoloScreen>
 {:else}
-	<SoloScreen title="Sign up" lead="Start with your email and a password. Your profile comes next.">
+	<SoloScreen title={heading} lead="Start with your email and a password. Your profile comes next.">
 		{#snippet top()}
 			<a class="button-quiet" href="/welcome"><Icon name="back" size={18} /> Back</a>
 		{/snippet}

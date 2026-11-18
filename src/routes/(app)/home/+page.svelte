@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
 	import NoteCard from '#lib/features/notes/NoteCard.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -6,6 +8,9 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.notes);
 </script>
 
 <svelte:head>
@@ -30,9 +35,7 @@
 <section class="notes" aria-labelledby="notes-heading">
 	<h2 id="notes-heading" class="section-label">Notes</h2>
 	{#if data.notes.length === 0}
-		<p class="empty">
-			Add the wifi password, bin nights, where the spare key lives. Everyone here can see them.
-		</p>
+		<p class="empty">{emptyLine}</p>
 		<a class="button-secondary" href="/home/notes/new">Add a note</a>
 	{:else}
 		<div class="note-list">

@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -6,6 +10,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.newGroup);
 	let saving = $state(false);
 
 	const others = $derived(data.household.members.filter((person) => person.id !== data.me.id));
@@ -17,7 +24,7 @@
 	<title>New group · home base</title>
 </svelte:head>
 
-<PageHeader title="New group">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/money"><Icon name="back" size={18} /> Money</a>
 	{/snippet}
@@ -41,7 +48,8 @@
 			name="name"
 			value={form?.name ?? ''}
 			maxlength="40"
-			placeholder="Our Place"
+			placeholder={PLACEHOLDERS.groupName[0]}
+			use:placeholderReel={PLACEHOLDERS.groupName}
 			required
 			aria-invalid={form?.errors?.name ? 'true' : undefined}
 		/>

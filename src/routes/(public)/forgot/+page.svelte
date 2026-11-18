@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -6,6 +8,10 @@
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const sentHeading = pick(HEADINGS.checkEmail);
+	const heading = pick(HEADINGS.forgotPassword);
 	let submitting = $state(false);
 </script>
 
@@ -15,13 +21,13 @@
 
 {#if form?.sent}
 	<SoloScreen
-		title="Check your email"
+		title={sentHeading}
 		lead="If there’s an account for {form.email}, a link to set a new password is on its way."
 	>
 		{#snippet footer()}<a href="/login">Back to sign in</a>{/snippet}
 	</SoloScreen>
 {:else}
-	<SoloScreen title="Reset your password" lead="We’ll email you a link to set a new one.">
+	<SoloScreen title={heading} lead="We’ll email you a link to set a new one.">
 		{#snippet top()}
 			<a class="button-quiet" href="/login"><Icon name="back" size={18} /> Sign in</a>
 		{/snippet}

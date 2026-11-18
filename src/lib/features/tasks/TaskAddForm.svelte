@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { isRepeat, type Repeat } from './repeat.js';
 	import { enhance } from '$app/forms';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
@@ -39,7 +41,8 @@
 			bind:this={input}
 			id="task-title"
 			name="title"
-			placeholder="Add a task"
+			placeholder={PLACEHOLDERS.task[0]}
+			use:placeholderReel={PLACEHOLDERS.task}
 			autocomplete="off"
 			enterkeyhint="done"
 			maxlength="160"

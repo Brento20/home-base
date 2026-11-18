@@ -1,4 +1,4 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 declare global {
@@ -6,8 +6,8 @@ declare global {
 		interface Locals {
 			/** Null while Supabase isn't configured: the app runs on sample data. */
 			supabase: SupabaseClient | null;
-			/** The signed-in Supabase user, validated with the auth server. */
-			user: User | null;
+			/** The signed-in person, from their verified session token (see hooks.server.ts). */
+			user: { id: string; email: string | null } | null;
 			/** True when running on in-memory sample data. */
 			sampleMode: boolean;
 			/** Where the signed-in person is in sign-up; decides which pages they can open. */

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import AppGestures from '#lib/ui/AppGestures.svelte';
 	import TabBar from '#lib/ui/TabBar.svelte';
 	import { startLiveRefresh } from '#lib/ui/live-refresh.js';
 	import type { LayoutProps } from './$types';
@@ -10,16 +11,16 @@
 	onMount(() => startLiveRefresh());
 </script>
 
-<main class="screen">
+<main class="screen" data-page>
 	{@render children()}
 </main>
 
 <TabBar />
+<!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->
+<AppGestures />
 
 <style>
 	.screen {
-		/* The part of the screen that moves during page transitions. */
-		view-transition-name: page;
 		max-width: 480px;
 		margin: 0 auto;
 		padding: calc(env(safe-area-inset-top) + 28px) var(--page-gutter)

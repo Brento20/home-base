@@ -16,7 +16,8 @@
 		| 'compose'
 		| 'more'
 		| 'photo'
-		| 'reply';
+		| 'reply'
+		| 'refresh';
 </script>
 
 <script lang="ts">
@@ -88,6 +89,9 @@
 		<rect x="3.5" y="5" width="17" height="14" rx="3" />
 		<circle cx="9" cy="10" r="1.6" />
 		<path d="M4 17l4.5-4.5 3.5 3.5 3-3 5 5" />
+	{:else if name === 'refresh'}
+		<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+		<path d="M19.5 4.5v4h-4" />
 	{:else if name === 'reply'}
 		<path d="M10 7L5 12l5 5" />
 		<path d="M5.5 12H14a5 5 0 0 1 5 5v1" />

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { EMPTY } from '#lib/copy/voice.js';
 	/** The open tasks on Lists › Tasks, with a link to Past tasks. */
 	import type { Profile, Task } from '#lib/types.js';
 	import TaskRow from './TaskRow.svelte';
@@ -10,10 +12,13 @@
 	}
 
 	let { tasks, people, today }: Props = $props();
+
+	// Said a little differently each visit (src/lib/copy/voice.ts).
+	const emptyLine = pick(EMPTY.tasks);
 </script>
 
 {#if tasks.length === 0}
-	<p class="empty">Nothing to do. Add the next chore above.</p>
+	<p class="empty">{emptyLine}</p>
 {:else}
 	<p class="summary" aria-live="polite">{tasks.length} to do</p>
 	<ul class="rows">

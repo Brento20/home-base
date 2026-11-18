@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { pick } from '#lib/copy/pick.js';
+	import { HEADINGS } from '#lib/copy/voice.js';
 	import { describeRepeat } from '#lib/features/tasks/repeat.js';
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -8,6 +10,9 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// A fresh way of asking each visit (src/lib/copy/voice.ts).
+	const heading = pick(HEADINGS.pastTasks);
 
 	const groups = $derived.by(() => {
 		const result: { label: string; tasks: Task[] }[] = [];
@@ -27,7 +32,7 @@
 	<title>Past tasks · home base</title>
 </svelte:head>
 
-<PageHeader title="Past tasks">
+<PageHeader title={heading}>
 	{#snippet lead()}
 		<a class="button-quiet" href="/lists/tasks"><Icon name="back" size={18} /> Tasks</a>
 	{/snippet}
