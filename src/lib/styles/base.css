@@ -161,6 +161,66 @@ html[data-nav] [data-page] {
 	animation: none;
 }
 
+/*
+ * The tab bar, the edge fades and a page's action bar get their own names while a transition
+ * runs, so they're drawn above the moving page. Without this, the page slides over the root
+ * snapshot that holds them and shows through the tab bar for a moment on every tab change.
+ * They don't move: their snapshots are simply held in place on top.
+ */
+html[data-nav] [data-still='tab-bar'] {
+	view-transition-name: tab-bar;
+}
+
+html[data-nav] [data-still='fade-bottom'] {
+	view-transition-name: fade-bottom;
+}
+
+html[data-nav] [data-still='fade-top'] {
+	view-transition-name: fade-top;
+}
+
+html[data-nav] [data-still='action-dock'] {
+	view-transition-name: action-dock;
+}
+
+html[data-nav] [data-still='action-fade'] {
+	view-transition-name: action-fade;
+}
+
+::view-transition-group(tab-bar),
+::view-transition-group(fade-bottom),
+::view-transition-group(fade-top),
+::view-transition-old(tab-bar),
+::view-transition-new(tab-bar),
+::view-transition-old(fade-bottom),
+::view-transition-new(fade-bottom),
+::view-transition-old(fade-top),
+::view-transition-new(fade-top) {
+	animation: none;
+}
+
+/*
+ * A snapshot can't blur what's behind it, so while the page slides, the tab bar's frost is
+ * stood in for by a solid backing the shape of the bar.
+ */
+::view-transition-group(tab-bar) {
+	border-radius: var(--radius-pill);
+	background: rgb(16 12 10 / 0.82);
+}
+
+/* Same screen both sides: just show the new one. */
+::view-transition-old(tab-bar),
+::view-transition-old(fade-bottom),
+::view-transition-old(fade-top) {
+	display: none;
+}
+
+/* A page's action bar comes and goes with its page, so it fades. */
+::view-transition-group(action-dock),
+::view-transition-group(action-fade) {
+	animation-duration: 200ms;
+}
+
 ::view-transition-group(page) {
 	animation-duration: 340ms;
 	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);

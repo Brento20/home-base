@@ -16,8 +16,8 @@
 </script>
 
 <!-- The page melts away a little higher here, so nothing reads through the bar. -->
-<div class="dock-fade backdrop-paint" aria-hidden="true"></div>
-<div class="action-dock">
+<div class="dock-fade backdrop-paint" data-still="action-fade" aria-hidden="true"></div>
+<div class="action-dock" data-still="action-dock">
 	{@render above?.()}
 	<div class="action-bar">{@render children()}</div>
 </div>
@@ -67,7 +67,7 @@
 		gap: 4px;
 		padding: 5px;
 		border-radius: var(--radius-pill);
-		background: rgb(20 15 13 / 0.6);
+		background: rgb(20 15 13 / 0.68);
 		box-shadow:
 			var(--glass-inner-light),
 			0 14px 32px -14px rgb(0 0 0 / 0.7);

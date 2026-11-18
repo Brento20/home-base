@@ -18,7 +18,7 @@
 </script>
 
 <div class="tab-bar-dock">
-	<div class="tab-bar">
+	<div class="tab-bar" data-still="tab-bar">
 		<PillNav items={TABS} indexFor={tabIndexFor} {current} label="Main" variant="tabs">
 			{#snippet item(tab)}
 				<Icon name={tab.icon} />
@@ -46,9 +46,12 @@
 		position: relative;
 		width: min(100%, 420px);
 		border-radius: var(--radius-pill);
-		background: rgb(20 15 13 / 0.6);
+		background: rgb(20 15 13 / 0.68);
 		-webkit-backdrop-filter: blur(20px) saturate(150%);
 		backdrop-filter: blur(20px) saturate(150%);
+		/* Its own layer for good, so iOS doesn't re-rasterise it (and drop the blur) mid-scroll. */
+		transform: translateZ(0);
+		will-change: transform;
 		box-shadow:
 			var(--glass-inner-light),
 			0 14px 32px -14px rgb(0 0 0 / 0.7);

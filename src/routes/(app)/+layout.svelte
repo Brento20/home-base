@@ -27,8 +27,8 @@
 	paint the backdrop itself over the page, faded in, so content dissolves rather than slides
 	under hard edges. Static layers, so scrolling past them costs nothing.
 -->
-<div class="edge-fade top backdrop-paint" aria-hidden="true"></div>
-<div class="edge-fade bottom backdrop-paint" aria-hidden="true"></div>
+<div class="edge-fade top backdrop-paint" data-still="fade-top" aria-hidden="true"></div>
+<div class="edge-fade bottom backdrop-paint" data-still="fade-bottom" aria-hidden="true"></div>
 
 <TabBar />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->
@@ -60,8 +60,9 @@
 	}
 
 	/*
-	 * From a little above the tab bar down to the bottom edge. Not fully solid behind the bar,
-	 * so a faint ghost of the page still passes behind its frost.
+	 * From a little above the tab bar down to the bottom edge, nearly solid by the time it's
+	 * behind the bar. iOS Safari sometimes drops a fixed element's blur for a frame; with this
+	 * under the bar, there's nothing sharp left to show through when it does.
 	 */
 	.bottom {
 		bottom: 0;
@@ -75,10 +76,10 @@
 		-webkit-mask-image: linear-gradient(
 			to bottom,
 			transparent,
-			rgb(0 0 0 / 0.72) 55%,
-			rgb(0 0 0 / 0.9)
+			rgb(0 0 0 / 0.92) 42%,
+			rgb(0 0 0 / 0.97)
 		);
-		mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.72) 55%, rgb(0 0 0 / 0.9));
+		mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.92) 42%, rgb(0 0 0 / 0.97));
 	}
 
 	.screen {
