@@ -10,6 +10,11 @@
 	let { data }: PageProps = $props();
 
 	const heading = $derived(formatTodayHeading(new Date(`${data.today}T12:00:00Z`)));
+	const tonight = $derived(
+		data.comingUp.find(
+			(item) => item.kind === 'task' && item.task.recipe && item.task.dueOn === data.today
+		)
+	);
 </script>
 
 <svelte:head>
@@ -27,7 +32,7 @@
 <div class="stack">
 	<ComingUp items={data.comingUp} people={data.household.members} today={data.today} />
 	<ListsGlance lists={data.lists} />
-	<HomeShortcuts />
+	<HomeShortcuts tonight={tonight?.kind === 'task' ? (tonight.task.recipe?.title ?? null) : null} />
 	<FeedSection
 		posts={data.feed.posts}
 		hasMore={data.feed.hasMore}

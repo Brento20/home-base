@@ -87,6 +87,12 @@ export interface Task {
 	completedBy: string | null;
 	repeat: import('#lib/features/tasks/repeat.js').Repeat;
 	createdBy: string | null;
+	/** 'HH:MM' household time, for dinners scheduled at a time. */
+	dueTime: string | null;
+	/** Set for dinners: the recipe it came from and the recipe as scheduled. */
+	recipeId: string | null;
+	servings: number | null;
+	recipe: import('#lib/features/recipes/recipe.js').DinnerSnapshot | null;
 }
 
 export interface Plan {

@@ -6,7 +6,7 @@
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
-	import { daysBetween, formatDayLabel } from '#lib/time.js';
+	import { daysBetween, formatDayLabel, formatDinnerWhen } from '#lib/time.js';
 	import type { Profile, Task } from '#lib/types.js';
 
 	interface Props {
@@ -26,21 +26,28 @@
 
 	const assignee = $derived(people.find((person) => person.id === task.assigneeId));
 	const daysLate = $derived(task.dueOn ? -daysBetween(today, task.dueOn) : 0);
+	const dinner = $derived(Boolean(task.recipe));
 	const when = $derived(
-		daysLate > 0
-			? daysLate === 1
-				? 'Overdue since yesterday'
-				: `Overdue by ${daysLate} days`
-			: formatDayLabel(task.dueOn!, today)
+		dinner
+			? formatDinnerWhen(task.dueOn!, task.dueTime, today)
+			: daysLate > 0
+				? daysLate === 1
+					? 'Overdue since yesterday'
+					: `Overdue by ${daysLate} days`
+				: formatDayLabel(task.dueOn!, today)
 	);
 </script>
 
 <div class="task-card" class:highlighted class:done>
 	<GlassSurface radius={28} squish />
-	<a class="cover" href="/lists/tasks/{task.id}" aria-label={label ?? task.title}></a>
+	<a
+		class="cover"
+		href={dinner ? `/dinner/cook/${task.id}` : `/lists/tasks/${task.id}`}
+		aria-label={label ?? task.title}
+	></a>
 	<div class="body">
-		<span class="when" class:late={daysLate > 0}>
-			Chore · {when}
+		<span class="when" class:late={!dinner && daysLate > 0}>
+			{dinner ? 'Dinner' : 'Chore'} · {when}
 			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
 					><Icon name="repeat" size={13} /></span
 				>{/if}
@@ -53,7 +60,7 @@
 				{:else}
 					<span class="dot anyone"></span>
 				{/if}
-				{assignee ? assignee.displayName : 'Anyone'}
+				{assignee ? assignee.displayName : 'Anyone'}{dinner ? ' cooking' : ''}
 			</span>
 			<form
 				method="POST"
@@ -77,7 +84,9 @@
 				<PointPop count={pops} />
 				<button
 					class="done-button"
-					aria-label="Tick off {task.title}, earns a point"
+					aria-label={dinner
+						? `Mark ${task.title} as cooked, earns a point`
+						: `Tick off ${task.title}, earns a point`}
 					disabled={done}
 				>
 					<Icon name="check" size={18} />

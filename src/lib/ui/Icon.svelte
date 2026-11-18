@@ -17,7 +17,14 @@
 		| 'more'
 		| 'photo'
 		| 'reply'
-		| 'refresh';
+		| 'refresh'
+		| 'dinner'
+		| 'star'
+		| 'search'
+		| 'clock'
+		| 'minus'
+		| 'filter'
+		| 'leaf';
 </script>
 
 <script lang="ts">
@@ -95,6 +102,29 @@
 	{:else if name === 'reply'}
 		<path d="M10 7L5 12l5 5" />
 		<path d="M5.5 12H14a5 5 0 0 1 5 5v1" />
+	{:else if name === 'dinner'}
+		<path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z" />
+		<path d="M8.5 4c0 1.3 1 1.7 1 3M12 3c0 1.3 1 1.7 1 3M15.5 4c0 1.3 1 1.7 1 3" />
+	{:else if name === 'star'}
+		<path
+			fill={filled ? 'currentColor' : 'none'}
+			d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.5l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"
+		/>
+	{:else if name === 'search'}
+		<circle cx="11" cy="11" r="6.5" />
+		<path d="M16 16l4.5 4.5" />
+	{:else if name === 'clock'}
+		<circle cx="12" cy="12" r="8.5" />
+		<path d="M12 7.5V12l3 2" />
+	{:else if name === 'minus'}
+		<path d="M5 12h14" />
+	{:else if name === 'filter'}
+		<path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+		<circle cx="15" cy="7" r="2" />
+		<circle cx="9" cy="17" r="2" />
+	{:else if name === 'leaf'}
+		<path d="M5.5 18.5C5.5 10.5 10.5 5.5 19 5c0 8.5-5 13.5-13.5 13.5z" />
+		<path d="M5.5 18.5c2.8-3.8 5.8-6.8 9-9" />
 	{/if}
 </svg>
 

@@ -79,7 +79,7 @@
 		const position = `${index + 1} of ${visible.length}`;
 		return item.kind === 'plan'
 			? `${position}, plan: ${item.plan.title}`
-			: `${position}, chore: ${item.task.title}`;
+			: `${position}, ${item.task.recipe ? 'dinner' : 'chore'}: ${item.task.title}`;
 	};
 
 	// Countdown is client-only so the server render never disagrees with the phone's clock.

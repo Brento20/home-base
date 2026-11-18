@@ -188,6 +188,37 @@ export async function addListItem(locals: App.Locals, listId: string, name: stri
 	if (insertError) error(500, insertError.message);
 }
 
+/**
+ * Adds several items in the order given (a recipe's ingredients), so they read top to bottom
+ * the same way. The list shows newest first, so each is stamped a moment after the next.
+ */
+export async function addListItems(locals: App.Locals, listId: string, names: string[]) {
+	const { supabase } = locals;
+	if (!supabase) {
+		const list = sampleList(listId);
+		list.items.unshift(
+			...names.map((name) => ({
+				id: crypto.randomUUID(),
+				name,
+				checked: false,
+				createdBy: sampleProfiles[0].id
+			}))
+		);
+		refreshSampleCompletion(list);
+		return;
+	}
+
+	const start = Date.now();
+	const { error: insertError } = await supabase.from('list_items').insert(
+		names.map((name, index) => ({
+			list_id: listId,
+			name,
+			created_at: new Date(start + (names.length - index)).toISOString()
+		}))
+	);
+	if (insertError) error(500, insertError.message);
+}
+
 export async function setListItemChecked(locals: App.Locals, itemId: string, checked: boolean) {
 	const { supabase } = locals;
 	if (!supabase) {

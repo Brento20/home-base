@@ -39,7 +39,10 @@ export const HEADINGS = {
 	newPassword: ['Pick a new password', 'Fresh start'],
 	checkEmail: ['Check your inbox', 'Look out for an email'],
 	homeSettings: ['House rules', 'Home settings'],
-	groupSettings: ['Group settings', 'Tidy up the group']
+	groupSettings: ['Group settings', 'Tidy up the group'],
+	dinner: ['What’s for dinner?', 'What are we cooking?', 'Hungry yet?', 'Dinner, sorted'],
+	newRecipe: ['Add a recipe', 'Share the secret recipe', 'What’s the recipe?'],
+	editRecipe: ['Tweak the recipe', 'Fix up the recipe']
 } as const;
 
 // Placeholder reels ---------------------------------------------------------------------------
@@ -207,6 +210,27 @@ export const PLACEHOLDERS = {
 
 // Empty states --------------------------------------------------------------------------------
 
+/** Search placeholders for the recipe library: the first line says what it searches. */
+export const RECIPE_SEARCH = [
+	'Search dishes or ingredients',
+	'Chicken?',
+	'Something with mushrooms?',
+	'Pasta, obviously',
+	'What’s in the fridge?',
+	'Lentils?',
+	'Winner winner, chicken dinner?',
+	'Comfort food?'
+];
+
+export const RECIPE_TITLE = [
+	'Nonna’s lasagne',
+	'Friday night curry',
+	'Mum’s famous meatloaf',
+	'The good fried rice',
+	'Hangover pasta',
+	'Dad’s chilli'
+];
+
 export const EMPTY = {
 	tasks: [
 		'Nothing to do. Suspicious. Add the next chore above.',
@@ -233,5 +257,10 @@ export const EMPTY = {
 	],
 	points: ['Tick off a task to get on the board.', 'The board’s empty. First chore wins.'],
 	pastLists: ['Finished lists will show up here.'],
-	pastTasks: ['Ticked-off tasks will show up here.']
+	pastTasks: ['Ticked-off tasks will show up here.'],
+	recipes: [
+		'Nothing matches that.',
+		'No luck. Try fewer filters?',
+		'Nothing in the cookbook for that.'
+	]
 } as const;

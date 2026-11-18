@@ -9,8 +9,8 @@ export const TABS: { href: string; label: string; icon: IconName }[] = [
 	{ href: '/home', label: 'Home', icon: 'home' }
 ];
 
-/** Pages that belong to a tab without living under its path: the feed is part of Today. */
-const ALSO_UNDER: Record<string, string[]> = { '/': ['/feed'] };
+/** Pages that belong to a tab without living under its path: the feed and dinner are Today's. */
+const ALSO_UNDER: Record<string, string[]> = { '/': ['/feed', '/dinner'] };
 
 /** Which tab a path belongs to, or -1 for pages outside the tab bar (sign up, setup). */
 export function tabIndexFor(pathname: string) {

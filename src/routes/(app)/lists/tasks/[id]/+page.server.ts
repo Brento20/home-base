@@ -9,7 +9,10 @@ import {
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	return { task: await getTask(locals, params.id) };
+	const task = await getTask(locals, params.id);
+	// A dinner opens in the cook view, with the recipe right there.
+	if (task.recipe) redirect(307, `/dinner/cook/${task.id}`);
+	return { task };
 };
 
 export const actions: Actions = {

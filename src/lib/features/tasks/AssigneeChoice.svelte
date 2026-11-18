@@ -8,13 +8,15 @@
 		/** Selected profile id, or '' for anyone. */
 		value: string;
 		error?: string;
+		/** The question above the choices. */
+		label?: string;
 	}
 
-	let { people, value, error }: Props = $props();
+	let { people, value, error, label = 'Who' }: Props = $props();
 </script>
 
 <fieldset class="field">
-	<legend class="field-label">Who</legend>
+	<legend class="field-label">{label}</legend>
 	<div class="choice-pills">
 		<label class="choice-pill">
 			<input type="radio" name="assigneeId" value="" checked={value === ''} />

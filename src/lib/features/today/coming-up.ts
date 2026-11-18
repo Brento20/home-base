@@ -10,7 +10,7 @@ export type ComingUpItem =
 
 /** Household-local "YYYY-MM-DD HH:MM", so plans and chores sort on one timeline. */
 function sortKey(item: ComingUpItem) {
-	if (item.kind === 'task') return `${item.task.dueOn} 00:00`;
+	if (item.kind === 'task') return `${item.task.dueOn} ${item.task.dueTime ?? '00:00'}`;
 	const { date, time } = zonedParts(new Date(item.plan.startsAt));
 	return `${date} ${item.plan.allDay ? '00:00' : time}`;
 }

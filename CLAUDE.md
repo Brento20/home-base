@@ -38,6 +38,14 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 - Touches starting on text fields, horizontal scrollers (except at the screen's edge) or anything with `data-gesture-ignore` are left alone. Add that attribute to anything new that drags sideways.
 - Listeners are passive and the page only moves with `translate`, so gestures never hold up scrolling.
 
+## Plan dinner
+
+- The built-in library is `src/lib/features/recipes/library.json`: 66 recipes trimmed from the source file (the per-ingredient nutrition workings were dropped). It's imported on the server only. Recipes a home adds live in `public.recipes`; library ids look like `recipe_001`, home ones are uuids, and ratings and dinners refer to either by that text id.
+- Every recipe's amounts are for `baseServings`. `scaleIngredients` multiplies by servings / baseServings; `formatQuantity` rounds to measurable amounts (½ tsp, 125 g, 1.2 kg). Methods never name amounts ("add half the stock"), so they read right at any serving count; keep it that way when adding recipes.
+- A dinner is a task with `recipe_id`, `servings`, an optional `due_time` and a `recipe` snapshot (title, servings, scaled ingredients, steps), so it reads the same if the recipe changes. Who's cooking is the assignee. Marking it cooked is completing the task (it earns a point). Skipping deletes it. Dinners show on Today only on their day.
+- Ratings: one per person per recipe (`recipe_ratings`), editable; 5 stars is a favourite. The card at the top of Plan dinner (`getDinnerPrompt`) asks "How was it?" for a cooked dinner you haven't answered (`dinner_checkins`), or "Did you make it?" when a dinner's time is an hour past (7pm if it has no time) and it's still open. Rating a recipe anywhere, or Not now, answers it for all its recent dinners.
+- Sheets (Add to Lists, Schedule) use `src/lib/ui/Sheet.svelte`, a native modal `<dialog>` that slides up over everything.
+
 ## Installed app (PWA)
 
 - `src/service-worker/index.ts` caches the built files and static files on install, and any `/_app/immutable/` file as it loads. Pages and their `__data.json` are network-first with a 4 second timeout, falling back to the saved copy, then `static/offline.html`. Saving a page also saves its data, because SvelteKit can't fall back offline from a missing data file. Match cached files with `ignoreVary`.

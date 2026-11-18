@@ -1,61 +1,30 @@
 <script lang="ts">
 	/**
-	 * Shortcuts on Today: the lights (sample state until Home Assistant is connected) and Post
-	 * update, which opens the feed composer.
+	 * Shortcuts on Today: Plan dinner, which opens the recipe library (and says what's for
+	 * dinner tonight once it's planned), and Post update, which opens the feed composer.
 	 */
-	import { goto } from '$app/navigation';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 
-	// Sample state until Home Assistant is connected (step 7).
-	let lightsOn = $state(false);
-
-	const HOLD_MS = 500;
-	let holdTimer: ReturnType<typeof setTimeout> | undefined;
-	let held = false;
-
-	// Tap toggles; press and hold opens the device in the Home tab.
-	function startHold() {
-		held = false;
-		holdTimer = setTimeout(() => {
-			held = true;
-			navigator.vibrate?.(10);
-			goto('/home');
-		}, HOLD_MS);
+	interface Props {
+		/** Tonight's dinner, if one's planned. */
+		tonight?: string | null;
 	}
 
-	function cancelHold() {
-		clearTimeout(holdTimer);
-	}
-
-	function tapLights() {
-		if (held) return;
-		lightsOn = !lightsOn;
-	}
+	let { tonight = null }: Props = $props();
 </script>
 
 <div class="shortcuts" aria-label="Home shortcuts" role="group">
-	<button
-		type="button"
-		class="tile"
-		class:on={lightsOn}
-		aria-pressed={lightsOn}
-		onclick={tapLights}
-		onpointerdown={startHold}
-		onpointerup={cancelHold}
-		onpointerleave={cancelHold}
-		onpointercancel={cancelHold}
-		oncontextmenu={(event) => event.preventDefault()}
-	>
+	<a class="tile dinner" class:on={tonight} href="/dinner">
 		<GlassSurface radius={24} squish />
 		<span class="tile-body">
-			<span class="icon"><Icon name="lightbulb" size={24} filled={lightsOn} /></span>
+			<span class="icon"><Icon name="dinner" size={24} /></span>
 			<span>
-				<span class="label">Lights</span>
-				<span class="state">{lightsOn ? 'On' : 'Off'}</span>
+				<span class="label">Plan dinner</span>
+				<span class="state">{tonight ? `Tonight: ${tonight}` : 'What’s cooking?'}</span>
 			</span>
 		</span>
-	</button>
+	</a>
 
 	<a class="tile compose" href="/feed/new">
 		<GlassSurface radius={24} squish />
@@ -122,7 +91,7 @@
 		color: var(--colour-text-muted);
 	}
 
-	.on .icon,
+	.dinner .icon,
 	.compose .icon {
 		color: #f6b37a;
 	}
@@ -135,8 +104,11 @@
 
 	.state {
 		display: block;
+		overflow: hidden;
 		margin-top: 2px;
 		font-size: var(--text-caption);
 		color: var(--colour-text-muted);
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 </style>

@@ -32,12 +32,17 @@ interface TaskRow {
 	completed_at: string | null;
 	completed_by: string | null;
 	created_by: string | null;
+	due_time: string | null;
+	recipe_id: string | null;
+	servings: number | null;
+	recipe: Task['recipe'];
 }
 
-const COLUMNS =
-	'id, title, notes, assignee_id, due_on, repeat, completed_at, completed_by, created_by';
+export const TASK_COLUMNS =
+	'id, title, notes, assignee_id, due_on, repeat, completed_at, completed_by, created_by, due_time, recipe_id, servings, recipe';
+const COLUMNS = TASK_COLUMNS;
 
-const toTask = (row: TaskRow): Task => ({
+export const toTask = (row: TaskRow): Task => ({
 	id: row.id,
 	title: row.title,
 	notes: row.notes,
@@ -46,7 +51,11 @@ const toTask = (row: TaskRow): Task => ({
 	repeat: row.repeat,
 	completedAt: row.completed_at,
 	completedBy: row.completed_by,
-	createdBy: row.created_by
+	createdBy: row.created_by,
+	dueTime: row.due_time ? row.due_time.slice(0, 5) : null,
+	recipeId: row.recipe_id,
+	servings: row.servings,
+	recipe: row.recipe
 });
 
 /** Soonest due first, undated last. */
@@ -109,10 +118,16 @@ export async function listOpenTasks(locals: App.Locals): Promise<Task[]> {
 	return (data ?? []).map(toTask);
 }
 
-/** Open chores due within the next week, overdue ones included: what Today's slider shows. */
+/**
+ * Open chores due within the next week, overdue ones included: what Today's slider shows.
+ * Dinners only show on their day (an overdue one is asked about in Plan dinner instead).
+ */
 export async function listTasksComingUp(locals: App.Locals, days = 7): Promise<Task[]> {
-	const until = addDays(todayISO(), days - 1);
-	return (await listOpenTasks(locals)).filter((task) => task.dueOn !== null && task.dueOn <= until);
+	const today = todayISO();
+	const until = addDays(today, days - 1);
+	return (await listOpenTasks(locals)).filter((task) =>
+		task.recipeId ? task.dueOn === today : task.dueOn !== null && task.dueOn <= until
+	);
 }
 
 /** Finished tasks, most recent first. */
@@ -165,7 +180,11 @@ export async function createTask(locals: App.Locals, input: TaskInput) {
 			...input,
 			completedAt: null,
 			completedBy: null,
-			createdBy: sampleProfiles[0].id
+			createdBy: sampleProfiles[0].id,
+			dueTime: null,
+			recipeId: null,
+			servings: null,
+			recipe: null
 		});
 		return;
 	}

@@ -1,3 +1,5 @@
+import library from '#lib/features/recipes/library.json';
+import { cookTitle, scaleIngredients, type Recipe } from '#lib/features/recipes/recipe.js';
 import { addDays, todayISO, zonedToInstant } from '#lib/time.js';
 import type {
 	AccountDetails,
@@ -118,7 +120,11 @@ const task = (
 	repeat,
 	completedAt: null,
 	completedBy: null,
-	createdBy: brenton.id
+	createdBy: brenton.id,
+	dueTime: null,
+	recipeId: null,
+	servings: null,
+	recipe: null
 });
 
 export const sampleTasks: Task[] = [
@@ -133,6 +139,49 @@ export const sampleTasks: Task[] = [
 		completedBy: chris.id
 	}
 ];
+
+// Plan dinner ---------------------------------------------------------------------------------
+
+const libraryRecipe = (id: string) =>
+	(library as Omit<Recipe, 'custom'>[]).find((r) => r.id === id)!;
+
+const dinner = (recipeId: string, cook: string, dayOffset: number, time: string | null): Task => {
+	const recipe = libraryRecipe(recipeId);
+	return {
+		...task(cookTitle(recipe.title), cook, addDays(today, dayOffset)),
+		dueTime: time,
+		recipeId,
+		servings: 2,
+		recipe: {
+			title: recipe.title,
+			servings: 2,
+			ingredients: scaleIngredients(recipe, 2),
+			steps: recipe.steps
+		}
+	};
+};
+
+// Last night's biryani (cooked, so Plan dinner asks how it was) and tonight's bolognese.
+sampleTasks.push(
+	{
+		...dinner('recipe_037', chris.id, -1, '18:30'),
+		completedAt: zonedToInstant(addDays(today, -1), '19:40').toISOString(),
+		completedBy: chris.id
+	},
+	dinner('recipe_008', brenton.id, 0, '18:30')
+);
+
+/** Recipes added at home (the library itself ships with the app). */
+export const sampleHomeRecipes: Recipe[] = [];
+
+export const sampleRatings: { recipeId: string; profileId: string; stars: number }[] = [
+	{ recipeId: 'recipe_008', profileId: brenton.id, stars: 5 },
+	{ recipeId: 'recipe_008', profileId: chris.id, stars: 4 },
+	{ recipeId: 'recipe_037', profileId: chris.id, stars: 5 }
+];
+
+/** `${taskId}:${profileId}` for each "How was it?" answered. */
+export const sampleCheckins = new Set<string>();
 
 const plan = (
 	title: string,

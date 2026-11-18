@@ -88,6 +88,21 @@ export function formatClock(instant: Date) {
 	return `${displayHour}:${String(minute).padStart(2, '0')} ${suffix}`;
 }
 
+/** 'HH:MM' (24-hour) as "6:30 pm". */
+export function formatTimeOfDay(time: string) {
+	const [hour, minute] = time.split(':').map(Number);
+	const suffix = hour >= 12 ? 'pm' : 'am';
+	const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+	return `${displayHour}:${String(minute).padStart(2, '0')} ${suffix}`;
+}
+
+/** When a dinner is: "Tonight, 6:30 pm", "Tomorrow", "Thursday, 7:00 pm". */
+export function formatDinnerWhen(dateISO: string, time: string | null, today = todayISO()) {
+	const day = formatDayLabel(dateISO, today);
+	const name = day === 'Today' ? 'Tonight' : day === 'Yesterday' ? 'Last night' : day;
+	return time ? `${name}, ${formatTimeOfDay(time)}` : name;
+}
+
 const weekdayShort = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, {
 	weekday: 'short',
 	timeZone: 'UTC'

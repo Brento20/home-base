@@ -1,0 +1,3076 @@
+[
+	{
+		"id": "recipe_001",
+		"title": "Soy and ginger chicken bowls",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "stir-fry", "rice bowl"],
+		"cuisine": "Chinese-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken thigh", "quantity": 150.0, "unit": "g", "prepNote": "boneless, sliced" },
+			{ "name": "Jasmine rice", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Broccoli", "quantity": 90.0, "unit": "g", "prepNote": "cut into florets" },
+			{ "name": "Soy sauce", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Ginger", "quantity": 7.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Honey", "quantity": 5.0, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Spring onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" }
+		],
+		"steps": [
+			"Rinse the jasmine rice and cook it according to the packet. Steam or blanch the broccoli until just tender.",
+			"Mix soy sauce, grated ginger, garlic and honey. Heat canola oil in a frying pan and stir-fry the chicken until browned and 75°C in the centre.",
+			"Add the sauce and broccoli and toss until glossy and hot. Serve over the rice with sliced spring onion."
+		],
+		"nutrition": {
+			"energyKj": 2132,
+			"proteinG": 38.8,
+			"fatG": 10.3,
+			"carbsG": 61.6,
+			"sugarsG": 5.5,
+			"fibreG": 4.6
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_002",
+		"title": "Lemon and herb chicken tray bake",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 35,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["tray bake"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken thigh", "quantity": 175.0, "unit": "g", "prepNote": "boneless" },
+			{ "name": "Potato", "quantity": 200.0, "unit": "g", "prepNote": "cut into wedges" },
+			{ "name": "Carrot", "quantity": 100.0, "unit": "g", "prepNote": "cut into batons" },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves" },
+			{ "name": "Olive oil", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Heat the oven to 220°C conventional or 200°C fan. Toss the potato wedges and carrots in some of the olive oil and season. Roast for 15 minutes.",
+			"Coat the chicken with remaining oil, lemon zest and juice, garlic, oregano, salt and pepper. Add it to the tray.",
+			"Roast for another 20 minutes or until the vegetables are tender and the chicken reaches 75°C. Spoon the pan juices over to serve."
+		],
+		"nutrition": {
+			"energyKj": 1875,
+			"proteinG": 38.5,
+			"fatG": 16.9,
+			"carbsG": 30.7,
+			"sugarsG": 8.7,
+			"fibreG": 7.0
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_003",
+		"title": "Chicken pesto pasta",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 17,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Penne", "quantity": 90.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Chicken breast", "quantity": 125.0, "unit": "g", "prepNote": "diced" },
+			{ "name": "Basil pesto", "quantity": 30.0, "unit": "g", "prepNote": null },
+			{ "name": "Cherry tomato", "quantity": 75.0, "unit": "g", "prepNote": "halved" },
+			{ "name": "Baby spinach", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 10.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Olive oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "for pasta water" }
+		],
+		"steps": [
+			"Boil the penne in salted water until al dente. Reserve a splash of the pasta water and drain.",
+			"Fry the chicken in olive oil until it reaches 75°C. Stir in the cherry tomatoes and spinach and cook until the spinach wilts.",
+			"Toss with pasta, pesto and enough reserved water to coat. Finish with Parmesan."
+		],
+		"nutrition": {
+			"energyKj": 2718,
+			"proteinG": 45.7,
+			"fatG": 20.7,
+			"carbsG": 66.5,
+			"sugarsG": 3.3,
+			"fibreG": 5.2
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_004",
+		"title": "Chicken and capsicum fajitas",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "wrap"],
+		"cuisine": "Tex-Mex",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken breast", "quantity": 150.0, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Red capsicum", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Flour tortilla", "quantity": 2.0, "unit": "each", "prepNote": "small" },
+			{ "name": "Lime", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Smoked paprika", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Greek yoghurt", "quantity": 30.0, "unit": "g", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Slice the chicken, capsicum and onion. Toss chicken in cumin, smoked paprika and salt.",
+			"Fry the chicken in canola oil, then add the capsicum and onion. Stir-fry until the vegetables soften slightly and the chicken reaches 75°C.",
+			"Warm the tortillas in a dry pan. Fill with chicken and vegetables and serve with lime and yoghurt."
+		],
+		"nutrition": {
+			"energyKj": 2108,
+			"proteinG": 42.5,
+			"fatG": 17.5,
+			"carbsG": 40.4,
+			"sugarsG": 14.6,
+			"fibreG": 5.5
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_005",
+		"title": "Egg and vegetable fried rice",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "stir-fry"],
+		"cuisine": "Chinese-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["egg"],
+		"ingredients": [
+			{
+				"name": "Microwave jasmine rice",
+				"quantity": 150.0,
+				"unit": "g",
+				"prepNote": "ready-cooked, straight from the pouch"
+			},
+			{ "name": "Egg", "quantity": 1.5, "unit": "each", "prepNote": null },
+			{ "name": "Frozen mixed vegetables", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Spring onion", "quantity": 1.0, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Soy sauce", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Sesame oil", "quantity": 2.5, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Scramble the beaten egg in a little canola oil, breaking it into pieces, then set aside.",
+			"Fry the garlic, spring onion whites and frozen vegetables in the remaining canola oil until hot. Add the rice and stir-fry until steaming throughout.",
+			"Return the egg to the pan and add soy sauce, sesame oil and the spring onion greens. Toss and serve immediately."
+		],
+		"nutrition": {
+			"energyKj": 1962,
+			"proteinG": 17.9,
+			"fatG": 17.0,
+			"carbsG": 56.3,
+			"sugarsG": 3.9,
+			"fibreG": 8.2
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_006",
+		"title": "Teriyaki tofu rice bowls",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 30,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "rice bowl"],
+		"cuisine": "Japanese-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["tofu"],
+		"ingredients": [
+			{ "name": "Firm tofu", "quantity": 150.0, "unit": "g", "prepNote": "drained and cubed" },
+			{ "name": "Jasmine rice", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Broccoli", "quantity": 90.0, "unit": "g", "prepNote": "cut into florets" },
+			{ "name": "Teriyaki sauce", "quantity": 30.0, "unit": "ml", "prepNote": null },
+			{ "name": "Cornflour", "quantity": 7.5, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Sesame seeds", "quantity": 0.5, "unit": "tsp", "prepNote": null }
+		],
+		"steps": [
+			"Cook the rice and steam the broccoli until just tender.",
+			"Pat the tofu dry and coat with cornflour. Fry in canola oil, turning, until crisp and golden.",
+			"Add the teriyaki sauce and toss until it coats the tofu. Serve over the rice with the broccoli and sesame seeds."
+		],
+		"nutrition": {
+			"energyKj": 2667,
+			"proteinG": 29.8,
+			"fatG": 21.5,
+			"carbsG": 75.9,
+			"sugarsG": 11.9,
+			"fibreG": 5.8
+		},
+		"nutritionNote": null,
+		"tips": ["Use vegan teriyaki sauce without honey or fish ingredients."]
+	},
+	{
+		"id": "recipe_007",
+		"title": "Beef and broccoli stir-fry",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "stir-fry"],
+		"cuisine": "Chinese-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef", "shellfish"],
+		"ingredients": [
+			{ "name": "Beef rump steak", "quantity": 125.0, "unit": "g", "prepNote": "thinly sliced" },
+			{ "name": "Broccoli", "quantity": 125.0, "unit": "g", "prepNote": "cut into florets" },
+			{ "name": "Jasmine rice", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Oyster sauce", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Soy sauce", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 5.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Cornflour", "quantity": 5.0, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Water", "quantity": 30.0, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Cook the rice. Mix oyster sauce, soy sauce, water and cornflour in a small bowl.",
+			"Sear the sliced beef in hot canola oil and set aside. Stir-fry the broccoli with the garlic and ginger, adding a splash of water if needed.",
+			"Return the beef and stir in the sauce. Toss over high heat until the sauce thickens and the beef is cooked to your liking. Serve over rice."
+		],
+		"nutrition": {
+			"energyKj": 2235,
+			"proteinG": 37.0,
+			"fatG": 11.9,
+			"carbsG": 65.2,
+			"sugarsG": 4.2,
+			"fibreG": 5.7
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_008",
+		"title": "Spaghetti bolognese",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["pasta", "good for leftovers"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef"],
+		"ingredients": [
+			{ "name": "Spaghetti", "quantity": 90.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Beef mince", "quantity": 125.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "grated" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null },
+			{ "name": "Tomato paste", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 12.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Soften the onion and carrot in olive oil, then add garlic. Add the mince and break it up while it browns.",
+			"Stir in tomato paste, canned tomatoes, oregano, salt and pepper. Simmer until thickened and the beef reaches 75°C, stirring occasionally.",
+			"In the meantime, cook the spaghetti until al dente. Drain and serve with the beef sauce and grated Parmesan."
+		],
+		"nutrition": {
+			"energyKj": 3063,
+			"proteinG": 47.3,
+			"fatG": 22.9,
+			"carbsG": 78.0,
+			"sugarsG": 15.4,
+			"fibreG": 10.1
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_009",
+		"title": "Beef mince tacos",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "tacos"],
+		"cuisine": "Tex-Mex",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef"],
+		"ingredients": [
+			{ "name": "Beef mince", "quantity": 125.0, "unit": "g", "prepNote": null },
+			{ "name": "Corn tortilla", "quantity": 3.0, "unit": "each", "prepNote": "small" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Taco seasoning", "quantity": 7.5, "unit": "g", "prepNote": null },
+			{ "name": "Water", "quantity": 30.0, "unit": "ml", "prepNote": null },
+			{ "name": "Cos lettuce", "quantity": 30.0, "unit": "g", "prepNote": "shredded" },
+			{ "name": "Tomato", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Cheddar", "quantity": 25.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Lime", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 5.0, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Prepare the lettuce, tomato, grated cheddar and lime. Warm the corn tortillas in a dry pan.",
+			"Soften onion in canola oil and add beef mince, breaking it up as it browns. Add the taco seasoning and water and simmer until thickened and 75°C in the centre.",
+			"Fill the tortillas with the mince and toppings. Finish with a squeeze of lime."
+		],
+		"nutrition": {
+			"energyKj": 2549,
+			"proteinG": 39.9,
+			"fatG": 27.2,
+			"carbsG": 46.6,
+			"sugarsG": 10.2,
+			"fibreG": 7.4
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_010",
+		"title": "Turkey meatballs with tomato risoni",
+		"baseServings": 1,
+		"prepMinutes": 12,
+		"cookMinutes": 28,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["pasta", "good for leftovers"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["turkey"],
+		"ingredients": [
+			{ "name": "Turkey mince", "quantity": 125.0, "unit": "g", "prepNote": null },
+			{ "name": "Risoni", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Egg", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Panko breadcrumbs", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Tomato passata", "quantity": 175.0, "unit": "g", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 10.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Beat the egg and measure the scaled amount. Mix it with turkey mince, panko, garlic, oregano, salt and pepper. Shape into small meatballs.",
+			"Brown the meatballs in olive oil. Add the passata and simmer until the meatballs reach 75°C in the centre.",
+			"Boil and drain the risoni separately. Spoon the meatballs and sauce over the pasta and finish with Parmesan."
+		],
+		"nutrition": {
+			"energyKj": 2886,
+			"proteinG": 45.0,
+			"fatG": 23.2,
+			"carbsG": 69.9,
+			"sugarsG": 8.3,
+			"fibreG": 9.1
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_011",
+		"title": "Lemon salmon with potatoes and green beans",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["tray bake", "seafood"],
+		"cuisine": "Modern Australian",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["fish"],
+		"ingredients": [
+			{ "name": "Salmon fillet", "quantity": 150.0, "unit": "g", "prepNote": null },
+			{ "name": "Potato", "quantity": 200.0, "unit": "g", "prepNote": "cut into small chunks" },
+			{ "name": "Green beans", "quantity": 100.0, "unit": "g", "prepNote": "trimmed" },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Heat the oven to 220°C conventional or 200°C fan. Toss the potato pieces in some oil, salt and pepper and roast for about 20 minutes.",
+			"Dress the salmon and green beans with remaining oil, lemon juice, zest and garlic. Add to the tray with the potatoes.",
+			"Roast until the salmon is opaque and flakes easily and the beans are tender, around 10 more minutes. Serve with the tray juices."
+		],
+		"nutrition": {
+			"energyKj": 2506,
+			"proteinG": 36.9,
+			"fatG": 36.6,
+			"carbsG": 27.1,
+			"sugarsG": 5.1,
+			"fibreG": 6.0
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_012",
+		"title": "Tuna and tomato pasta",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 15,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "dinner",
+		"tags": ["quick", "pasta", "pantry"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["fish"],
+		"ingredients": [
+			{ "name": "Penne", "quantity": 90.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Canned tuna", "quantity": 75.0, "unit": "g", "prepNote": "drained weight" },
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Baby spinach", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Dried chilli flakes", "quantity": 0.125, "unit": "tsp", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Cook the penne in salted water, reserving a little pasta water before draining.",
+			"Fry the garlic and chilli flakes briefly in olive oil. Add canned tomatoes, salt and pepper and simmer until slightly thickened.",
+			"Stir through tuna and spinach and heat until the leaves wilt. Toss with the pasta, loosening with reserved water as needed."
+		],
+		"nutrition": {
+			"energyKj": 2168,
+			"proteinG": 33.7,
+			"fatG": 10.2,
+			"carbsG": 68.0,
+			"sugarsG": 6.1,
+			"fibreG": 6.2
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_013",
+		"title": "Garlic prawn spaghetti",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 17,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "pasta", "seafood"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["shellfish"],
+		"ingredients": [
+			{ "name": "Spaghetti", "quantity": 90.0, "unit": "g", "prepNote": "dry" },
+			{
+				"name": "Raw peeled prawns",
+				"quantity": 125.0,
+				"unit": "g",
+				"prepNote": "thawed if frozen"
+			},
+			{ "name": "Garlic", "quantity": 1.5, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Unsalted butter", "quantity": 10.0, "unit": "g", "prepNote": null },
+			{ "name": "Parsley", "quantity": 5.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Dried chilli flakes", "quantity": 0.125, "unit": "tsp", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Cook the spaghetti in salted water until al dente. Reserve a splash of cooking water before draining.",
+			"Heat olive oil and butter and briefly cook garlic and chilli flakes. Add the prawns and toss until they are opaque throughout.",
+			"Add spaghetti, lemon juice, parsley and some cooking water. Toss until the sauce lightly coats the pasta and season to taste."
+		],
+		"nutrition": {
+			"energyKj": 2581,
+			"proteinG": 38.1,
+			"fatG": 22.2,
+			"carbsG": 62.7,
+			"sugarsG": 0.6,
+			"fibreG": 4.5
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_014",
+		"title": "Chickpea and spinach coconut curry",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 22,
+		"restMinutes": 0,
+		"totalMinutes": 30,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "curry", "good for leftovers"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Canned chickpeas", "quantity": 120.0, "unit": "g", "prepNote": "drained weight" },
+			{ "name": "Coconut milk", "quantity": 100.0, "unit": "ml", "prepNote": null },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Baby spinach", "quantity": 37.5, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 5.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Curry powder", "quantity": 1.0, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Basmati rice", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Put the rice on to cook. Soften the onion in oil, then add garlic, ginger and curry powder and cook briefly.",
+			"Stir in coconut milk, tomatoes and drained chickpeas. Simmer until the sauce thickens slightly.",
+			"Fold in the spinach and let it wilt. Season and serve with the rice."
+		],
+		"nutrition": {
+			"energyKj": 2771,
+			"proteinG": 17.6,
+			"fatG": 26.2,
+			"carbsG": 80.9,
+			"sugarsG": 9.7,
+			"fibreG": 12.7
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_015",
+		"title": "Red lentil dhal and rice",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "curry", "pantry", "good for leftovers"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Red lentils", "quantity": 80.0, "unit": "g", "prepNote": "dry, rinsed" },
+			{ "name": "Basmati rice", "quantity": 60.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 7.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Garam masala", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Vegetable stock", "quantity": 250.0, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": null }
+		],
+		"steps": [
+			"Put the basmati rice on to cook. Rinse the red lentils.",
+			"Soften onion in oil. Add garlic, ginger, turmeric, cumin and garam masala and cook until fragrant.",
+			"Add lentils and vegetable stock. Simmer, stirring occasionally, until the lentils are soft and creamy. Finish with lemon juice and serve with rice."
+		],
+		"nutrition": {
+			"energyKj": 2431,
+			"proteinG": 24.8,
+			"fatG": 10.1,
+			"carbsG": 88.1,
+			"sugarsG": 7.0,
+			"fibreG": 14.7
+		},
+		"nutritionNote": null,
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_016",
+		"title": "Black bean and cheese quesadillas",
+		"baseServings": 1,
+		"prepMinutes": 7,
+		"cookMinutes": 13,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "pantry"],
+		"cuisine": "Mexican-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["legumes", "dairy"],
+		"ingredients": [
+			{ "name": "Flour tortilla", "quantity": 2.0, "unit": "each", "prepNote": "medium" },
+			{
+				"name": "Canned black beans",
+				"quantity": 120.0,
+				"unit": "g",
+				"prepNote": "drained weight"
+			},
+			{
+				"name": "Cheddar",
+				"quantity": 50.0,
+				"unit": "g",
+				"prepNote": "grated, vegetarian if required"
+			},
+			{ "name": "Red capsicum", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Ground cumin", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Tomato salsa", "quantity": 40.0, "unit": "g", "prepNote": "to serve" },
+			{ "name": "Lime", "quantity": 0.25, "unit": "each", "prepNote": null }
+		],
+		"steps": [
+			"Mix drained black beans with diced capsicum, cumin and lime juice. Spread over half of each tortilla with grated cheddar, then fold closed.",
+			"Brush a frying pan with canola oil and toast the quesadillas over medium heat, turning when golden, until the cheese melts.",
+			"Slice into wedges and serve with tomato salsa."
+		],
+		"nutrition": {
+			"energyKj": 2984,
+			"proteinG": 30.7,
+			"fatG": 30.5,
+			"carbsG": 70.7,
+			"sugarsG": 9.0,
+			"fibreG": 13.9
+		},
+		"nutritionNote": null,
+		"tips": ["Use cheddar made with non-animal rennet and tortillas made without lard."]
+	},
+	{
+		"id": "recipe_017",
+		"title": "Tomato and white bean stew",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 22,
+		"restMinutes": 0,
+		"totalMinutes": 30,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "one pot", "pantry"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{
+				"name": "Canned cannellini beans",
+				"quantity": 120.0,
+				"unit": "g",
+				"prepNote": "drained weight"
+			},
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Baby spinach", "quantity": 30.0, "unit": "g", "prepNote": null },
+			{ "name": "Vegetable stock", "quantity": 75.0, "unit": "ml", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{
+				"name": "Sourdough bread",
+				"quantity": 2.0,
+				"unit": "each",
+				"prepNote": "slices, to serve"
+			},
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Soften onion and garlic in olive oil. Add oregano, canned tomatoes, vegetable stock and drained cannellini beans.",
+			"Simmer until the flavours combine and the liquid thickens slightly. Stir in spinach and black pepper.",
+			"Toast the sourdough and serve it alongside the stew."
+		],
+		"nutrition": {
+			"energyKj": 1944,
+			"proteinG": 19.6,
+			"fatG": 9.2,
+			"carbsG": 65.2,
+			"sugarsG": 13.9,
+			"fibreG": 16.0
+		},
+		"nutritionNote": null,
+		"tips": ["Use vegan vegetable stock and dairy-free sourdough."]
+	},
+	{
+		"id": "recipe_018",
+		"title": "Baked feta and cherry tomato pasta",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 32,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "pasta"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Penne", "quantity": 90.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Feta", "quantity": 75.0, "unit": "g", "prepNote": "vegetarian if required" },
+			{ "name": "Cherry tomato", "quantity": 175.0, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.5, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Olive oil", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Basil", "quantity": 5.0, "unit": "g", "prepNote": "leaves" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "for pasta water" }
+		],
+		"steps": [
+			"Heat the oven to 200°C conventional or 180°C fan. Put feta, cherry tomatoes and garlic in a baking dish with olive oil and pepper.",
+			"Bake for 25–30 minutes until the tomatoes burst and feta softens. Meanwhile, cook the penne in salted water and reserve a little pasta water.",
+			"Mash the feta and tomatoes together, fold through pasta and basil and loosen with a splash of reserved pasta water if needed."
+		],
+		"nutrition": {
+			"energyKj": 2729,
+			"proteinG": 25.9,
+			"fatG": 28.4,
+			"carbsG": 68.6,
+			"sugarsG": 6.5,
+			"fibreG": 6.8
+		},
+		"nutritionNote": null,
+		"tips": ["Use feta made with non-animal rennet."]
+	},
+	{
+		"id": "recipe_019",
+		"title": "Halloumi and lemon couscous bowls",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 10,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "lunch",
+		"tags": ["quick", "vegetarian", "bowl"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{
+				"name": "Halloumi",
+				"quantity": 90.0,
+				"unit": "g",
+				"prepNote": "sliced, vegetarian if required"
+			},
+			{ "name": "Couscous", "quantity": 70.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Lebanese cucumber", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Cherry tomato", "quantity": 75.0, "unit": "g", "prepNote": "halved" },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 10.0, "unit": "ml", "prepNote": null },
+			{ "name": "Parsley", "quantity": 5.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Vegetable stock", "quantity": 90.0, "unit": "ml", "prepNote": "hot" }
+		],
+		"steps": [
+			"Pour hot vegetable stock over the couscous, cover for 5 minutes and fluff with a fork.",
+			"Toss couscous with cucumber, tomatoes, chopped parsley, lemon juice and most of the olive oil.",
+			"Pat the halloumi dry and fry in the remaining oil until golden on both sides. Serve over the couscous."
+		],
+		"nutrition": {
+			"energyKj": 2710,
+			"proteinG": 29.9,
+			"fatG": 31.7,
+			"carbsG": 57.3,
+			"sugarsG": 7.8,
+			"fibreG": 5.4
+		},
+		"nutritionNote": null,
+		"tips": ["Use halloumi made with non-animal rennet."]
+	},
+	{
+		"id": "recipe_020",
+		"title": "Mushroom and cheddar omelettes",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 12,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "breakfast",
+		"tags": ["quick", "vegetarian", "one pan"],
+		"cuisine": "French-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["egg", "dairy"],
+		"ingredients": [
+			{ "name": "Egg", "quantity": 2.0, "unit": "each", "prepNote": null },
+			{ "name": "Button mushroom", "quantity": 100.0, "unit": "g", "prepNote": "sliced" },
+			{
+				"name": "Cheddar",
+				"quantity": 25.0,
+				"unit": "g",
+				"prepNote": "grated, vegetarian if required"
+			},
+			{ "name": "Unsalted butter", "quantity": 10.0, "unit": "g", "prepNote": null },
+			{ "name": "Chives", "quantity": 2.5, "unit": "g", "prepNote": "chopped" },
+			{
+				"name": "Sourdough bread",
+				"quantity": 2.0,
+				"unit": "each",
+				"prepNote": "slices, to serve"
+			},
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Slice the mushrooms, grate the cheddar and chop the chives. Beat the eggs with salt and pepper.",
+			"Fry the mushrooms in some butter and set aside. Melt the remaining butter in a non-stick pan, add egg and cook gently until nearly set.",
+			"Add mushrooms and cheddar, fold the omelette and cook until just set. Finish with chives and toasted sourdough."
+		],
+		"nutrition": {
+			"energyKj": 2275,
+			"proteinG": 29.5,
+			"fatG": 27.3,
+			"carbsG": 42.0,
+			"sugarsG": 2.4,
+			"fibreG": 4.4
+		},
+		"nutritionNote": null,
+		"tips": ["Use cheddar made with non-animal rennet."]
+	},
+	{
+		"id": "recipe_021",
+		"title": "Avocado and eggs on toast",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 10,
+		"restMinutes": 0,
+		"totalMinutes": 15,
+		"mealType": "breakfast",
+		"tags": ["quick", "vegetarian"],
+		"cuisine": "Modern Australian",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["egg"],
+		"ingredients": [
+			{ "name": "Sourdough bread", "quantity": 2.0, "unit": "each", "prepNote": "slices" },
+			{ "name": "Avocado", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Egg", "quantity": 2.0, "unit": "each", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Dried chilli flakes", "quantity": 0.125, "unit": "tsp", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Toast the sourdough. Mash the avocado with lemon juice, salt, pepper and chilli flakes.",
+			"Fry the eggs in olive oil to your liking.",
+			"Spread avocado over toast, top with the eggs and serve."
+		],
+		"nutrition": {
+			"energyKj": 2135,
+			"proteinG": 22.4,
+			"fatG": 26.2,
+			"carbsG": 41.8,
+			"sugarsG": 1.6,
+			"fibreG": 7.9
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_022",
+		"title": "Banana and peanut butter overnight oats",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 0,
+		"restMinutes": 480,
+		"totalMinutes": 490,
+		"mealType": "breakfast",
+		"tags": ["vegetarian", "make ahead"],
+		"cuisine": "Contemporary",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy", "nuts"],
+		"ingredients": [
+			{ "name": "Rolled oats", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Milk", "quantity": 110.0, "unit": "ml", "prepNote": null },
+			{ "name": "Greek yoghurt", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Banana", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Peanut butter", "quantity": 15.0, "unit": "g", "prepNote": null },
+			{ "name": "Chia seeds", "quantity": 5.0, "unit": "g", "prepNote": null },
+			{ "name": "Ground cinnamon", "quantity": 0.25, "unit": "tsp", "prepNote": null }
+		],
+		"steps": [
+			"Stir the oats, milk, yoghurt, peanut butter, chia seeds and cinnamon together in a covered container.",
+			"Refrigerate for at least 8 hours to soften the oats. Stir and top with sliced banana before eating."
+		],
+		"nutrition": {
+			"energyKj": 2089,
+			"proteinG": 17.6,
+			"fatG": 22.6,
+			"carbsG": 51.2,
+			"sugarsG": 19.0,
+			"fibreG": 9.1
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_023",
+		"title": "Berry yoghurt and granola bowls",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 0,
+		"restMinutes": 0,
+		"totalMinutes": 5,
+		"mealType": "breakfast",
+		"tags": ["quick", "vegetarian", "no cook"],
+		"cuisine": "Contemporary",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Greek yoghurt", "quantity": 175.0, "unit": "g", "prepNote": null },
+			{ "name": "Mixed berries", "quantity": 75.0, "unit": "g", "prepNote": "fresh" },
+			{ "name": "Granola", "quantity": 30.0, "unit": "g", "prepNote": null },
+			{ "name": "Honey", "quantity": 7.5, "unit": "g", "prepNote": null }
+		],
+		"steps": [
+			"Spoon the yoghurt into a bowl. Rinse and drain the berries and add them to the yoghurt.",
+			"Scatter over granola and drizzle with honey just before serving."
+		],
+		"nutrition": {
+			"energyKj": 1716,
+			"proteinG": 12.0,
+			"fatG": 22.6,
+			"carbsG": 36.5,
+			"sugarsG": 24.8,
+			"fibreG": 4.9
+		},
+		"nutritionNote": null,
+		"tips": ["Use vegetarian granola, such as a variety without gelatine."]
+	},
+	{
+		"id": "recipe_024",
+		"title": "Roast vegetable and hummus wraps",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "lunch",
+		"tags": ["vegetarian", "wrap"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Flour tortilla", "quantity": 1.0, "unit": "each", "prepNote": "large" },
+			{ "name": "Zucchini", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Red capsicum", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Red onion", "quantity": 0.25, "unit": "each", "prepNote": "cut into wedges" },
+			{ "name": "Hummus", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Baby spinach", "quantity": 20.0, "unit": "g", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 10.0, "unit": "ml", "prepNote": null },
+			{ "name": "Smoked paprika", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Heat the oven to 220°C conventional or 200°C fan. Toss the zucchini, capsicum and red onion with olive oil, smoked paprika and salt.",
+			"Roast until golden and tender, about 25 minutes. Warm the tortilla briefly so it is pliable.",
+			"Spread hummus on the tortilla, add spinach and roasted vegetables and roll up."
+		],
+		"nutrition": {
+			"energyKj": 2105,
+			"proteinG": 12.4,
+			"fatG": 26.6,
+			"carbsG": 49.9,
+			"sugarsG": 13.9,
+			"fibreG": 7.6
+		},
+		"nutritionNote": null,
+		"tips": ["Use vegan flour tortillas and hummus."]
+	},
+	{
+		"id": "recipe_025",
+		"title": "Tuna and white bean salad",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 0,
+		"restMinutes": 0,
+		"totalMinutes": 15,
+		"mealType": "lunch",
+		"tags": ["quick", "salad", "no cook", "pantry"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["fish", "legumes"],
+		"ingredients": [
+			{ "name": "Canned tuna", "quantity": 75.0, "unit": "g", "prepNote": "drained weight" },
+			{
+				"name": "Canned cannellini beans",
+				"quantity": 120.0,
+				"unit": "g",
+				"prepNote": "drained weight"
+			},
+			{ "name": "Lebanese cucumber", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Cherry tomato", "quantity": 75.0, "unit": "g", "prepNote": "halved" },
+			{ "name": "Red onion", "quantity": 0.125, "unit": "each", "prepNote": "thinly sliced" },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 10.0, "unit": "ml", "prepNote": null },
+			{ "name": "Parsley", "quantity": 5.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Drain the tuna and beans. Dice the cucumber, halve the tomatoes and finely slice the red onion.",
+			"Whisk lemon juice, olive oil and black pepper. Toss with the vegetables, beans, tuna and chopped parsley."
+		],
+		"nutrition": {
+			"energyKj": 1391,
+			"proteinG": 28.8,
+			"fatG": 11.9,
+			"carbsG": 20.3,
+			"sugarsG": 8.0,
+			"fibreG": 10.5
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_026",
+		"title": "Tomato, mozzarella and basil toasties",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 10,
+		"restMinutes": 0,
+		"totalMinutes": 15,
+		"mealType": "lunch",
+		"tags": ["quick", "vegetarian", "sandwich"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Sourdough bread", "quantity": 2.0, "unit": "each", "prepNote": "slices" },
+			{
+				"name": "Mozzarella",
+				"quantity": 62.5,
+				"unit": "g",
+				"prepNote": "drained, vegetarian if required"
+			},
+			{ "name": "Tomato", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Basil", "quantity": 5.0, "unit": "g", "prepNote": "leaves" },
+			{ "name": "Unsalted butter", "quantity": 7.5, "unit": "g", "prepNote": null },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Layer mozzarella, tomato and basil on sourdough and add black pepper. Close the sandwich and butter the outside.",
+			"Cook in a frying pan over medium heat until the bread is golden on both sides and the mozzarella has melted."
+		],
+		"nutrition": {
+			"energyKj": 1920,
+			"proteinG": 22.5,
+			"fatG": 21.3,
+			"carbsG": 41.3,
+			"sugarsG": 2.6,
+			"fibreG": 3.7
+		},
+		"nutritionNote": null,
+		"tips": ["Use mozzarella made with non-animal rennet."]
+	},
+	{
+		"id": "recipe_027",
+		"title": "Sausages, mash and peas",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["comfort food"],
+		"cuisine": "British-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef"],
+		"ingredients": [
+			{ "name": "Beef sausage", "quantity": 150.0, "unit": "g", "prepNote": null },
+			{ "name": "Potato", "quantity": 250.0, "unit": "g", "prepNote": "peeled and chopped" },
+			{ "name": "Frozen peas", "quantity": 90.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Milk", "quantity": 30.0, "unit": "ml", "prepNote": null },
+			{ "name": "Unsalted butter", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{
+				"name": "Gravy powder",
+				"quantity": 10.0,
+				"unit": "g",
+				"prepNote": "adjust to packet directions"
+			},
+			{ "name": "Water", "quantity": 125.0, "unit": "ml", "prepNote": "for gravy" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Boil the chopped potatoes until fork-tender, drain and mash with the milk, butter, salt and pepper. Cook the peas separately.",
+			"Brown the sausages in canola oil and cook until they reach 75°C in the centre. Set them aside briefly and soften the sliced onion in the same pan.",
+			"Mix the gravy powder with water following the packet and simmer with the onion. Serve the sausages with mash, peas and onion gravy."
+		],
+		"nutrition": {
+			"energyKj": 3187,
+			"proteinG": 34.4,
+			"fatG": 44.9,
+			"carbsG": 50.2,
+			"sugarsG": 11.3,
+			"fibreG": 9.9
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_028",
+		"title": "Ginger pork lettuce cups",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 12,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "dinner",
+		"tags": ["quick", "stir-fry"],
+		"cuisine": "Chinese-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["pork"],
+		"ingredients": [
+			{ "name": "Pork mince", "quantity": 150.0, "unit": "g", "prepNote": null },
+			{ "name": "Cos lettuce", "quantity": 4.0, "unit": "each", "prepNote": "leaves" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "grated" },
+			{ "name": "Spring onion", "quantity": 1.0, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 7.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Soy sauce", "quantity": 10.0, "unit": "ml", "prepNote": null },
+			{ "name": "Hoisin sauce", "quantity": 12.5, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Lime", "quantity": 0.5, "unit": "each", "prepNote": null }
+		],
+		"steps": [
+			"Separate and wash the lettuce leaves and pat them dry. Grate the carrot and slice the spring onion.",
+			"Fry garlic and ginger briefly in canola oil. Add the pork mince and cook, breaking it up, until browned and 75°C in the centre.",
+			"Stir in soy and hoisin sauces, carrot and some spring onion. Spoon into the leaves and finish with lime and remaining spring onion."
+		],
+		"nutrition": {
+			"energyKj": 1631,
+			"proteinG": 33.9,
+			"fatG": 21.5,
+			"carbsG": 12.1,
+			"sugarsG": 10.7,
+			"fibreG": 5.9
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_029",
+		"title": "Chicken and vegetable noodle soup",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["one pot", "soup"],
+		"cuisine": "Contemporary",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken thigh", "quantity": 125.0, "unit": "g", "prepNote": "boneless, diced" },
+			{ "name": "Chicken stock", "quantity": 375.0, "unit": "ml", "prepNote": null },
+			{ "name": "Egg noodles", "quantity": 60.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Celery", "quantity": 1.0, "unit": "each", "prepNote": "stalks, sliced" },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Olive oil", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Parsley", "quantity": 5.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Soften chopped onion, carrot and celery in olive oil, then add garlic.",
+			"Pour in stock and bring to a simmer. Add the diced chicken and cook until it reaches 75°C in the centre.",
+			"Add the egg noodles and cook according to the packet. Finish with parsley and black pepper."
+		],
+		"nutrition": {
+			"energyKj": 1933,
+			"proteinG": 32.9,
+			"fatG": 10.2,
+			"carbsG": 55.8,
+			"sugarsG": 10.3,
+			"fibreG": 6.3
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_030",
+		"title": "Miso mushroom noodle bowls",
+		"baseServings": 1,
+		"prepMinutes": 8,
+		"cookMinutes": 17,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "one pot", "soup"],
+		"cuisine": "Japanese-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["tofu"],
+		"ingredients": [
+			{ "name": "Udon noodles", "quantity": 200.0, "unit": "g", "prepNote": "pre-cooked" },
+			{ "name": "Button mushroom", "quantity": 100.0, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Firm tofu", "quantity": 100.0, "unit": "g", "prepNote": "drained and cubed" },
+			{ "name": "Bok choy", "quantity": 80.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "White miso paste", "quantity": 17.5, "unit": "g", "prepNote": null },
+			{ "name": "Vegetable stock", "quantity": 325.0, "unit": "ml", "prepNote": null },
+			{ "name": "Soy sauce", "quantity": 5.0, "unit": "ml", "prepNote": null },
+			{ "name": "Spring onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Sesame oil", "quantity": 2.5, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Heat sesame oil in a saucepan and sauté the mushrooms. Add vegetable stock and bring to a simmer.",
+			"Add tofu, bok choy and udon and simmer until the vegetables are tender and the noodles are hot.",
+			"Whisk the miso into a ladleful of broth, take the pan off the heat and stir it back in with soy sauce. Finish with spring onion."
+		],
+		"nutrition": {
+			"energyKj": 1998,
+			"proteinG": 28.4,
+			"fatG": 13.5,
+			"carbsG": 55.7,
+			"sugarsG": 4.7,
+			"fibreG": 10.4
+		},
+		"nutritionNote": null,
+		"tips": ["Use plain egg-free udon, vegan stock and miso without fish dashi."]
+	},
+	{
+		"id": "recipe_031",
+		"title": "Thai green coconut curry with spinach",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 12,
+		"restMinutes": 0,
+		"totalMinutes": 22,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "vegan", "curry"],
+		"cuisine": "Thai-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["nuts"],
+		"ingredients": [
+			{ "name": "Vegetable stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "English spinach", "quantity": 250.0, "unit": "g", "prepNote": "washed" },
+			{
+				"name": "Cherry tomato",
+				"quantity": 125.0,
+				"unit": "g",
+				"prepNote": "orange variety, halved"
+			},
+			{ "name": "Garlic", "quantity": 0.25, "unit": "each", "prepNote": "clove" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Thai green curry paste", "quantity": 3.75, "unit": "ml", "prepNote": "vegan" },
+			{
+				"name": "Light coconut milk",
+				"quantity": 100.0,
+				"unit": "ml",
+				"prepNote": "divided between sauce and rice"
+			},
+			{ "name": "Cornflour", "quantity": 3.75, "unit": "g", "prepNote": null },
+			{ "name": "Brown rice", "quantity": 50.0, "unit": "g", "prepNote": "cooked" },
+			{ "name": "Roasted cashews", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Desiccated coconut", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 2.5, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Wilt the spinach in batches in a covered pan with a splash of boiling water. Cool, squeeze out the excess water and set aside.",
+			"Soften the onion and garlic in the oil, then stir in the curry paste, tomatoes, stock powder and three-quarters of the coconut milk.",
+			"Whisk the cornflour with a little cold water, stir it into the simmering sauce until thickened and fold in the spinach.",
+			"Heat the cooked rice with the remaining coconut milk until steaming. Serve alongside the curry and scatter over the cashews and coconut."
+		],
+		"nutrition": {
+			"energyKj": 1883,
+			"proteinG": 15.1,
+			"fatG": 24.7,
+			"carbsG": 36.5,
+			"sugarsG": 11.0,
+			"fibreG": 11.5
+		},
+		"nutritionNote": "Use curry paste without shrimp paste, fish sauce or other animal ingredients. Use vegan vegetable stock. The 400 mL coconut milk in the source is treated as the batch total.",
+		"tips": [
+			"Use curry paste without shrimp paste, fish sauce or other animal ingredients.",
+			"Use vegan vegetable stock."
+		]
+	},
+	{
+		"id": "recipe_032",
+		"title": "Chickpea and sweet potato aloo curry",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 30,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "vegan", "curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 87.5, "unit": "ml", "prepNote": null },
+			{ "name": "Sweet potato", "quantity": 0.5, "unit": "each", "prepNote": "medium, cubed" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "medium, diced" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Canned chickpeas", "quantity": 60.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Frozen peas", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves" },
+			{ "name": "Ginger", "quantity": 3.75, "unit": "g", "prepNote": "grated" },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Dried curry leaves", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Cumin seeds", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Curry powder", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Fresh coriander", "quantity": 3.75, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Lemon", "quantity": 0.125, "unit": "each", "prepNote": "juice" }
+		],
+		"steps": [
+			"Heat the oil and fry the cumin seeds and curry leaves briefly. Add the onion, garlic, ginger and curry powder and cook until fragrant.",
+			"Add the sweet potato, tomatoes, chickpeas and vegetable stock. Cover and simmer for about 15 minutes, until the sweet potato is nearly tender.",
+			"Stir in the peas and cook until hot, then finish with coriander and lemon juice."
+		],
+		"nutrition": {
+			"energyKj": 1047,
+			"proteinG": 8.5,
+			"fatG": 9.0,
+			"carbsG": 27.6,
+			"sugarsG": 11.6,
+			"fibreG": 10.6
+		},
+		"nutritionNote": "Use vegan vegetable stock. Rice, naan and chutney are optional serving suggestions and are excluded from the estimate.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_033",
+		"title": "One-pot curried cod",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["fish", "legumes"],
+		"ingredients": [
+			{ "name": "Fish stock", "quantity": 125.0, "unit": "ml", "prepNote": null },
+			{ "name": "Cod fillet", "quantity": 1.0, "unit": "each", "prepNote": "skinless portions" },
+			{ "name": "White cabbage", "quantity": 50.0, "unit": "g", "prepNote": "roughly chopped" },
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null },
+			{ "name": "Canned chickpeas", "quantity": 60.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Canned lentils", "quantity": 60.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Ginger", "quantity": 12.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.75, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Canola oil", "quantity": 11.25, "unit": "ml", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Curry powder", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "juice and zest" },
+			{ "name": "Fresh coriander", "quantity": 3.75, "unit": "g", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Briefly sear the cod in some of the oil on both sides, then transfer it to a plate.",
+			"Soften the onion in the remaining oil. Add the garlic, ginger and spices, then stir in the tomatoes, fish stock and cabbage. Simmer for about 10 minutes.",
+			"Add the drained chickpeas and lentils and nestle the cod in the sauce. Cook gently until the fish flakes and is opaque throughout.",
+			"Finish with lemon zest, juice and coriander."
+		],
+		"nutrition": {
+			"energyKj": 1806,
+			"proteinG": 39.3,
+			"fatG": 13.6,
+			"carbsG": 29.7,
+			"sugarsG": 13.4,
+			"fibreG": 12.9
+		},
+		"nutritionNote": "The calculation uses 150 g per cod fillet and standard drained weights for both cans.",
+		"tips": []
+	},
+	{
+		"id": "recipe_034",
+		"title": "Sri Lankan vegetable curry",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "curry"],
+		"cuisine": "Sri Lankan-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": [],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Butternut pumpkin", "quantity": 50.0, "unit": "g", "prepNote": "cubed" },
+			{
+				"name": "Cauliflower",
+				"quantity": 0.25,
+				"unit": "each",
+				"prepNote": "cut into small florets"
+			},
+			{ "name": "Runner beans", "quantity": 25.0, "unit": "g", "prepNote": "trimmed and sliced" },
+			{ "name": "Brown onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Green chilli", "quantity": 0.75, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Light coconut milk", "quantity": 100.0, "unit": "ml", "prepNote": null },
+			{ "name": "Curry paste", "quantity": 7.5, "unit": "ml", "prepNote": "vegan" },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Basmati rice", "quantity": 50.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Fresh coriander", "quantity": 2.5, "unit": "g", "prepNote": "to serve" }
+		],
+		"steps": [
+			"Cook the rice according to the packet.",
+			"Soften the onion in the oil, then add garlic and chilli. Stir in the curry paste and turmeric and fry until fragrant.",
+			"Pour in the vegetable stock and coconut milk. Simmer the pumpkin for about 5 minutes, then add the cauliflower and cook for another 3–4 minutes.",
+			"Add the runner beans and continue simmering until the vegetables are tender. Serve with rice and coriander."
+		],
+		"nutrition": {
+			"energyKj": 1557,
+			"proteinG": 10.0,
+			"fatG": 12.0,
+			"carbsG": 52.4,
+			"sugarsG": 12.7,
+			"fibreG": 7.0
+		},
+		"nutritionNote": "Use vegan curry paste and vegetable stock. The unspecified rice is treated as dry basmati.",
+		"tips": ["Use vegan curry paste and vegetable stock."]
+	},
+	{
+		"id": "recipe_035",
+		"title": "Lentil curry with orange tomatoes",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 25.0, "unit": "ml", "prepNote": null },
+			{ "name": "Green lentils", "quantity": 50.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Tomato", "quantity": 100.0, "unit": "g", "prepNote": "orange variety, chopped" },
+			{ "name": "Frozen peas", "quantity": 30.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 1.25, "unit": "g", "prepNote": "grated" },
+			{ "name": "Light coconut milk", "quantity": 62.5, "unit": "ml", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Curry powder", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Cayenne pepper", "quantity": 0.03125, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Wild rice", "quantity": 50.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Fresh coriander", "quantity": 2.5, "unit": "g", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Start the wild rice and lentils in separate pots and cook each according to its packet.",
+			"Soften the onion, garlic and ginger in the oil with the cayenne. Stir in the tomatoes, coconut milk, vegetable stock and remaining spices and simmer for 5 minutes.",
+			"Drain the cooked lentils, add them and the peas to the sauce, and simmer for about 10 minutes. Serve with wild rice and fresh coriander."
+		],
+		"nutrition": {
+			"energyKj": 1998,
+			"proteinG": 23.7,
+			"fatG": 10.0,
+			"carbsG": 63.8,
+			"sugarsG": 8.1,
+			"fibreG": 15.5
+		},
+		"nutritionNote": "Use vegan vegetable stock. Green lentils were chosen because the source gives no variety.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_036",
+		"title": "Roasted cauliflower korma",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": [],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 100.0, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 1.875, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Ginger", "quantity": 3.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Green chilli", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Korma curry powder", "quantity": 0.75, "unit": "tsp", "prepNote": null },
+			{ "name": "Cauliflower", "quantity": 0.25, "unit": "each", "prepNote": "quartered" },
+			{ "name": "Light coconut milk", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Lime", "quantity": 0.25, "unit": "each", "prepNote": "wedges" },
+			{ "name": "Basmati rice", "quantity": 90.0, "unit": "g", "prepNote": "cooked" }
+		],
+		"steps": [
+			"Heat the oven to 180°C conventional. Brown the cauliflower on its cut sides in an ovenproof pan with the oil and set it aside.",
+			"In the same pan, soften the onion, garlic, ginger and chilli with the korma powder. Stir in the coconut milk and enough stock to make a spoonable sauce, then reduce slightly.",
+			"Return the cauliflower to the pan and spoon over the sauce. Cover and roast for 15–20 minutes or until tender. Serve with hot rice and lime wedges."
+		],
+		"nutrition": {
+			"energyKj": 1060,
+			"proteinG": 6.9,
+			"fatG": 6.3,
+			"carbsG": 39.3,
+			"sugarsG": 7.0,
+			"fibreG": 5.0
+		},
+		"nutritionNote": "Use vegan vegetable stock. The curry guide lists 400 mL liquid and the budget guide lists 200 mL. Start with less and add the remainder if the sauce needs it. Nutrition uses the curry guide amount.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_037",
+		"title": "Chicken biryani",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 40,
+		"restMinutes": 25,
+		"totalMinutes": 75,
+		"mealType": "dinner",
+		"tags": [],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "Chicken breast", "quantity": 0.5, "unit": "each", "prepNote": "skinless, diced" },
+			{ "name": "Basmati rice", "quantity": 62.5, "unit": "g", "prepNote": "cooked" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, crushed" },
+			{
+				"name": "Green chilli",
+				"quantity": 0.5,
+				"unit": "each",
+				"prepNote": "deseeded and chopped"
+			},
+			{ "name": "Cardamom pods", "quantity": 0.5, "unit": "each", "prepNote": "lightly crushed" },
+			{ "name": "Reduced-fat plain yoghurt", "quantity": 11.25, "unit": "ml", "prepNote": null },
+			{ "name": "Ginger", "quantity": 7.5, "unit": "ml", "prepNote": "freshly grated" },
+			{ "name": "Lemon juice", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Garam masala", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Fresh coriander", "quantity": 7.5, "unit": "ml", "prepNote": "chopped" },
+			{ "name": "Fresh mint", "quantity": 7.5, "unit": "ml", "prepNote": "chopped" },
+			{
+				"name": "Brown onion",
+				"quantity": 0.5,
+				"unit": "each",
+				"prepNote": "large, finely chopped"
+			},
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Flaked almonds", "quantity": 7.5, "unit": "ml", "prepNote": "toasted, optional" }
+		],
+		"steps": [
+			"Coat the chicken with the stock powder, garlic, chilli, cardamom, yoghurt, ginger, lemon juice and spices. Cover and refrigerate for 20–30 minutes.",
+			"Fry the onions in the oil until evenly browned and lift them out. Cook the marinated chicken with half the onions, coriander and mint for several minutes.",
+			"Spread the hot cooked rice over the chicken. Top with the remaining onions and herbs, cover and cook gently for 15–20 minutes, until the chicken reaches 75°C in the centre. Fluff gently before serving and add the almonds if using."
+		],
+		"nutrition": {
+			"energyKj": 1110,
+			"proteinG": 23.6,
+			"fatG": 4.9,
+			"carbsG": 29.0,
+			"sugarsG": 5.9,
+			"fibreG": 4.1
+		},
+		"nutritionNote": "Optional almonds, poppadoms, pickles and chutney are excluded from the estimate.",
+		"tips": []
+	},
+	{
+		"id": "recipe_038",
+		"title": "Chicken tikka masala",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 45,
+		"restMinutes": 360,
+		"totalMinutes": 420,
+		"mealType": "dinner",
+		"tags": [],
+		"cuisine": "British Indian",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 87.5, "unit": "ml", "prepNote": null },
+			{ "name": "Chicken breast", "quantity": 150.0, "unit": "g", "prepNote": "skinless, diced" },
+			{ "name": "Double cream", "quantity": 12.5, "unit": "ml", "prepNote": "for marinade" },
+			{ "name": "Lemon juice", "quantity": 11.25, "unit": "ml", "prepNote": null },
+			{
+				"name": "Ginger",
+				"quantity": 5.0,
+				"unit": "g",
+				"prepNote": "grated, divided between marinade and sauce"
+			},
+			{
+				"name": "Garlic",
+				"quantity": 1.75,
+				"unit": "each",
+				"prepNote": "cloves, roughly a third for marinade, rest for sauce"
+			},
+			{ "name": "Ground cumin", "quantity": 0.25, "unit": "tsp", "prepNote": "for marinade" },
+			{ "name": "Sweet paprika", "quantity": 0.5, "unit": "tsp", "prepNote": "split equally" },
+			{
+				"name": "Chilli powder",
+				"quantity": 0.375,
+				"unit": "tsp",
+				"prepNote": "one third for marinade, rest for sauce"
+			},
+			{
+				"name": "Garam masala",
+				"quantity": 0.5,
+				"unit": "tsp",
+				"prepNote": "one quarter for marinade, rest for sauce"
+			},
+			{ "name": "Unsalted butter", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "finely diced" },
+			{ "name": "Ground coriander", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Plain yoghurt", "quantity": 25.0, "unit": "ml", "prepNote": null },
+			{ "name": "Tomato", "quantity": 0.25, "unit": "each", "prepNote": "large, diced" },
+			{ "name": "Fresh coriander", "quantity": 5.0, "unit": "g", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Coat the chicken in lemon juice and refrigerate for 15–20 minutes. Add the marinade portions of ginger, garlic, cumin, paprika, chilli powder and garam masala plus the cream. Cover and refrigerate for 5–6 hours.",
+			"Brown the onion in butter, then fry the remaining garlic and ginger. Stir in the ground coriander, turmeric and remaining chilli powder and paprika, then stir in the yoghurt, tomato and chicken stock.",
+			"Simmer the sauce gently for 15–20 minutes. Meanwhile, thread the chicken onto skewers and grill, turning, until browned and 75°C in the centre.",
+			"Remove the chicken from the skewers and fold it into the sauce with the remaining garam masala and fresh coriander."
+		],
+		"nutrition": {
+			"energyKj": 1540,
+			"proteinG": 37.6,
+			"fatG": 19.7,
+			"carbsG": 7.4,
+			"sugarsG": 5.3,
+			"fibreG": 4.5
+		},
+		"nutritionNote": "Rest time is approximate and includes marination. Optional naan or rice is excluded from the estimate.",
+		"tips": []
+	},
+	{
+		"id": "recipe_039",
+		"title": "Potato and pea curry",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 45,
+		"restMinutes": 0,
+		"totalMinutes": 55,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 75.0, "unit": "ml", "prepNote": null },
+			{ "name": "New potato", "quantity": 150.0, "unit": "g", "prepNote": null },
+			{ "name": "Frozen peas", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Green chilli", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Garlic", "quantity": 0.75, "unit": "each", "prepNote": "cloves" },
+			{ "name": "Ginger", "quantity": 2.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Tomato passata", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Chilli powder", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Bay leaf", "quantity": 0.25, "unit": "each", "prepNote": null },
+			{ "name": "Sunflower oil", "quantity": 2.5, "unit": "ml", "prepNote": null },
+			{ "name": "Fresh coriander", "quantity": 2.5, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Basmati and wild rice blend", "quantity": 50.0, "unit": "g", "prepNote": "dry" }
+		],
+		"steps": [
+			"Start the rice according to the packet. Boil the potatoes until just tender, drain and brown them in half the oil.",
+			"Soften the onion in the remaining oil. Add the ginger, garlic, ground spices and bay leaf and stir for about a minute.",
+			"Add the passata, vegetable stock, chilli and potatoes and simmer for 10 minutes. Stir in the peas and heat through. Remove the bay leaf and serve with rice and coriander."
+		],
+		"nutrition": {
+			"energyKj": 1468,
+			"proteinG": 11.0,
+			"fatG": 3.6,
+			"carbsG": 63.3,
+			"sugarsG": 6.5,
+			"fibreG": 7.8
+		},
+		"nutritionNote": "Use vegan vegetable stock.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_040",
+		"title": "Roasted eggplant and chickpea curry",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 50,
+		"restMinutes": 0,
+		"totalMinutes": 65,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 125.0, "unit": "ml", "prepNote": null },
+			{
+				"name": "Eggplant",
+				"quantity": 0.75,
+				"unit": "each",
+				"prepNote": "roasted flesh, skins discarded"
+			},
+			{ "name": "Olive oil", "quantity": 15.0, "unit": "ml", "prepNote": "divided" },
+			{ "name": "White onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.75, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Ginger", "quantity": 2.5, "unit": "g", "prepNote": "diced" },
+			{ "name": "Red chilli", "quantity": 0.25, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Sweet paprika", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Cumin seeds", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Coriander seeds", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Canned chickpeas", "quantity": 62.5, "unit": "g", "prepNote": "drained" },
+			{ "name": "Coconut cream", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Fresh coriander", "quantity": 3.75, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Heat the oven to 200°C conventional. Rub the eggplants with some of the olive oil and season. Roast for roughly 40 minutes until very soft.",
+			"Meanwhile, soften the onion, garlic, ginger and chilli in the remaining oil with the spices. Add the drained chickpeas and vegetable stock, cover and simmer for about 30 minutes.",
+			"Scoop the flesh from the roasted eggplants, discard the skins and fold the flesh into the pan with the coconut cream and coriander. Return briefly to a simmer."
+		],
+		"nutrition": {
+			"energyKj": 1548,
+			"proteinG": 8.0,
+			"fatG": 28.0,
+			"carbsG": 17.0,
+			"sugarsG": 7.8,
+			"fibreG": 10.6
+		},
+		"nutritionNote": "Use vegan vegetable stock. Chickpeas are modelled as cooked and drained. Optional rice or naan is excluded from the estimate.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_041",
+		"title": "Indian chicken and sweet potato curry",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 60,
+		"restMinutes": 0,
+		"totalMinutes": 75,
+		"mealType": "dinner",
+		"tags": ["curry"],
+		"cuisine": "Indian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken", "legumes"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 375.0, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Ginger", "quantity": 5.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Garlic", "quantity": 0.75, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Canola oil", "quantity": 15.0, "unit": "ml", "prepNote": null },
+			{
+				"name": "Chicken thigh",
+				"quantity": 150.0,
+				"unit": "g",
+				"prepNote": "skinless and boneless, cubed"
+			},
+			{ "name": "Curry powder", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Cayenne pepper", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Garam masala", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground coriander", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.5, "unit": "each", "prepNote": "juice and zest" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Canned chickpeas", "quantity": 60.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Sweet potato", "quantity": 100.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Fresh coriander", "quantity": 3.75, "unit": "g", "prepNote": "to serve" },
+			{
+				"name": "Reduced-fat plain yoghurt",
+				"quantity": 0.25,
+				"unit": "tsp",
+				"prepNote": "to serve"
+			},
+			{ "name": "Wild rice", "quantity": 100.0, "unit": "g", "prepNote": "cooked" },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Brown the chicken in the oil in a large pot. Add the onion, ginger, garlic and ground spices and fry briefly.",
+			"Add the lemon, tomatoes, chickpeas, sweet potato and chicken stock. Simmer for about an hour, stirring occasionally, until the sweet potato is tender, the curry has reduced and the chicken reaches 75°C.",
+			"Season and serve with hot wild rice, yoghurt and fresh coriander."
+		],
+		"nutrition": {
+			"energyKj": 2445,
+			"proteinG": 40.9,
+			"fatG": 21.5,
+			"carbsG": 49.2,
+			"sugarsG": 13.1,
+			"fibreG": 11.8
+		},
+		"nutritionNote": "The source quantity of 1.5 L stock makes a loose curry. Use a wide pot if you prefer more reduction.",
+		"tips": []
+	},
+	{
+		"id": "recipe_042",
+		"title": "One-pot beef and spinach curry",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 90,
+		"restMinutes": 0,
+		"totalMinutes": 105,
+		"mealType": "dinner",
+		"tags": ["curry"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef"],
+		"ingredients": [
+			{ "name": "Beef stock", "quantity": 83.33333333, "unit": "ml", "prepNote": null },
+			{ "name": "Beef braising steak", "quantity": 100.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Light coconut milk", "quantity": 66.66666667, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 41.66666667, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Baby spinach", "quantity": 33.33333333, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Ginger", "quantity": 3.33333333, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Curry powder", "quantity": 5.0, "unit": "ml", "prepNote": "mild" },
+			{ "name": "Flaked almonds", "quantity": 8.33333333, "unit": "g", "prepNote": null },
+			{ "name": "Fresh coriander", "quantity": 1.66666667, "unit": "g", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 1.66666667, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Brown the beef in the oil in a heavy pot. Stir in the onion, garlic, ginger and curry powder and cook gently for 5 minutes.",
+			"Add the beef stock and coconut milk. Bring to a simmer, cover and cook gently until the beef is tender, about 90 minutes. Stir occasionally and loosen with hot water if needed.",
+			"Wilt the spinach into the curry and finish with almonds and fresh coriander."
+		],
+		"nutrition": {
+			"energyKj": 1335,
+			"proteinG": 25.8,
+			"fatG": 21.4,
+			"carbsG": 4.2,
+			"sugarsG": 3.7,
+			"fibreG": 4.1
+		},
+		"nutritionNote": "Optional naan or rice is excluded from the estimate.",
+		"tips": []
+	},
+	{
+		"id": "recipe_043",
+		"title": "One-pot tomato pasta with marinated mozzarella",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 10,
+		"restMinutes": 0,
+		"totalMinutes": 15,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{
+				"name": "Paprika and sun-dried tomato vegetable stock",
+				"quantity": 200.0,
+				"unit": "ml",
+				"prepNote": null
+			},
+			{ "name": "Linguine", "quantity": 80.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, chopped" },
+			{ "name": "Brown onion", "quantity": 0.125, "unit": "each", "prepNote": "diced" },
+			{ "name": "Basil", "quantity": 3.75, "unit": "g", "prepNote": "torn" },
+			{ "name": "Cherry tomato", "quantity": 62.5, "unit": "g", "prepNote": "one punnet" },
+			{ "name": "Buffalo mozzarella", "quantity": 62.5, "unit": "g", "prepNote": "drained" },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "zest only" },
+			{
+				"name": "Fresh oregano",
+				"quantity": 1.5,
+				"unit": "each",
+				"prepNote": "sprigs, leaves picked"
+			},
+			{ "name": "Dried chilli flakes", "quantity": 0.125, "unit": "tsp", "prepNote": null }
+		],
+		"steps": [
+			"Put the linguine, garlic, onion, basil and tomatoes in a wide saucepan. Add just enough stock to cover, then simmer and stir until the pasta is al dente and the liquid has reduced to a sauce.",
+			"Tear the mozzarella into chunks and dress it with olive oil, lemon zest, oregano and chilli flakes. Spoon it over the pasta just before serving."
+		],
+		"nutrition": {
+			"energyKj": 2314,
+			"proteinG": 25.5,
+			"fatG": 22.4,
+			"carbsG": 59.0,
+			"sugarsG": 3.5,
+			"fibreG": 4.7
+		},
+		"nutritionNote": "Use vegetable stock and mozzarella made with non-animal rennet. Plain vegetable stock can replace the flavoured stock.",
+		"tips": ["Use vegetable stock and mozzarella made with non-animal rennet."]
+	},
+	{
+		"id": "recipe_044",
+		"title": "Pasta primavera",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 30,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy", "legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 75.0, "unit": "ml", "prepNote": null },
+			{ "name": "Asparagus", "quantity": 1.0, "unit": "each", "prepNote": "spears, thinly sliced" },
+			{ "name": "Zucchini", "quantity": 0.25, "unit": "each", "prepNote": "thinly sliced" },
+			{ "name": "English spinach", "quantity": 62.5, "unit": "g", "prepNote": null },
+			{ "name": "Frozen peas", "quantity": 37.5, "unit": "g", "prepNote": null },
+			{ "name": "Basil pesto", "quantity": 3.75, "unit": "ml", "prepNote": "vegetarian" },
+			{ "name": "Tagliatelle", "quantity": 62.5, "unit": "g", "prepNote": "dry" },
+			{ "name": "Vegetarian hard cheese", "quantity": 7.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": "to finish" }
+		],
+		"steps": [
+			"Boil the tagliatelle in water until al dente and drain. Bring the vegetable stock to a simmer in a separate pan.",
+			"Add the sliced zucchini and asparagus for a minute, then stir in the peas, spinach and pesto and cook until the greens wilt and the peas are hot.",
+			"Toss the pasta through the vegetables and finish with grated vegetarian hard cheese and olive oil."
+		],
+		"nutrition": {
+			"energyKj": 1475,
+			"proteinG": 13.7,
+			"fatG": 8.6,
+			"carbsG": 51.2,
+			"sugarsG": 4.0,
+			"fibreG": 6.1
+		},
+		"nutritionNote": "Use pesto and hard cheese made without animal rennet. The source only uses half the pasta cooking liquid for the sauce. This adaptation uses 300 mL prepared stock and treats the drained pasta water as cooking water.",
+		"tips": ["Use pesto and hard cheese made without animal rennet."]
+	},
+	{
+		"id": "recipe_045",
+		"title": "Tuna and olive pasta bake",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["pasta"],
+		"cuisine": "British-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["fish", "dairy"],
+		"ingredients": [
+			{ "name": "Herb vegetable stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "Pasta shells", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Unsalted butter", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, chopped" },
+			{ "name": "Plain flour", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Green olives", "quantity": 25.0, "unit": "g", "prepNote": "pitted" },
+			{ "name": "Canned tuna in oil", "quantity": 65.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Cheddar", "quantity": 20.0, "unit": "g", "prepNote": "grated" }
+		],
+		"steps": [
+			"Heat the oven to 220°C conventional or 200°C fan. Cook the pasta until just al dente, then drain it.",
+			"Soften the onion and garlic in the butter. Stir in the flour for 2–3 minutes, then add tomatoes and herb stock powder. Simmer with the olives and tuna for 5 minutes.",
+			"Toss with the pasta and transfer to a baking dish. Sprinkle with cheddar and bake for about 15 minutes until bubbling and golden."
+		],
+		"nutrition": {
+			"energyKj": 2544,
+			"proteinG": 32.8,
+			"fatG": 25.3,
+			"carbsG": 58.7,
+			"sugarsG": 5.3,
+			"fibreG": 5.3
+		},
+		"nutritionNote": "Two 185 g tins of tuna are estimated to yield 260 g drained. Cook time allows for the sauce and baking. Plain vegetable stock powder can replace herb stock powder.",
+		"tips": []
+	},
+	{
+		"id": "recipe_046",
+		"title": "Spinach and pine nut pasta",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["dairy", "nuts"],
+		"ingredients": [
+			{ "name": "Chicken stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "English spinach", "quantity": 125.0, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 0.625, "unit": "each", "prepNote": "cloves, chopped" },
+			{ "name": "Fusilli", "quantity": 50.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Pine nuts", "quantity": 25.0, "unit": "g", "prepNote": "roasted" },
+			{ "name": "Ground nutmeg", "quantity": 0.0625, "unit": "tsp", "prepNote": "optional" },
+			{ "name": "Black pepper", "quantity": 0.0625, "unit": "tsp", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 25.0, "unit": "g", "prepNote": "grated" }
+		],
+		"steps": [
+			"Cook the fusilli until al dente and reserve a little cooking water. Heat the oven to 200°C conventional.",
+			"Soften the garlic in olive oil, add the spinach and cook until wilted. Add stock powder dissolved in a splash of pasta water, pine nuts, pepper and the optional nutmeg.",
+			"Toss with the pasta and half the Parmesan. Put in a heatproof dish, scatter over the rest of the cheese and bake at 200°C for about 15 minutes, or until golden."
+		],
+		"nutrition": {
+			"energyKj": 2088,
+			"proteinG": 21.2,
+			"fatG": 28.7,
+			"carbsG": 38.2,
+			"sugarsG": 1.8,
+			"fibreG": 6.0
+		},
+		"nutritionNote": "This contains chicken stock but no chicken meat. Optional nutmeg is excluded from nutrition.",
+		"tips": []
+	},
+	{
+		"id": "recipe_047",
+		"title": "Chicken and mushroom penne",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken", "dairy"],
+		"ingredients": [
+			{ "name": "Chicken stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "Penne", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Button mushroom", "quantity": 62.5, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Dried mixed herbs", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Chicken breast", "quantity": 75.0, "unit": "g", "prepNote": "diced" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Milk", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Cornflour", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Mozzarella", "quantity": 25.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Parsley", "quantity": 0.25, "unit": "tsp", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Cook and drain the penne. In a separate pan, soften the onion and garlic in the oil, then add the mushrooms and herbs.",
+			"Add the chicken and brown on all sides. Stir in the tomatoes, chicken stock powder and three-quarters of the milk, and simmer for 5 minutes.",
+			"Whisk the remaining milk and cornflour, pour it in and stir gently until the sauce thickens and the chicken reaches 75°C. Toss through the pasta and top with mozzarella and parsley."
+		],
+		"nutrition": {
+			"energyKj": 2215,
+			"proteinG": 36.8,
+			"fatG": 13.2,
+			"carbsG": 61.8,
+			"sugarsG": 8.5,
+			"fibreG": 5.5
+		},
+		"nutritionNote": "The estimate uses canned tomatoes and mozzarella from the alternatives listed in the source.",
+		"tips": []
+	},
+	{
+		"id": "recipe_048",
+		"title": "One-pot mushroom ragù with pasta",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Mushroom stock", "quantity": 125.0, "unit": "ml", "prepNote": null },
+			{ "name": "Swiss brown mushroom", "quantity": 125.0, "unit": "g", "prepNote": "quartered" },
+			{ "name": "Baby spinach", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, finely chopped" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Crème fraîche", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Fusilli", "quantity": 56.25, "unit": "g", "prepNote": "dry" },
+			{ "name": "Vegetarian hard cheese", "quantity": 6.25, "unit": "g", "prepNote": "grated" }
+		],
+		"steps": [
+			"Brown the mushrooms in olive oil over high heat. Add garlic and canned tomatoes and cook for 2 minutes.",
+			"Stir in mushroom stock, crème fraîche and the dry pasta. Cover and simmer for about 10 minutes, stirring occasionally, until the pasta is tender.",
+			"Take the pan off the heat and stir in the cheese and spinach until the leaves wilt."
+		],
+		"nutrition": {
+			"energyKj": 1443,
+			"proteinG": 14.8,
+			"fatG": 9.9,
+			"carbsG": 45.0,
+			"sugarsG": 4.3,
+			"fibreG": 6.3
+		},
+		"nutritionNote": "Use vegetarian mushroom stock and hard cheese made without animal rennet.",
+		"tips": ["Use vegetarian mushroom stock and hard cheese made without animal rennet."]
+	},
+	{
+		"id": "recipe_049",
+		"title": "Creamy tomato tortellini soup",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "soup"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 200.0, "unit": "ml", "prepNote": null },
+			{ "name": "Tomato", "quantity": 25.0, "unit": "g", "prepNote": "diced" },
+			{ "name": "Celery", "quantity": 0.25, "unit": "each", "prepNote": "stalk, diced" },
+			{ "name": "Zucchini", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Tomato paste", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.75, "unit": "each", "prepNote": "cloves, chopped" },
+			{ "name": "Double cream", "quantity": 25.0, "unit": "ml", "prepNote": null },
+			{
+				"name": "Spinach and ricotta tortellini",
+				"quantity": 75.0,
+				"unit": "g",
+				"prepNote": "fresh"
+			},
+			{ "name": "Kale", "quantity": 50.0, "unit": "g", "prepNote": "stems removed, chopped" },
+			{ "name": "Basil", "quantity": 3.75, "unit": "g", "prepNote": "divided" },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Vegetarian hard cheese", "quantity": 5.0, "unit": "g", "prepNote": "to serve" }
+		],
+		"steps": [
+			"Soften the onion, garlic, celery, zucchini and fresh tomatoes in olive oil for about 10 minutes.",
+			"Stir in the canned tomatoes, tomato paste and prepared stock. Bring to a boil and simmer for 5–10 minutes.",
+			"Add the tortellini, cream, kale and some basil. Simmer until the pasta is cooked according to its packet, then serve with the remaining basil and grated cheese."
+		],
+		"nutrition": {
+			"energyKj": 1792,
+			"proteinG": 13.3,
+			"fatG": 22.8,
+			"carbsG": 38.0,
+			"sugarsG": 12.1,
+			"fibreG": 7.6
+		},
+		"nutritionNote": "Use vegetarian cheese, vegetable stock and vegetarian cheese-filled tortellini. The source lists kale but says spinach in the method. This version uses kale. Olive oil and finishing cheese are included at estimated amounts because they appear only in the method.",
+		"tips": ["Use vegetarian cheese, vegetable stock and vegetarian cheese-filled tortellini."]
+	},
+	{
+		"id": "recipe_050",
+		"title": "Prawn, kale and spinach linguine",
+		"baseServings": 1,
+		"prepMinutes": 25,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["shellfish"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 25.0, "unit": "ml", "prepNote": null },
+			{ "name": "Linguine", "quantity": 62.5, "unit": "g", "prepNote": "dry" },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Unsalted butter", "quantity": 6.25, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Dried chilli flakes", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{
+				"name": "Raw peeled prawns",
+				"quantity": 125.0,
+				"unit": "g",
+				"prepNote": "peeled and deveined"
+			},
+			{ "name": "Kale", "quantity": 50.0, "unit": "g", "prepNote": "finely sliced" },
+			{ "name": "English spinach", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 12.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Lemon juice", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Salt", "quantity": null, "unit": null, "prepNote": "to taste" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Boil and drain the linguine. Heat the olive oil and butter in a wide pan and briefly fry the garlic and chilli flakes.",
+			"Cook the prawns until just opaque. Add the kale, spinach, oregano and vegetable stock and heat until the greens wilt and the liquid reduces slightly.",
+			"Toss through the linguine, Parmesan and lemon juice. Season to taste."
+		],
+		"nutrition": {
+			"energyKj": 2159,
+			"proteinG": 41.1,
+			"fatG": 17.6,
+			"carbsG": 43.9,
+			"sugarsG": 0.7,
+			"fibreG": 6.7
+		},
+		"nutritionNote": "The source lists stock but omits it from the directions. This version uses a modest amount of prepared vegetable stock in the sauce and uses the butter from the ingredient list.",
+		"tips": []
+	},
+	{
+		"id": "recipe_051",
+		"title": "Oven-baked lentil bolognese",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 50,
+		"restMinutes": 0,
+		"totalMinutes": 60,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["legumes", "dairy"],
+		"ingredients": [
+			{
+				"name": "Paprika and sun-dried tomato vegetable stock powder",
+				"quantity": 2.5,
+				"unit": "g",
+				"prepNote": null
+			},
+			{ "name": "Spaghetti", "quantity": 80.0, "unit": "g", "prepNote": "dry" },
+			{
+				"name": "Canned diced tomato",
+				"quantity": 200.0,
+				"unit": "g",
+				"prepNote": "whole peeled plum tomatoes can be substituted"
+			},
+			{ "name": "Green lentils", "quantity": 50.0, "unit": "g", "prepNote": "dry Puy lentils" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "grated" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "grated" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Breadcrumbs", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Vegetarian hard cheese", "quantity": 18.75, "unit": "g", "prepNote": "grated" },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "zest only" },
+			{ "name": "Fresh oregano", "quantity": 2.5, "unit": "g", "prepNote": "leaves picked" },
+			{ "name": "Olive oil", "quantity": 1.875, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Heat the oven to 180°C. Crush the canned tomatoes in a deep roasting dish. Add the rinsed lentils, carrot, onion, garlic and stock powder. Stir in enough water to keep the lentils submerged.",
+			"Bake for 35–40 minutes, stirring once and adding hot water if the pan dries out. Continue until the lentils are tender.",
+			"Toss breadcrumbs with cheese, lemon zest, oregano and oil and bake on a separate tray for 10–12 minutes until crisp. Cook and drain the spaghetti, then serve with the lentil sauce and breadcrumb topping."
+		],
+		"nutrition": {
+			"energyKj": 2930,
+			"proteinG": 35.4,
+			"fatG": 10.2,
+			"carbsG": 105.4,
+			"sugarsG": 14.1,
+			"fibreG": 16.7
+		},
+		"nutritionNote": "Use vegetarian hard cheese and vegetable stock powder. The unspecified pasta packet was estimated as 320 g dry for four portions. Water added to cook the lentils is excluded from nutrient totals.",
+		"tips": ["Use vegetarian hard cheese and vegetable stock powder."]
+	},
+	{
+		"id": "recipe_052",
+		"title": "Baked ziti with ricotta",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 50,
+		"restMinutes": 0,
+		"totalMinutes": 65,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "pasta"],
+		"cuisine": "Italian-American",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Vegetable stock powder", "quantity": 2.5, "unit": "g", "prepNote": null },
+			{ "name": "Unsalted butter", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Bay leaf", "quantity": 0.5, "unit": "each", "prepNote": null },
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null },
+			{ "name": "Basil", "quantity": 5.0, "unit": "g", "prepNote": "chopped" },
+			{
+				"name": "Ziti",
+				"quantity": 75.0,
+				"unit": "g",
+				"prepNote": "cooked and drained, or use cooked rigatoni"
+			},
+			{ "name": "Ricotta", "quantity": 50.0, "unit": "g", "prepNote": null },
+			{ "name": "Vegetarian hard cheese", "quantity": 12.5, "unit": "g", "prepNote": "grated" },
+			{ "name": "Olive oil", "quantity": 1.25, "unit": "ml", "prepNote": "for the dish" }
+		],
+		"steps": [
+			"Heat the oven to 180°C conventional or 160°C fan. Soften the onion in butter, then add the garlic for a couple of minutes.",
+			"Add the tomatoes, bay leaves and vegetable stock powder. Simmer for 10 minutes, remove the bay leaves and stir in basil.",
+			"Grease a baking dish with olive oil. Spread a little sauce across the bottom and mix the remaining sauce with the cooked ziti. Layer half of the pasta, all the ricotta and the remaining pasta. Scatter over the hard cheese and bake for 20–30 minutes until golden."
+		],
+		"nutrition": {
+			"energyKj": 1345,
+			"proteinG": 16.1,
+			"fatG": 13.6,
+			"carbsG": 30.0,
+			"sugarsG": 9.7,
+			"fibreG": 5.1
+		},
+		"nutritionNote": "Uses the vegetable stock option, vegetarian ricotta and hard cheese made without animal rennet. The 300 g pasta is treated as cooked weight, as specified.",
+		"tips": [
+			"Uses the vegetable stock option, vegetarian ricotta and hard cheese made without animal rennet."
+		]
+	},
+	{
+		"id": "recipe_053",
+		"title": "Eggplant, spinach and ricotta lasagne roll-ups",
+		"baseServings": 1,
+		"prepMinutes": 20,
+		"cookMinutes": 50,
+		"restMinutes": 0,
+		"totalMinutes": 70,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 100.0, "unit": "ml", "prepNote": null },
+			{ "name": "Ricotta", "quantity": 62.5, "unit": "g", "prepNote": null },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "zest only" },
+			{ "name": "Vegetarian hard cheese", "quantity": 18.75, "unit": "g", "prepNote": "grated" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, divided" },
+			{ "name": "Fresh lasagne sheet", "quantity": 62.5, "unit": "g", "prepNote": null },
+			{
+				"name": "Eggplant",
+				"quantity": 0.25,
+				"unit": "each",
+				"prepNote": "large, sliced thinly lengthways"
+			},
+			{ "name": "Baby spinach", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Carrot", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{
+				"name": "Fresh thyme",
+				"quantity": 1.0,
+				"unit": "each",
+				"prepNote": "sprigs, leaves picked"
+			},
+			{ "name": "Canned diced tomato", "quantity": 200.0, "unit": "g", "prepNote": null }
+		],
+		"steps": [
+			"Heat the oven to 200°C conventional or 180°C fan. Soften onion, carrot, thyme and half the garlic in oil, add canned tomatoes and stock, then simmer for 20 minutes. Soften the eggplant slices in a hot pan if needed to make them flexible.",
+			"Beat together ricotta, the remaining garlic, lemon zest and hard cheese. Spread over the fresh sheets, add eggplant and spinach, then roll each sheet up.",
+			"Pour the tomato sauce into a baking dish and nestle the rolls in the sauce. Bake for about 30 minutes until the pasta is tender and the sauce bubbles."
+		],
+		"nutrition": {
+			"energyKj": 1893,
+			"proteinG": 23.4,
+			"fatG": 17.1,
+			"carbsG": 45.6,
+			"sugarsG": 14.7,
+			"fibreG": 9.3
+		},
+		"nutritionNote": "Use vegetarian stock, ricotta and hard cheese. The unspecified fresh lasagne packet was estimated as 250 g.",
+		"tips": ["Use vegetarian stock, ricotta and hard cheese."]
+	},
+	{
+		"id": "recipe_054",
+		"title": "Classic beef lasagne",
+		"baseServings": 1,
+		"prepMinutes": 40,
+		"cookMinutes": 75,
+		"restMinutes": 0,
+		"totalMinutes": 115,
+		"mealType": "dinner",
+		"tags": ["pasta"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["beef", "dairy"],
+		"ingredients": [
+			{ "name": "Beef stock", "quantity": 50.0, "unit": "ml", "prepNote": null },
+			{ "name": "Lasagne sheet", "quantity": 50.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Lean beef mince", "quantity": 125.0, "unit": "g", "prepNote": null },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Carrot", "quantity": 0.25, "unit": "each", "prepNote": "finely diced" },
+			{ "name": "Celery", "quantity": 0.25, "unit": "each", "prepNote": "stalk, finely diced" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "finely diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, finely chopped" },
+			{ "name": "Tomato paste", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Dried oregano", "quantity": 0.125, "unit": "tsp", "prepNote": null },
+			{ "name": "Dried thyme", "quantity": 0.125, "unit": "tsp", "prepNote": null },
+			{ "name": "Reduced-fat milk", "quantity": 225.0, "unit": "ml", "prepNote": null },
+			{ "name": "Parmesan", "quantity": 10.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Unsalted butter", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Plain flour", "quantity": 12.5, "unit": "g", "prepNote": null },
+			{ "name": "Bay leaf", "quantity": 0.25, "unit": "each", "prepNote": null },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Brown the beef mince with the onion, carrot and celery. Add garlic, tomatoes, tomato paste, stock, oregano and thyme. Simmer for about 20 minutes and make sure the mince reaches 75°C.",
+			"Warm the milk with the bay leaf and pepper, then remove the leaf. Melt butter in a second pot and stir in flour. Gradually whisk in the warm milk, simmer for 4–5 minutes until thick and melt in most of the Parmesan.",
+			"Layer meat sauce, pasta and béchamel in a baking dish. Finish with béchamel and the remaining Parmesan. Bake at 180°C conventional or 160°C fan for 25–35 minutes, until golden and bubbling. Rest briefly before slicing."
+		],
+		"nutrition": {
+			"energyKj": 2776,
+			"proteinG": 49.5,
+			"fatG": 21.9,
+			"carbsG": 63.4,
+			"sugarsG": 19.6,
+			"fibreG": 5.5
+		},
+		"nutritionNote": null,
+		"tips": []
+	},
+	{
+		"id": "recipe_055",
+		"title": "Tofu and vegetable vermicelli bowls",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 10,
+		"restMinutes": 0,
+		"totalMinutes": 20,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "vegan"],
+		"cuisine": "East Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["tofu"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 200.0, "unit": "ml", "prepNote": null },
+			{
+				"name": "Rice vermicelli",
+				"quantity": 37.5,
+				"unit": "g",
+				"prepNote": "dry, approximately one nest per portion"
+			},
+			{ "name": "Firm tofu", "quantity": 75.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Red cabbage", "quantity": 0.125, "unit": "each", "prepNote": "finely shredded" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "cut into thin ribbons" },
+			{
+				"name": "Swiss brown mushroom",
+				"quantity": 37.5,
+				"unit": "g",
+				"prepNote": "thinly sliced"
+			},
+			{ "name": "Spring onion", "quantity": 0.5, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "juice" },
+			{ "name": "Soy sauce", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "White miso paste", "quantity": 1.0, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Dried chilli flakes", "quantity": 0.0625, "unit": "tsp", "prepNote": "to taste" }
+		],
+		"steps": [
+			"Brown the tofu in oil. Add the mushrooms and cook briefly. Place the rice vermicelli, cabbage, carrot, spring onion, cooked tofu and mushrooms in serving bowls.",
+			"Bring the stock to a boil and stir in the soy sauce. Pour it over the noodles, cover and stand for about 5 minutes or until tender.",
+			"Loosen the miso with a spoonful of broth, stir it back through and finish with lemon juice and chilli flakes."
+		],
+		"nutrition": {
+			"energyKj": 1462,
+			"proteinG": 15.1,
+			"fatG": 11.2,
+			"carbsG": 40.2,
+			"sugarsG": 8.4,
+			"fibreG": 7.1
+		},
+		"nutritionNote": "Use vegan stock and miso without fish dashi. Oil, miso and chilli appear only in the source method and are quantified here. Refrigerate the components if assembling ahead and add hot stock just before serving.",
+		"tips": ["Use vegan stock and miso without fish dashi."]
+	},
+	{
+		"id": "recipe_056",
+		"title": "One-pot butternut pumpkin and lentils",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 40,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan"],
+		"cuisine": "Contemporary",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 75.0, "unit": "ml", "prepNote": null },
+			{ "name": "Butternut pumpkin", "quantity": 150.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Baby spinach", "quantity": 15.0, "unit": "g", "prepNote": null },
+			{ "name": "Canned lentils", "quantity": 60.0, "unit": "g", "prepNote": "green, drained" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, chopped" },
+			{ "name": "Tomato paste", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Dried mixed herbs", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Soften the onion and garlic in oil for about 5 minutes. Stir in the tomato paste and herbs and cook briefly.",
+			"Add the pumpkin, drained lentils, tomatoes and stock. Bring to a boil, then simmer for about 20 minutes, until the pumpkin is tender.",
+			"Fold the spinach through just before serving."
+		],
+		"nutrition": {
+			"energyKj": 815,
+			"proteinG": 9.7,
+			"fatG": 4.9,
+			"carbsG": 23.5,
+			"sugarsG": 13.7,
+			"fibreG": 7.9
+		},
+		"nutritionNote": "Use vegan vegetable stock. Optional crusty bread or quinoa is excluded from the estimate.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_057",
+		"title": "Asparagus and lemon risotto",
+		"baseServings": 1,
+		"prepMinutes": 25,
+		"cookMinutes": 30,
+		"restMinutes": 0,
+		"totalMinutes": 55,
+		"mealType": "dinner",
+		"tags": ["vegetarian"],
+		"cuisine": "Italian-inspired",
+		"isVegetarian": true,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 250.0, "unit": "ml", "prepNote": "hot" },
+			{ "name": "Arborio rice", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{
+				"name": "Asparagus",
+				"quantity": 50.0,
+				"unit": "g",
+				"prepNote": "tips, cut into bite-sized pieces"
+			},
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "finely chopped" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Lemon", "quantity": 0.25, "unit": "each", "prepNote": "zest only" },
+			{ "name": "Unsalted butter", "quantity": 7.5, "unit": "g", "prepNote": null },
+			{ "name": "Dry white wine", "quantity": 25.0, "unit": "ml", "prepNote": "optional" },
+			{ "name": "Vegetarian hard cheese", "quantity": 10.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Parsley", "quantity": 3.75, "unit": "ml", "prepNote": "chopped" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Soften the onion in butter, add the garlic and stir through the dry rice. If using wine, add it now and reduce until almost evaporated.",
+			"Add the hot stock a ladle at a time, stirring and letting each addition absorb before the next, until the rice is creamy and nearly al dente.",
+			"Add the asparagus and lemon zest for the final 5 minutes. Stir through the cheese and parsley and finish with black pepper."
+		],
+		"nutrition": {
+			"energyKj": 1602,
+			"proteinG": 10.9,
+			"fatG": 10.1,
+			"carbsG": 59.5,
+			"sugarsG": 3.1,
+			"fibreG": 3.0
+		},
+		"nutritionNote": "Use vegetable stock and hard cheese made without animal rennet. Optional wine is excluded from the estimate.",
+		"tips": ["Use vegetable stock and hard cheese made without animal rennet."]
+	},
+	{
+		"id": "recipe_058",
+		"title": "Broccoli and cheddar soup",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 35,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["soup"],
+		"cuisine": "British-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["dairy"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 200.0, "unit": "ml", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Potato", "quantity": 0.25, "unit": "each", "prepNote": "large, cubed" },
+			{ "name": "Broccoli", "quantity": 0.25, "unit": "each", "prepNote": "small head, chopped" },
+			{ "name": "Pouring cream", "quantity": 15.0, "unit": "ml", "prepNote": null },
+			{ "name": "Cheddar", "quantity": 20.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Black pepper", "quantity": 0.0625, "unit": "tsp", "prepNote": null }
+		],
+		"steps": [
+			"Soften the onion in olive oil without browning it. Add broccoli and potato and stir over medium heat for several minutes.",
+			"Pour in the chicken stock and simmer until the potato is soft, about 15 minutes. Stir in cream and cheddar until the cheese melts.",
+			"Blend until smooth with a stick blender and season with black pepper."
+		],
+		"nutrition": {
+			"energyKj": 900,
+			"proteinG": 10.3,
+			"fatG": 13.5,
+			"carbsG": 10.7,
+			"sugarsG": 4.3,
+			"fibreG": 4.1
+		},
+		"nutritionNote": "As written it contains chicken stock but no chicken meat. Vegetable stock and cheddar made without animal rennet make a vegetarian variation.",
+		"tips": []
+	},
+	{
+		"id": "recipe_059",
+		"title": "Roasted vegetable couscous",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 25,
+		"mealType": "dinner",
+		"tags": ["quick", "vegetarian", "vegan"],
+		"cuisine": "Mediterranean-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": [],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 93.75, "unit": "ml", "prepNote": "hot" },
+			{ "name": "Couscous", "quantity": 62.5, "unit": "g", "prepNote": "dry" },
+			{ "name": "Butternut pumpkin", "quantity": 25.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Red capsicum", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Yellow capsicum", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Zucchini", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Red onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Lemon juice", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{
+				"name": "Olive oil",
+				"quantity": 11.25,
+				"unit": "ml",
+				"prepNote": "two-thirds for roasting, one-third for dressing"
+			},
+			{ "name": "Fresh coriander", "quantity": 2.5, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Fresh mint", "quantity": 2.5, "unit": "g", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Heat the oven to 200°C conventional or 180°C fan. Toss the diced vegetables with two-thirds of the olive oil and roast for about 20 minutes, turning once.",
+			"Pour the hot vegetable stock over the couscous, cover and leave it for about 5 minutes, then fluff with a fork.",
+			"Mix through the roasted vegetables, lemon juice, remaining oil, coriander and mint."
+		],
+		"nutrition": {
+			"energyKj": 1651,
+			"proteinG": 11.8,
+			"fatG": 11.5,
+			"carbsG": 57.4,
+			"sugarsG": 12.8,
+			"fibreG": 6.4
+		},
+		"nutritionNote": "Use vegan vegetable stock.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_060",
+		"title": "Chicken noodle soup with cheddar and parsley",
+		"baseServings": 1,
+		"prepMinutes": 5,
+		"cookMinutes": 12,
+		"restMinutes": 0,
+		"totalMinutes": 17,
+		"mealType": "dinner",
+		"tags": ["quick", "soup"],
+		"cuisine": "Contemporary",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken", "dairy"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 312.5, "unit": "ml", "prepNote": null },
+			{
+				"name": "Chicken breast",
+				"quantity": 0.5,
+				"unit": "each",
+				"prepNote": "cooked fillets, shredded"
+			},
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "cut into thin ribbons" },
+			{
+				"name": "Spaghetti",
+				"quantity": 18.75,
+				"unit": "g",
+				"prepNote": "dry, broken into pieces"
+			},
+			{
+				"name": "Spring onion",
+				"quantity": 0.5,
+				"unit": "each",
+				"prepNote": "bunches, finely sliced"
+			},
+			{ "name": "Cheddar", "quantity": 25.0, "unit": "g", "prepNote": "grated" },
+			{ "name": "Parsley", "quantity": 2.5, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Black pepper", "quantity": null, "unit": null, "prepNote": "to taste" }
+		],
+		"steps": [
+			"Bring the chicken stock to the boil and add the broken spaghetti. Stir and cook for about 5 minutes.",
+			"Add the carrot ribbons, spring onions and cooked shredded chicken. Simmer until the pasta is tender and the chicken is steaming hot throughout.",
+			"Mix the grated cheddar with the parsley, scatter it over the bowls and add black pepper."
+		],
+		"nutrition": {
+			"energyKj": 1309,
+			"proteinG": 28.6,
+			"fatG": 11.8,
+			"carbsG": 20.5,
+			"sugarsG": 6.4,
+			"fibreG": 3.7
+		},
+		"nutritionNote": "Uses already-cooked chicken. Optional crusty bread is excluded from the estimate.",
+		"tips": []
+	},
+	{
+		"id": "recipe_061",
+		"title": "Coconut red lentil soup with walnuts",
+		"baseServings": 1,
+		"prepMinutes": 20,
+		"cookMinutes": 25,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan", "soup"],
+		"cuisine": "South Asian-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes", "nuts"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 125.0, "unit": "ml", "prepNote": null },
+			{ "name": "Red lentils", "quantity": 50.0, "unit": "g", "prepNote": "dry, rinsed" },
+			{ "name": "Tomato", "quantity": 100.0, "unit": "g", "prepNote": "orange variety, chopped" },
+			{ "name": "Carrot", "quantity": 75.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "English spinach", "quantity": 50.0, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Celery", "quantity": 37.5, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Brown onion", "quantity": 0.75, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Garlic", "quantity": 1.0, "unit": "each", "prepNote": "cloves, minced" },
+			{ "name": "Ginger", "quantity": 3.75, "unit": "g", "prepNote": "minced" },
+			{ "name": "Ground cumin", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Ground turmeric", "quantity": 0.5, "unit": "tsp", "prepNote": null },
+			{ "name": "Light coconut milk", "quantity": 200.0, "unit": "ml", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null },
+			{ "name": "Lemon juice", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Walnut", "quantity": 20.0, "unit": "g", "prepNote": "to serve" }
+		],
+		"steps": [
+			"Soften the onions, garlic and ginger in olive oil. Stir in the cumin, turmeric, carrot, celery, tomatoes and rinsed lentils.",
+			"Add the coconut milk and vegetable stock. Bring to a boil and simmer until the lentils and vegetables are soft.",
+			"Blend briefly to keep some texture. Wilt the spinach into the soup and finish with lemon juice and walnuts."
+		],
+		"nutrition": {
+			"energyKj": 2574,
+			"proteinG": 20.2,
+			"fatG": 36.8,
+			"carbsG": 42.6,
+			"sugarsG": 18.4,
+			"fibreG": 17.0
+		},
+		"nutritionNote": "Use vegan vegetable stock. The tomatoes are listed in the source ingredients but omitted from its method, so this version cooks them with the vegetables.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_062",
+		"title": "Slow-cooker chicken with potatoes and carrots",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 250,
+		"restMinutes": 0,
+		"totalMinutes": 265,
+		"mealType": "dinner",
+		"tags": [],
+		"cuisine": "Contemporary",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 125.0, "unit": "ml", "prepNote": null },
+			{ "name": "Chicken thigh", "quantity": 125.0, "unit": "g", "prepNote": "skinless, boneless" },
+			{ "name": "Plain flour", "quantity": 12.5, "unit": "g", "prepNote": "for dusting" },
+			{ "name": "Potato", "quantity": 0.5, "unit": "each", "prepNote": "large, quartered" },
+			{ "name": "Carrot", "quantity": 0.5, "unit": "each", "prepNote": "large, thickly sliced" },
+			{ "name": "Ginger", "quantity": 3.0, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Red chilli", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, chopped" },
+			{
+				"name": "Star anise",
+				"quantity": 1.0,
+				"unit": "each",
+				"prepNote": "optional, remove before serving"
+			},
+			{ "name": "Coriander seeds", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Fennel seeds", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Olive oil", "quantity": 7.5, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Lightly dust the chicken with flour and shake off the excess. Brown the pieces in oil in a frying pan.",
+			"Add onion, garlic, ginger, chilli, coriander seeds, fennel seeds and optional star anise. Cook for 4–5 minutes, then add the stock and bring to a simmer.",
+			"Transfer to a slow cooker with potatoes and carrots. Cover and cook on low for 4–6 hours, until the vegetables are tender and the chicken reaches 75°C. Remove the star anise before serving."
+		],
+		"nutrition": {
+			"energyKj": 1474,
+			"proteinG": 28.8,
+			"fatG": 11.3,
+			"carbsG": 30.5,
+			"sugarsG": 9.0,
+			"fibreG": 5.9
+		},
+		"nutritionNote": "The calculation uses the listed flour, so actual intake may be slightly lower after dusting. Optional star anise is excluded. A single portion may be too small for some slow cookers, so follow your appliance's minimum fill guidance or cook a larger batch.",
+		"tips": []
+	},
+	{
+		"id": "recipe_063",
+		"title": "Spicy black bean and sweet potato tacos",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 35,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan"],
+		"cuisine": "Mexican-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{
+				"name": "Smoked chilli and tomato vegetable stock",
+				"quantity": 25.0,
+				"unit": "ml",
+				"prepNote": null
+			},
+			{
+				"name": "Canned black beans",
+				"quantity": 120.0,
+				"unit": "g",
+				"prepNote": "drained and rinsed"
+			},
+			{
+				"name": "Sweet potato",
+				"quantity": 0.25,
+				"unit": "each",
+				"prepNote": "large, peeled and cubed"
+			},
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Jalapeño", "quantity": 0.25, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, finely diced" },
+			{ "name": "Olive oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Plain flour", "quantity": 62.5, "unit": "g", "prepNote": "for tortillas" },
+			{ "name": "Water", "quantity": 25.0, "unit": "ml", "prepNote": "for tortillas" },
+			{ "name": "Canola oil", "quantity": 11.25, "unit": "ml", "prepNote": "for tortillas" },
+			{ "name": "Avocado", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Red onion", "quantity": 0.125, "unit": "each", "prepNote": "finely diced" },
+			{ "name": "Fresh coriander", "quantity": 3.75, "unit": "g", "prepNote": "leaves" },
+			{ "name": "Lime", "quantity": 0.25, "unit": "each", "prepNote": "wedges" }
+		],
+		"steps": [
+			"Soften the onion, jalapeño and garlic in olive oil. Add the diced sweet potato and stock, cover and simmer until the sweet potato is soft, adding a splash of water if the pan dries out. Stir in the beans and simmer uncovered until the filling is thick.",
+			"Mix the flour, water and canola oil into a dough. If the dough is too stiff to knead, add a little water. Knead until smooth, rest briefly, divide into small balls and roll each one thin. Cook each tortilla in a hot dry pan until spotted and cooked on both sides.",
+			"Fill the warm tortillas with the bean mixture. Finish with avocado, red onion, coriander and lime."
+		],
+		"nutrition": {
+			"energyKj": 2677,
+			"proteinG": 19.4,
+			"fatG": 21.5,
+			"carbsG": 82.8,
+			"sugarsG": 8.3,
+			"fibreG": 18.1
+		},
+		"nutritionNote": "The source reprints a different curry method on this page. These steps were written from the taco ingredients. Use vegan vegetable stock and choose a chilli-tomato variety or use plain vegetable stock.",
+		"tips": [
+			"Use vegan vegetable stock and choose a chilli-tomato variety or use plain vegetable stock."
+		]
+	},
+	{
+		"id": "recipe_064",
+		"title": "Five-spice chicken ramen",
+		"baseServings": 1,
+		"prepMinutes": 15,
+		"cookMinutes": 20,
+		"restMinutes": 0,
+		"totalMinutes": 35,
+		"mealType": "dinner",
+		"tags": [],
+		"cuisine": "Japanese-inspired",
+		"isVegetarian": false,
+		"isVegan": false,
+		"proteins": ["chicken", "egg"],
+		"ingredients": [
+			{ "name": "Chicken stock", "quantity": 200.0, "unit": "ml", "prepNote": null },
+			{ "name": "Ramen noodles", "quantity": 75.0, "unit": "g", "prepNote": "dry" },
+			{ "name": "Shiitake mushroom", "quantity": 37.5, "unit": "g", "prepNote": "sliced" },
+			{ "name": "English spinach", "quantity": 25.0, "unit": "g", "prepNote": null },
+			{ "name": "Bok choy", "quantity": 0.25, "unit": "each", "prepNote": "chopped" },
+			{ "name": "Sesame oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, sliced" },
+			{ "name": "Soy sauce", "quantity": 18.75, "unit": "ml", "prepNote": null },
+			{ "name": "Ginger", "quantity": 1.25, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Canola oil", "quantity": 7.5, "unit": "ml", "prepNote": "divided" },
+			{ "name": "Chicken breast", "quantity": 75.0, "unit": "g", "prepNote": "fillets" },
+			{ "name": "Chinese five-spice", "quantity": 0.25, "unit": "tsp", "prepNote": null },
+			{ "name": "Baby corn", "quantity": 25.0, "unit": "g", "prepNote": "cooked" },
+			{ "name": "Egg", "quantity": 1.0, "unit": "each", "prepNote": "boiled and halved" },
+			{ "name": "Spring onion", "quantity": 0.75, "unit": "each", "prepNote": "sliced" },
+			{ "name": "Sesame seeds", "quantity": 3.75, "unit": "g", "prepNote": "toasted" }
+		],
+		"steps": [
+			"Cook the ramen noodles according to the packet, drain and toss with sesame oil. Boil the eggs to your liking, then peel and halve. Warm the chicken stock and soy sauce together.",
+			"Season the chicken with five-spice and fry in half the canola oil until it reaches 75°C in the centre. Set aside to rest, then slice. Stir-fry the garlic, ginger, mushrooms, spinach and bok choy in the remaining oil.",
+			"Divide the noodles, vegetables, corn, chicken and eggs among bowls. Pour over the hot broth and finish with spring onions and sesame seeds."
+		],
+		"nutrition": {
+			"energyKj": 2395,
+			"proteinG": 36.6,
+			"fatG": 19.3,
+			"carbsG": 58.7,
+			"sugarsG": 3.1,
+			"fibreG": 7.0
+		},
+		"nutritionNote": "Use low-salt stock or adjust the soy sauce to taste if your prepared stock is salty.",
+		"tips": []
+	},
+	{
+		"id": "recipe_065",
+		"title": "Vegetable and chickpea tagine with couscous",
+		"baseServings": 1,
+		"prepMinutes": 10,
+		"cookMinutes": 35,
+		"restMinutes": 0,
+		"totalMinutes": 45,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan"],
+		"cuisine": "Moroccan-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 62.5, "unit": "ml", "prepNote": null },
+			{ "name": "Sweet potato", "quantity": 50.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Butternut pumpkin", "quantity": 50.0, "unit": "g", "prepNote": "cubed" },
+			{ "name": "Canned chickpeas", "quantity": 60.0, "unit": "g", "prepNote": "drained" },
+			{ "name": "Canned diced tomato", "quantity": 100.0, "unit": "g", "prepNote": null },
+			{ "name": "Yellow capsicum", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Kale", "quantity": 12.5, "unit": "g", "prepNote": "chopped" },
+			{ "name": "Brown onion", "quantity": 0.25, "unit": "each", "prepNote": "diced" },
+			{ "name": "Garlic", "quantity": 0.25, "unit": "each", "prepNote": "clove, chopped" },
+			{ "name": "Ras el hanout", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Couscous", "quantity": 50.0, "unit": "g", "prepNote": "dry, to serve" },
+			{ "name": "Parsley", "quantity": 2.5, "unit": "g", "prepNote": "chopped" }
+		],
+		"steps": [
+			"Soften the onion and garlic in oil. Stir in ras el hanout, tomatoes, capsicum, pumpkin, sweet potato and stock. Simmer for about 15 minutes.",
+			"Add the drained chickpeas and simmer until the vegetables are tender and the sauce has reduced, about 15 minutes more. Add a splash of water if needed.",
+			"Prepare the couscous according to its packet. Fold kale and parsley through the tagine until wilted and serve over the couscous."
+		],
+		"nutrition": {
+			"energyKj": 1668,
+			"proteinG": 15.4,
+			"fatG": 5.9,
+			"carbsG": 63.7,
+			"sugarsG": 15.7,
+			"fibreG": 11.9
+		},
+		"nutritionNote": "Use vegan vegetable stock. The ingredient list specifies drained chickpeas, which this version follows. The unquantified couscous is included at 50 g dry per serving.",
+		"tips": ["Use vegan vegetable stock."]
+	},
+	{
+		"id": "recipe_066",
+		"title": "Sweet potato and black bean shepherd’s pie",
+		"baseServings": 1,
+		"prepMinutes": 20,
+		"cookMinutes": 60,
+		"restMinutes": 0,
+		"totalMinutes": 80,
+		"mealType": "dinner",
+		"tags": ["vegetarian", "vegan"],
+		"cuisine": "British-inspired",
+		"isVegetarian": true,
+		"isVegan": true,
+		"proteins": ["legumes"],
+		"ingredients": [
+			{ "name": "Vegetable stock", "quantity": 25.0, "unit": "ml", "prepNote": null },
+			{ "name": "Sweet potato", "quantity": 200.0, "unit": "g", "prepNote": "peeled, cubed" },
+			{
+				"name": "Canned lentils",
+				"quantity": 100.0,
+				"unit": "g",
+				"prepNote": "drained and rinsed"
+			},
+			{ "name": "Tomato", "quantity": 100.0, "unit": "g", "prepNote": "orange variety, chopped" },
+			{ "name": "Button mushroom", "quantity": 62.5, "unit": "g", "prepNote": "sliced" },
+			{ "name": "Red onion", "quantity": 0.25, "unit": "each", "prepNote": "sliced" },
+			{
+				"name": "Canned black beans",
+				"quantity": 50.0,
+				"unit": "g",
+				"prepNote": "drained and rinsed"
+			},
+			{ "name": "Tomato paste", "quantity": 17.5, "unit": "g", "prepNote": null },
+			{ "name": "Garlic", "quantity": 0.5, "unit": "each", "prepNote": "cloves, crushed" },
+			{ "name": "Smoked paprika", "quantity": 1.875, "unit": "ml", "prepNote": null },
+			{ "name": "Ground cumin", "quantity": 3.75, "unit": "ml", "prepNote": null },
+			{ "name": "Canola oil", "quantity": 3.75, "unit": "ml", "prepNote": null }
+		],
+		"steps": [
+			"Heat the oven to 175°C conventional. Boil the sweet potatoes until soft, then drain and mash.",
+			"Fry the onion and mushrooms in oil until lightly browned. Stir in garlic, paprika and cumin, then add lentils, black beans, tomatoes, tomato paste and stock. Simmer until the filling thickens slightly.",
+			"Transfer the filling to a baking dish, spread the mash over it and score the top with a fork. Bake for 30–35 minutes, until bubbling and starting to brown."
+		],
+		"nutrition": {
+			"energyKj": 1647,
+			"proteinG": 18.0,
+			"fatG": 6.0,
+			"carbsG": 57.5,
+			"sugarsG": 19.0,
+			"fibreG": 17.7
+		},
+		"nutritionNote": "Use vegan vegetable stock. The 400 g lentils and 200 g black beans are treated as drained weights.",
+		"tips": ["Use vegan vegetable stock."]
+	}
+]

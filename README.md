@@ -25,6 +25,7 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | `src/routes/auth/`, `account/`, `avatars/` | Email links, setting a new password, serving profile photos           |
 | `src/lib/features/<feature>/`              | Each feature's components and its `*.server.ts` data functions        |
 | `src/lib/copy/`                            | The app's voice: headings, placeholder pools, empty states            |
+| `src/lib/features/recipes/`                | Plan dinner: the recipe library (library.json), scaling, search       |
 | `src/routes/(app)/feed/`                   | Post update, a post with its replies, and the photo route             |
 | `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, GlassCard, Avatar, Icon          |
 | `src/lib/styles/tokens.css`                | Type, spacing, colour, glass and the three day palettes               |
@@ -39,7 +40,8 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 
 ## Features so far
 
-- **Today**: a swipeable row of what's coming up, plans and due chores in date order, with a travelling glow and a Done button on chores. Below it, your open lists, the lights shortcut (sample until Home Assistant), Post update, and the home feed.
+- **Today**: a swipeable row of what's coming up, plans and due chores in date order, with a travelling glow and a Done button on chores. Below it, your open lists, Plan dinner (it says what's on tonight once it's planned), Post update, and the home feed.
+- **Plan dinner**: a recipe library (66 to start, plus any you add) with search by dish or ingredient and filters (Under 30 min, Vegetarian, Vegan, Favourites, and cuisine and protein under More filters). A recipe shows prep, cook and resting time, nutrition per serve, ingredients and method, with a servings bar at the bottom: **Add to Lists** makes a shopping list named after the meal, scaled to the servings, letting you untick what you've got; **Schedule** picks the night, an optional time and who's cooking, and makes a task carrying the scaled recipe that shows on Today on the night. The cook opens it from Today to follow along, then taps Mark as cooked (or reschedules or skips it). Next time you open Plan dinner, one card asks "How was it?" (or first "Did you make it?" if its time passed and it's still open). Ratings are one each per recipe and editable; five stars makes a favourite, and the recipe page shows everyone's.
 - **Voice**: prompts ask instead of label (“What’s the plan?”), headings change on every visit, and empty fields scroll through suggestions (“Shucking oysters on the beach?” → “Brunch with Gaga?”) until you tap them. All copy is in `src/lib/copy/voice.ts`.
 - **Gestures**: swipe left and right between tabs, swipe right to go back from anything deeper, and pull down to refresh.
 - **Home feed**: quick updates and photos for everyone at home, on Today under the rest. Older posts load as you scroll. React with one of four reactions (one each) or open a post to reply; replies stay with the post. The post menu has **Create event**, which opens a plan draft with the post in its notes; the saved plan shows on the post and links back to it. Authors can delete their own posts and replies.
