@@ -2,7 +2,7 @@
 
 A household app for friends who live together: plans, chores, lists and home notes, installed
 on each person's iPhone Home Screen.
-SvelteKit 3 + Supabase, with liquidglass.dev glass and an original grain-and-mesh backdrop.
+SvelteKit 3 + Supabase, with lightweight CSS glass and an original grain-and-mesh backdrop.
 
 ## Run it
 
@@ -29,7 +29,7 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, GlassCard, Avatar, Icon          |
 | `src/lib/styles/tokens.css`                | Type, spacing, colour, glass and the three day palettes               |
 | `src/lib/server/`                          | Server-only: Supabase client, sample data                             |
-| `src/lib/vendor/liquid-glass/`             | liquidglass.dev engine and web components, MIT, one Safari fix        |
+| `src/lib/vendor/liquid-glass/`             | liquidglass.dev engine, MIT, one Safari fix; not loaded at the moment |
 | `src/service-worker/`                      | Offline support: app shell, saved pages, the update handover          |
 | `static/`                                  | Manifest, icons, iPhone launch screens, the offline page              |
 | `supabase/migrations/`                     | Tables, row-level security and the database functions                 |
@@ -99,6 +99,6 @@ redirect to `/offline` would break the service worker's offline page.
 
 ## Before calling the shell finished
 
-- Check the glass in Safari on a real iPhone: the frosted cards, and the tab bar before and after its glass loads.
+- Check the glass in Safari on a real iPhone: the smoked cards and the frosted tab bar.
 - Check the tab bar clears the home indicator when launched from the Home Screen.
 - Check secondary text stays at 4.5:1 or better on all three palettes.

@@ -7,7 +7,6 @@
 	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
-	import { loadGlass } from '#lib/ui/glass.js';
 	import { usePageTransitions } from '#lib/ui/page-transitions.js';
 	import type { LayoutProps } from './$types';
 
@@ -18,7 +17,6 @@
 	onMount(() => {
 		// From here on, each screen opened gets a fresh heading (src/lib/copy/pick.ts).
 		markHydrated();
-		loadGlass();
 		applyDaypart();
 		const timer = setInterval(applyDaypart, 5 * 60 * 1000);
 		return () => clearInterval(timer);
@@ -29,8 +27,7 @@
 	<title>home base</title>
 </svelte:head>
 
-<!-- The tab bar's glass refracts an aligned copy of .app-backdrop; cards blur it. -->
-<div class="app" data-lg-backdrop=".app-backdrop">
+<div class="app">
 	<div class="app-backdrop" aria-hidden="true"></div>
 	{@render children()}
 </div>

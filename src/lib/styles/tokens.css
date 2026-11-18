@@ -48,8 +48,9 @@
 	--colour-hairline-strong: rgb(255 255 255 / 0.14);
 	/* Refracting glass (the tab bar and segmented controls): light enough for the bent backdrop to show. */
 	--glass-smoke: rgb(14 11 10 / 0.26);
-	/* Cards: frosted glass. The blur carries the colour through; the body keeps text at 4.5:1. */
-	--glass-body: rgb(18 14 12 / 0.46);
+	/* Cards: smoked glass with no live blur (see GlassSurface); the body keeps text at 4.5:1. */
+	--glass-body: rgb(18 14 12 / 0.56);
+	/* Live blur, kept for things that are briefly on screen (menus, notices, the refresh bead). */
 	--glass-blur: blur(24px) saturate(150%);
 	--glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
 	/* Light caught inside the top edge, as through the thickness of the glass. */
@@ -200,17 +201,6 @@
 	--ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 	--duration-quick: 180ms;
 	--duration-settle: 280ms;
-
-	/* liquidglass.dev theme */
-	--lg-on-glass: var(--colour-text-muted);
-	--lg-text: var(--colour-accent);
-	--lg-tint: var(--glass-smoke);
-	--lg-indicator: rgb(255 240 228 / 0.1);
-	--lg-shadow-1: 0 6px 18px rgb(0 0 0 / 0.38), 0 1px 3px rgb(0 0 0 / 0.3);
-	--lg-shadow-2: var(--shadow-lift);
-	--lg-fallback: var(--glass-blur);
-	--lg-focus: var(--colour-accent);
-	--lg-surface: transparent;
 }
 
 :root[data-daypart='morning'] {

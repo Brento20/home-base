@@ -1,13 +1,13 @@
 <script lang="ts">
 	/**
-	 * The glass body behind a card's content: the backdrop blurred and darkened through the
-	 * browser's own backdrop-filter, a specular rim drawn in CSS (bright at the top-left, softer
-	 * at the bottom-right), and a soft drop shadow.
+	 * The glass body behind a card's content: a smoked, see-through fill, light caught inside
+	 * the top edge, a specular rim drawn in CSS (bright at the top-left, softer at the
+	 * bottom-right), and a soft drop shadow.
 	 *
-	 * Cards used to bend the backdrop with liquidglass.dev's refraction filters. On iPhone those
-	 * are drawn on the CPU and made scrolling and page changes stutter, so cards keep the rim and
-	 * use blur instead; only the tab bar still refracts. Everything here is composited by the
-	 * GPU, so nothing repaints while a card moves.
+	 * No live blur. The backdrop is a soft gradient, so blurring it changed almost nothing you
+	 * could see, while every card's blur had to be redrawn on every frame of scrolling, swiping
+	 * and page changes, which is what made older iPhones stutter. A plain fill is drawn once.
+	 * (Cards bent the backdrop with liquidglass.dev refraction before that, which was worse.)
 	 */
 	import { onMount } from 'svelte';
 
@@ -101,8 +101,6 @@
 		display: block;
 		border-radius: var(--surface-radius);
 		background: var(--glass-body);
-		-webkit-backdrop-filter: var(--glass-blur);
-		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--glass-inner-light), var(--shadow-lift);
 		pointer-events: none;
 	}

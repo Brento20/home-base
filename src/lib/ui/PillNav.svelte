@@ -1,0 +1,127 @@
+<script lang="ts" generics="T extends { href: string }">
+	/**
+	 * A row of links with a glass pill that slides to the current one: the tab bar and the
+	 * Lists | Tasks switch.
+	 *
+	 * All CSS: the pill moves with a transform on a soft spring (a slight settle, no bounce),
+	 * which the phone's compositor runs without the main thread, so it never stutters a page
+	 * change. It sets off the moment a navigation starts (tap or swipe) instead of waiting for
+	 * the next page's data, and goes back if that navigation doesn't happen.
+	 */
+	import type { Snippet } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
+
+	interface Props {
+		items: T[];
+		/** The item for a path, or -1 for none. */
+		indexFor: (pathname: string) => number;
+		current: number;
+		label: string;
+		variant: 'tabs' | 'segmented';
+		item: Snippet<[T, boolean]>;
+	}
+
+	let { items, indexFor, current, label, variant, item }: Props = $props();
+
+	let heading = $state<number | null>(null);
+	const shown = $derived(heading ?? current);
+
+	beforeNavigate((navigation) => {
+		const next = navigation.to ? indexFor(navigation.to.url.pathname) : -1;
+		if (next < 0 || next === current) return;
+		heading = next;
+		navigation.complete.then(
+			() => (heading = null),
+			() => (heading = null)
+		);
+	});
+</script>
+
+<nav class="pill-nav {variant}" aria-label={label} style:--count={items.length} style:--at={shown}>
+	{#if shown >= 0}<span class="pill" aria-hidden="true"></span>{/if}
+	{#each items as entry, index (entry.href)}
+		<a
+			href={entry.href}
+			class:on={index === shown}
+			aria-current={index === current ? 'page' : undefined}
+		>
+			{@render item(entry, index === shown)}
+		</a>
+	{/each}
+</nav>
+
+<style>
+	.pill-nav {
+		--inset: 5px;
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+		padding: var(--inset);
+		border-radius: var(--radius-pill);
+		color: var(--colour-text-muted);
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+	}
+
+	.pill {
+		position: absolute;
+		top: var(--inset);
+		bottom: var(--inset);
+		left: var(--inset);
+		width: calc((100% - 2 * var(--inset)) / var(--count));
+		border-radius: var(--radius-pill);
+		background: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.06));
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.22),
+			inset 0 0 0 1px rgb(255 255 255 / 0.08),
+			0 6px 16px -8px rgb(0 0 0 / 0.6);
+		transform: translateX(calc(var(--at) * 100%));
+		transition: transform 440ms var(--spring-soft);
+	}
+
+	a {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-pill);
+		color: inherit;
+		text-decoration: none;
+		transition: color var(--duration-quick) var(--ease-out);
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	a.on {
+		color: var(--colour-accent);
+	}
+
+	a:focus-visible {
+		outline: 2px solid var(--colour-accent);
+		outline-offset: -2px;
+	}
+
+	.tabs a {
+		flex-direction: column;
+		gap: 4px;
+		height: 52px;
+		font-size: 11px;
+		font-weight: var(--weight-medium);
+		line-height: 1;
+		letter-spacing: var(--tracking-label);
+	}
+
+	.segmented {
+		display: inline-grid;
+	}
+
+	.segmented a {
+		height: 34px;
+		padding: 0 20px;
+		font-size: var(--text-small);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pill {
+			transition: none;
+		}
+	}
+</style>

@@ -4,23 +4,21 @@ Household app for friends who live together. SvelteKit 3 + Supabase, installed o
 
 ## Glass
 
-- Use the **liquid-glass-web** skill (liquidglass.dev) for every glass element. Read its SKILL.md before adding or changing glass. If it isn't installed, run `curl -fsSL https://liquidglass.dev/install-skill.sh | sh` (installs into `~/.claude/skills` and/or `~/.codex/skills`).
-- The engine and web components are vendored in `src/lib/vendor/liquid-glass/`, unchanged apart from one Safari fix marked `home base:` (its README explains it). Don't rewrite the filter code; the skill explains why. Chromium hides Safari-only glass bugs, so check glass changes in WebKit too.
-- Cards use `src/lib/ui/GlassSurface.svelte`: frosted glass, not refraction. The backdrop is blurred through `backdrop-filter` (`--glass-blur`) under a darkened body (`--glass-body`), with a specular rim drawn in CSS (`--glass-rim`, bright top-left, soft bottom-right) and light inside the top edge (`--glass-inner-light`). Refracting cards were drawn on the CPU on iPhone and stuttered scrolling and page changes, so only the navigation pills still refract. Pass `squish` for anything tappable.
-- Navigation pills use `<lg-navbar>` (`TabBar.svelte`, `SegmentedNav.svelte`), with the active item driven by the URL.
-- The pills refract the aligned copy of `.app-backdrop` (root layout, `data-lg-backdrop`), so their glass works in Safari and Firefox, not only Chrome.
-- The tab bar is a glass rod (bezel 1, curvature 2.5); its indicator lens is tuned through `glass.update()` in `TabBar.svelte`.
-- `--glass-body` (cards) and `--glass-smoke` (pills) are the tints that keep text at 4.5:1 over the brightest part of the backdrop. Recheck contrast before lightening them.
+- Glass is plain CSS, built to stay light on an older iPhone. No glass engine runs: the liquidglass.dev components in `src/lib/vendor/liquid-glass/` are no longer loaded (refraction is drawn on the CPU in Safari and made every tab change stutter). Don't bring back SVG-filter refraction or a live blur on anything that's always on screen or moves.
+- Cards use `src/lib/ui/GlassSurface.svelte`: smoked glass with no live blur. A see-through body (`--glass-body`), a specular rim drawn in CSS (`--glass-rim`, bright top-left, soft bottom-right) and light inside the top edge (`--glass-inner-light`). The backdrop is a soft gradient, so a blur behind cards changed almost nothing visible but had to be redrawn on every scroll and swipe frame. Pass `squish` for anything tappable.
+- The tab bar (`TabBar.svelte`) is the one always-visible surface with a live backdrop blur. It and the Lists | Tasks switch (`SegmentedNav.svelte`) share `PillNav.svelte`: a glass pill that slides with a CSS transform on `--spring-soft` (calm, a hint of settle) and sets off when a navigation starts.
+- Live blur (`--glass-blur`) is fine on things that are briefly on screen: menus, notices, the refresh bead.
+- `--glass-body` is the tint that keeps text at 4.5:1 over the brightest part of the backdrop. Recheck contrast before lightening it.
 - The warm glow is reserved for the next plan on Today.
 
 ## Motion
 
 - Presses squish (wider and shorter) on `--duration-press`, then spring back on `--spring-bouncy` over `--duration-release`. Glass cards squish as a whole (glass, rim and content together) through the Web Animations API on the `scale` property, started from pointer events (iOS often skips `:active`), so a card's own `transition` can't override the spring.
-- Page transitions (`src/lib/ui/page-transitions.ts`) use the Web Animations API on the element marked `data-page`, transform and opacity only. No View Transitions: their whole-page snapshots cost too much on phones. The old page starts easing away the moment you tap (while data loads), the new one springs in when it's ready, and the tab indicator sets off at the same moment. Direction follows tab order (`src/lib/ui/tabs.ts`) and path depth. Query-only changes don't animate. Measure with `scripts/navperf.py` (4× CPU throttle).
+- Page transitions (`src/lib/ui/page-transitions.ts`) are deliberately minimal. Switching tabs is instant, as in native apps; the tab pill is the motion. Going deeper slides the new page in from the right (from the left coming back): one 260ms transform on the element marked `data-page`. No fades, no View Transitions, nothing animating while data loads. Query-only changes don't animate. Measure with `scripts/navperf.py` (4× CPU throttle).
 - The session is checked with `getClaims()` in hooks.server.ts (local signature check, no auth round trip with asymmetric signing keys). `locals.user` is `{ id, email }`, not a full Supabase user.
 - Phones are portrait only: the manifest locks installed Android apps, and a short landscape screen shows the “Turn me upright” note from app.html (styles in base.css), since iPhones ignore the lock.
 - Everything collapses to a quick fade or nothing under `prefers-reduced-motion`.
-- Phones draw refracting glass on the CPU (Safari renders SVG filters in software), so keep it out of moving frames: cards don't refract, page transitions animate only transform and opacity (no blur or scale), and the tab indicator's stretch is rounded so its lens map is reused from cache. Judge motion changes in a CPU-throttled browser (4×), not by eye on a laptop.
+- Animate only transform and opacity, and as little as possible: every blur or filter under something moving is redrawn each frame, which phones feel long before a laptop does. Judge motion changes in a CPU-throttled browser (4×) and then on a real iPhone, not by eye on a laptop.
 
 ## Voice
 
