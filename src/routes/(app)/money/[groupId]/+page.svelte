@@ -178,6 +178,7 @@
 		min-height: var(--tap-target);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
+		text-decoration: none;
 	}
 
 	.empty {

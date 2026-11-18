@@ -21,9 +21,4 @@
 	{/snippet}
 </PageHeader>
 
-<RecipeForm
-	values={form?.values ?? data.values}
-	errors={form?.errors}
-	submitLabel="Save"
-	cancelHref="/dinner/{data.recipe.id}"
-/>
+<RecipeForm values={form?.values ?? data.values} errors={form?.errors} submitLabel="Save" />

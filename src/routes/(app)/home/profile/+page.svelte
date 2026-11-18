@@ -27,7 +27,6 @@
 	values={form?.values}
 	errors={form?.errors}
 	submitLabel="Save"
-	cancelHref="/home"
 	today={data.today}
 />
 
@@ -41,5 +40,6 @@
 		margin-top: var(--space-xl);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
+		text-decoration: none;
 	}
 </style>

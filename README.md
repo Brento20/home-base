@@ -11,6 +11,8 @@ npm install
 npm run dev
 ```
 
+Before shipping: `npm run check` (types), `npm run lint` (Prettier and ESLint), `npm run build`.
+
 With no `.env`, the app runs on in-memory sample data (resets when the dev server restarts).
 Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=evening`.
 
@@ -25,12 +27,11 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | `src/routes/auth/`, `account/`, `avatars/` | Email links, setting a new password, serving profile photos           |
 | `src/lib/features/<feature>/`              | Each feature's components and its `*.server.ts` data functions        |
 | `src/lib/copy/`                            | The app's voice: headings, placeholder pools, empty states            |
-| `src/lib/features/recipes/`                | Plan dinner: the recipe library (library.json), scaling, search       |
+| `src/lib/features/recipes/`                | Plan dinner: recipe library, scaling, search, ratings, dinners        |
 | `src/routes/(app)/feed/`                   | Post update, a post with its replies, and the photo route             |
-| `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, GlassCard, Avatar, Icon          |
+| `src/lib/ui/`                              | Shared pieces: TabBar, GlassSurface, Sheet, ActionDock, Avatar, Icon  |
 | `src/lib/styles/tokens.css`                | Type, spacing, colour, glass and the three day palettes               |
-| `src/lib/server/`                          | Server-only: Supabase client, sample data                             |
-| `src/lib/vendor/liquid-glass/`             | liquidglass.dev engine, MIT, one Safari fix; not loaded at the moment |
+| `src/lib/server/`                          | Server-only: Supabase client, friendly database errors, sample data   |
 | `src/service-worker/`                      | Offline support: app shell, saved pages, the update handover          |
 | `static/`                                  | Manifest, icons, iPhone launch screens, the offline page              |
 | `supabase/migrations/`                     | Tables, row-level security and the database functions                 |

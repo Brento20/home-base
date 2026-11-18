@@ -4,6 +4,7 @@
 	import DinnerPrompt from '#lib/features/recipes/DinnerPrompt.svelte';
 	import RecipeCard from '#lib/features/recipes/RecipeCard.svelte';
 	import {
+		FAVOURITE_STARS,
 		filterOptions,
 		filterRecipes,
 		NO_FILTERS,
@@ -105,7 +106,7 @@
 		{/if}
 	</label>
 
-	<div class="chips" role="group" aria-label="Filters">
+	<div class="chips quick" role="group" aria-label="Filters">
 		{#each QUICK_CHIPS as [key, label] (key)}
 			<button
 				type="button"
@@ -191,7 +192,7 @@
 	</ul>
 {:else}
 	<p class="empty">
-		{filters.favourites && !Object.values(data.myStars).some((stars) => stars === 5)
+		{filters.favourites && !Object.values(data.myStars).some((stars) => stars >= FAVOURITE_STARS)
 			? 'Give a recipe five stars and it’ll live here.'
 			: empty}
 	</p>
@@ -253,7 +254,22 @@
 		gap: 8px;
 	}
 
+	/* The main filters stay on one line and scroll sideways, edge to edge. */
+	.chips.quick {
+		flex-wrap: nowrap;
+		margin-inline: calc(-1 * var(--page-gutter));
+		padding-inline: var(--page-gutter);
+		overflow-x: auto;
+		scrollbar-width: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.chips.quick::-webkit-scrollbar {
+		display: none;
+	}
+
 	.chip {
+		flex: none;
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
@@ -318,7 +334,7 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		margin: var(--space-l) 0 var(--space-s);
+		margin: var(--space-l) 0 0;
 		font-size: var(--text-caption);
 		color: var(--colour-text-muted);
 	}
@@ -333,9 +349,6 @@
 	}
 
 	.recipes {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
 		margin: 0;
 		padding: 0;
 		list-style: none;

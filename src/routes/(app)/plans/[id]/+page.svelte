@@ -22,10 +22,7 @@
 
 <nav class="top-bar" aria-label="Plan">
 	<a class="button-quiet back" href="/plans"><Icon name="back" size={18} /> Plans</a>
-	<a class="edit-button" href="/plans/{plan.id}/edit">
-		<GlassSurface radius={22} squish />
-		<span>Edit</span>
-	</a>
+	<a class="button-edit" href="/plans/{plan.id}/edit">Edit</a>
 </nav>
 
 <article class="summary">
@@ -78,38 +75,6 @@
 		align-items: center;
 		justify-content: space-between;
 		margin: -10px -4px var(--space-l) -4px;
-	}
-
-	.edit-button {
-		position: relative;
-		display: grid;
-		place-items: center;
-		min-width: 76px;
-		height: var(--tap-target);
-		padding: 0 20px;
-		border-radius: 22px;
-		text-decoration: none;
-		color: var(--colour-text);
-		font-size: var(--text-small);
-		font-weight: var(--weight-medium);
-		-webkit-touch-callout: none;
-	}
-
-	.edit-button span {
-		position: relative;
-		z-index: 1;
-	}
-
-	.edit-button::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		border-radius: inherit;
-		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
-			var(--glass-highlight);
-		pointer-events: none;
 	}
 
 	.from-post {

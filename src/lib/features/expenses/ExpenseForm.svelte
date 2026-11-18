@@ -25,10 +25,9 @@
 		me: string;
 		action: string;
 		submitLabel: string;
-		cancelHref: string;
 	}
 
-	let { values, errors = {}, people, me, action, submitLabel, cancelHref }: Props = $props();
+	let { values, errors = {}, people, me, action, submitLabel }: Props = $props();
 
 	// The form keeps its own copy of every field. The live result re-renders on each keystroke,
 	// and fields bound to their own state keep what was typed through those re-renders.
@@ -242,7 +241,6 @@
 	</label>
 
 	<div class="form-actions">
-		<a class="button-quiet" href={cancelHref}>Cancel</a>
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
 	</div>
 </form>

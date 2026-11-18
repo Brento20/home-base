@@ -29,12 +29,11 @@
 
 	/** This page's URL with some query values changed (null removes one). */
 	function hrefWith(changes: Record<string, string | null>) {
-		const params = new URLSearchParams(page.url.search);
-		for (const [key, value] of Object.entries(changes)) {
-			if (value === null) params.delete(key);
-			else params.set(key, value);
-		}
-		const query = params.toString();
+		const merged = { ...Object.fromEntries(page.url.searchParams), ...changes };
+		const kept = Object.entries(merged).filter(
+			(entry): entry is [string, string] => entry[1] !== null
+		);
+		const query = new URLSearchParams(kept).toString();
 		return query ? `${base}?${query}` : base;
 	}
 

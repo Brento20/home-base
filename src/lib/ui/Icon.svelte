@@ -5,8 +5,6 @@
 		| 'lists'
 		| 'money'
 		| 'home'
-		| 'lightbulb'
-		| 'snowflake'
 		| 'check'
 		| 'plus'
 		| 'chevron'
@@ -65,14 +63,6 @@
 		<path d="M3 10h18M15 15h3" />
 	{:else if name === 'home'}
 		<path d="M4 10.5L12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-5v6h-4A1.5 1.5 0 0 1 4 19z" />
-	{:else if name === 'lightbulb'}
-		<path
-			fill={filled ? 'currentColor' : 'none'}
-			d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2v.5h5v-.5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"
-		/>
-		<path d="M9.5 18.5h5M10.5 21h3" />
-	{:else if name === 'snowflake'}
-		<path d="M12 2v20M4.2 7l15.6 10M4.2 17L19.8 7M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5" />
 	{:else if name === 'check'}
 		<path d="M5 12.5l4.5 4.5L19 7.5" />
 	{:else if name === 'plus'}

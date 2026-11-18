@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleLists, sampleProfiles } from '#lib/server/sample-data.js';
 import type { FieldErrors, ListItem, ListSummary, ShoppingList } from '#lib/types.js';
@@ -89,7 +90,7 @@ async function readSummaries(locals: App.Locals, completed: boolean): Promise<Li
 		: query.is('completed_at', null).order('created_at');
 
 	const { data, error: readError } = await query;
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	return ((data ?? []) as ListRow[]).map(summarise);
 }
 
@@ -108,7 +109,7 @@ export async function getList(locals: App.Locals, id: string): Promise<ShoppingL
 		.select('id, name, completed_at')
 		.eq('id', id)
 		.maybeSingle();
-	if (listError) error(500, listError.message);
+	if (listError) dbError(listError);
 	if (!list) error(404, 'That list doesn’t exist any more.');
 
 	const { data: rows, error: itemsError } = await supabase
@@ -117,7 +118,7 @@ export async function getList(locals: App.Locals, id: string): Promise<ShoppingL
 		.eq('list_id', id)
 		.order('checked')
 		.order('created_at', { ascending: false });
-	if (itemsError) error(500, itemsError.message);
+	if (itemsError) dbError(itemsError);
 
 	return {
 		id: list.id,
@@ -141,7 +142,7 @@ export async function createList(locals: App.Locals, name: string): Promise<stri
 		.insert({ household_id: householdId, name })
 		.select('id')
 		.single();
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 	return data.id;
 }
 
@@ -153,7 +154,7 @@ export async function renameList(locals: App.Locals, id: string, name: string) {
 	}
 
 	const { error: updateError } = await supabase.from('lists').update({ name }).eq('id', id);
-	if (updateError) error(500, updateError.message);
+	if (updateError) dbError(updateError);
 }
 
 export async function deleteList(locals: App.Locals, id: string) {
@@ -165,7 +166,7 @@ export async function deleteList(locals: App.Locals, id: string) {
 	}
 
 	const { error: deleteError } = await supabase.from('lists').delete().eq('id', id);
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 }
 
 export async function addListItem(locals: App.Locals, listId: string, name: string) {
@@ -185,7 +186,7 @@ export async function addListItem(locals: App.Locals, listId: string, name: stri
 	const { error: insertError } = await supabase
 		.from('list_items')
 		.insert({ list_id: listId, name });
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 }
 
 /**
@@ -216,7 +217,7 @@ export async function addListItems(locals: App.Locals, listId: string, names: st
 			created_at: new Date(start + (names.length - index)).toISOString()
 		}))
 	);
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 }
 
 export async function setListItemChecked(locals: App.Locals, itemId: string, checked: boolean) {
@@ -235,7 +236,7 @@ export async function setListItemChecked(locals: App.Locals, itemId: string, che
 		.from('list_items')
 		.update({ checked })
 		.eq('id', itemId);
-	if (updateError) error(500, updateError.message);
+	if (updateError) dbError(updateError);
 }
 
 export async function deleteListItem(locals: App.Locals, itemId: string) {
@@ -250,5 +251,5 @@ export async function deleteListItem(locals: App.Locals, itemId: string) {
 	}
 
 	const { error: deleteError } = await supabase.from('list_items').delete().eq('id', itemId);
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 }

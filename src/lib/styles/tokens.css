@@ -46,8 +46,6 @@
 	/* Colour: surfaces */
 	--colour-hairline: rgb(255 255 255 / 0.08);
 	--colour-hairline-strong: rgb(255 255 255 / 0.14);
-	/* Refracting glass (the tab bar and segmented controls): light enough for the bent backdrop to show. */
-	--glass-smoke: rgb(14 11 10 / 0.26);
 	/* Cards: smoked glass with no live blur (see GlassSurface); the body keeps text at 4.5:1. */
 	--glass-body: rgb(18 14 12 / 0.56);
 	/* Live blur, kept for things that are briefly on screen (menus, notices, the refresh bead). */
@@ -273,7 +271,6 @@
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
 	:root {
-		--glass-smoke: rgb(20 16 14 / 0.88);
 		--glass-body: rgb(20 16 14 / 0.92);
 		--colour-text-muted: rgb(245 237 230 / 0.8);
 	}

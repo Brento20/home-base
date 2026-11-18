@@ -1,5 +1,9 @@
 <script lang="ts">
-	/** A delete button that needs two taps, instead of a browser confirm dialog. */
+	/**
+	 * The one way things are deleted: a quiet button at the foot of the thing's own page, under a
+	 * hairline, that needs two taps instead of a browser confirm dialog. Lists, tasks, plans,
+	 * notes, recipes, expenses and repayments all use it, so deleting feels the same everywhere.
+	 */
 	import { enhance } from '$app/forms';
 
 	interface Props {
@@ -23,15 +27,17 @@
 	}
 </script>
 
-<form method="POST" {action} use:enhance>
+<form class="confirm-delete" method="POST" {action} use:enhance>
 	<button class="delete" class:armed onclick={arm} aria-live="polite">
 		{armed ? 'Tap again to delete' : label}
 	</button>
 </form>
 
 <style>
-	form {
-		margin: 0;
+	.confirm-delete {
+		margin: var(--space-xl) 0 0;
+		padding-top: var(--space-m);
+		border-top: 1px solid var(--colour-hairline);
 	}
 
 	.delete {

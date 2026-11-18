@@ -37,9 +37,7 @@
 	recorded by mistake.
 </p>
 
-<div class="danger">
-	<ConfirmDelete action="?/delete" label="Delete repayment" />
-</div>
+<ConfirmDelete action="?/delete" label="Delete repayment" />
 
 <style>
 	.what {
@@ -59,9 +57,5 @@
 		margin-top: var(--space-l);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
-	}
-
-	.danger {
-		margin-top: var(--space-2xl);
 	}
 </style>

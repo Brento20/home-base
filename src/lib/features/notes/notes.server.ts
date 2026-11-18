@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleNotes } from '#lib/server/sample-data.js';
 import type { FieldErrors, HomeNote } from '#lib/types.js';
@@ -59,7 +60,7 @@ export async function listNotes(locals: App.Locals): Promise<HomeNote[]> {
 		.eq('household_id', await getHouseholdId(locals))
 		.order('updated_at', { ascending: false });
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	return (data ?? []).map(toNote);
 }
 
@@ -77,7 +78,7 @@ export async function getNote(locals: App.Locals, id: string): Promise<HomeNote>
 		.eq('id', id)
 		.maybeSingle();
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	if (!data) error(404, 'That note doesn’t exist any more.');
 	return toNote(data);
 }
@@ -95,7 +96,7 @@ export async function createNote(locals: App.Locals, values: NoteValues) {
 		body: values.body,
 		is_secret: values.isSecret
 	});
-	if (writeError) error(500, writeError.message);
+	if (writeError) dbError(writeError);
 }
 
 export async function updateNote(locals: App.Locals, id: string, values: NoteValues) {
@@ -109,7 +110,7 @@ export async function updateNote(locals: App.Locals, id: string, values: NoteVal
 		.from('home_notes')
 		.update({ title: values.title, body: values.body, is_secret: values.isSecret })
 		.eq('id', id);
-	if (writeError) error(500, writeError.message);
+	if (writeError) dbError(writeError);
 }
 
 export async function deleteNote(locals: App.Locals, id: string) {
@@ -121,5 +122,5 @@ export async function deleteNote(locals: App.Locals, id: string) {
 	}
 
 	const { error: writeError } = await supabase.from('home_notes').delete().eq('id', id);
-	if (writeError) error(500, writeError.message);
+	if (writeError) dbError(writeError);
 }

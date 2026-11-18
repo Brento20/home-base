@@ -268,6 +268,9 @@ export const NO_FILTERS: RecipeFilters = {
 /** A 5-star rating makes a favourite. */
 export const FAVOURITE_STARS = 5;
 
+/** When a dinner is due. With no time, it's treated as a 7pm dinner. */
+export const DEFAULT_DINNER_TIME = '19:00';
+
 /**
  * Recipes matching every filter. Search matches every word of the query against the title,
  * ingredients, cuisine and tags, so "chicken" finds Chicken biryani and anything cooked with

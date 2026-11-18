@@ -1,7 +1,8 @@
 <script lang="ts">
 	/**
 	 * Add or edit a home recipe. Ingredients one per line ("200 g chicken thigh, sliced"), steps
-	 * one per line. Nutrition is optional and tucked behind a chip, like a plan's place and note.
+	 * one per line. Rest time, protein, cuisine, a note and nutrition are optional and tucked
+	 * behind chips, like a plan's place and note, so the form starts short.
 	 */
 	import { enhance } from '$app/forms';
 	import { RECIPE_TITLE } from '#lib/copy/voice.js';
@@ -34,10 +35,9 @@
 		values: RecipeFormValues;
 		errors?: Partial<Record<string, string>>;
 		submitLabel: string;
-		cancelHref: string;
 	}
 
-	let { values, errors = {}, submitLabel, cancelHref }: Props = $props();
+	let { values, errors = {}, submitLabel }: Props = $props();
 
 	const PROTEINS = [
 		'chicken',
@@ -52,7 +52,34 @@
 		'dairy',
 		'nuts'
 	];
-	const nutritionOpen = $derived(Boolean(values.energyKj || values.proteinG || errors.nutrition));
+	const INGREDIENTS_EXAMPLE = [
+		'One per line, for the servings above:',
+		'200 g chicken thigh, sliced',
+		'1 tsp ground cumin',
+		'2 garlic cloves, crushed',
+		'Salt, to taste'
+	].join('\n');
+	const STEPS_EXAMPLE = [
+		'One step per line:',
+		'Brown the chicken in a hot pan.',
+		'Add the spices and cook until fragrant.'
+	].join('\n');
+
+	// Optional fields that already hold something start open.
+	const open = $derived({
+		rest: Boolean(values.restMinutes && values.restMinutes !== '0'),
+		protein: values.proteins.length > 0,
+		cuisine: Boolean(values.cuisine),
+		notes: Boolean(values.notes),
+		nutrition: Boolean(values.energyKj || values.proteinG || errors.nutrition)
+	});
+	const EXTRAS = [
+		['rest', 'Rest time'],
+		['protein', 'Protein'],
+		['cuisine', 'Cuisine'],
+		['notes', 'Note'],
+		['nutrition', 'Nutrition']
+	] as const;
 	let saving = $state(false);
 </script>
 
@@ -117,17 +144,6 @@
 				value={values.cookMinutes}
 			/>
 		</label>
-		<label class="field">
-			<span class="field-label">Rest (min)</span>
-			<input
-				class="field-input"
-				name="restMinutes"
-				type="number"
-				inputmode="numeric"
-				min="0"
-				value={values.restMinutes}
-			/>
-		</label>
 	</div>
 	{#if errors.baseServings || errors.minutes}
 		<span class="field-error">{errors.baseServings ?? errors.minutes}</span>
@@ -139,7 +155,7 @@
 			class="field-input"
 			name="ingredients"
 			rows="7"
-			placeholder={'One per line, for the servings above:\n200 g chicken thigh, sliced\n1 tsp ground cumin\n2 garlic cloves, crushed\nSalt, to taste'}
+			placeholder={INGREDIENTS_EXAMPLE}
 			aria-invalid={errors.ingredients ? 'true' : undefined}>{values.ingredients}</textarea
 		>
 		<span class="field-hint"
@@ -154,7 +170,7 @@
 			class="field-input"
 			name="steps"
 			rows="7"
-			placeholder={'One step per line:\nBrown the chicken in a hot pan.\nAdd the spices and cook until fragrant.'}
+			placeholder={STEPS_EXAMPLE}
 			aria-invalid={errors.steps ? 'true' : undefined}>{values.steps}</textarea
 		>
 		<span class="field-hint"
@@ -177,8 +193,20 @@
 		</div>
 	</fieldset>
 
-	<fieldset class="field">
-		<legend class="field-label">Protein (optional)</legend>
+	<label class="field extra rest short">
+		<span class="field-label">Rest (min)</span>
+		<input
+			class="field-input"
+			name="restMinutes"
+			type="number"
+			inputmode="numeric"
+			min="0"
+			value={values.restMinutes}
+		/>
+	</label>
+
+	<fieldset class="field extra protein">
+		<legend class="field-label">Protein</legend>
 		<div class="choice-pills">
 			{#each PROTEINS as protein (protein)}
 				<label class="choice-pill">
@@ -194,8 +222,8 @@
 		</div>
 	</fieldset>
 
-	<label class="field">
-		<span class="field-label">Cuisine (optional)</span>
+	<label class="field extra cuisine">
+		<span class="field-label">Cuisine</span>
 		<input
 			class="field-input"
 			name="cuisine"
@@ -205,8 +233,8 @@
 		/>
 	</label>
 
-	<label class="field">
-		<span class="field-label">Anything to know? (optional)</span>
+	<label class="field extra notes">
+		<span class="field-label">Anything to know?</span>
 		<textarea class="field-input" name="notes" rows="2" maxlength="1000" placeholder="Freezes well"
 			>{values.notes}</textarea
 		>
@@ -267,15 +295,16 @@
 		{#if errors.nutrition}<span class="field-error">{errors.nutrition}</span>{/if}
 	</div>
 
+	<!-- No name on these: they only show and hide fields, and aren't sent with the form. -->
 	<div class="extras">
-		<input class="extra-toggle" type="checkbox" id="recipe-add-nutrition" checked={nutritionOpen} />
-		<label class="extra-chip" for="recipe-add-nutrition"
-			><Icon name="plus" size={16} /> Nutrition</label
-		>
+		{#each EXTRAS as [key, label] (key)}
+			<input class="extra-toggle" type="checkbox" id="recipe-add-{key}" checked={open[key]} />
+			<label class="extra-chip" for="recipe-add-{key}"><Icon name="plus" size={16} /> {label}</label
+			>
+		{/each}
 	</div>
 
 	<div class="form-actions">
-		<a class="button-quiet" href={cancelHref}>Cancel</a>
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
 	</div>
 </form>
@@ -283,7 +312,7 @@
 <style>
 	.numbers {
 		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 8px;
 	}
 
@@ -302,39 +331,19 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-s);
-		animation: extra-in 320ms var(--ease-out);
 	}
 
+	.short {
+		max-width: calc((100% - 16px) / 3);
+	}
+
+	/* Optional fields stay tucked away until their chip is tapped (chip styles: forms.css). */
+	.recipe-form:has(#recipe-add-rest:not(:checked)) .rest,
+	.recipe-form:has(#recipe-add-protein:not(:checked)) .protein,
+	.recipe-form:has(#recipe-add-cuisine:not(:checked)) .cuisine,
+	.recipe-form:has(#recipe-add-notes:not(:checked)) .notes,
 	.recipe-form:has(#recipe-add-nutrition:not(:checked)) .nutrition,
-	.extra-toggle:checked + .extra-chip,
-	.recipe-form:has(#recipe-add-nutrition:checked) .extras {
+	.recipe-form:not(:has(.extra-toggle:not(:checked))) .extras {
 		display: none;
-	}
-
-	.extra-toggle {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.extra-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		min-height: 40px;
-		padding: 0 16px 0 12px;
-		border: 1px solid rgb(255 255 255 / 0.14);
-		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.05);
-		color: var(--colour-text-muted);
-		font-size: var(--text-small);
-		cursor: pointer;
-	}
-
-	@keyframes extra-in {
-		from {
-			opacity: 0;
-			transform: translateY(-6px);
-		}
 	}
 </style>

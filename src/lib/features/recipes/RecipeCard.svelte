@@ -1,8 +1,10 @@
 <script lang="ts">
-	/** A recipe in the library: name and your stars, then time and a line of nutrition. */
-	import GlassSurface from '#lib/ui/GlassSurface.svelte';
+	/**
+	 * A recipe row in the library: the name and your stars, then one quiet line of time, diet and
+	 * nutrition. Rows sit in one list with hairlines between them, like the rest of the app's lists.
+	 */
 	import Icon from '#lib/ui/Icon.svelte';
-	import { formatMinutes, nutritionLine, type RecipeSummary } from './recipe.js';
+	import { formatMinutes, type RecipeSummary } from './recipe.js';
 	import Stars from './Stars.svelte';
 
 	interface Props {
@@ -11,93 +13,93 @@
 	}
 
 	let { recipe, stars }: Props = $props();
-	const nutrition = $derived(nutritionLine(recipe.energyKj, recipe.proteinG));
+	const diet = $derived(recipe.isVegan ? 'Vegan' : recipe.isVegetarian ? 'Vegetarian' : null);
+	// Short enough for one line on a phone; the recipe page says it's per serve.
+	const nutrition = $derived(
+		recipe.energyKj !== null && recipe.proteinG !== null
+			? `${recipe.energyKj.toLocaleString('en-AU')} kJ · ${Math.round(recipe.proteinG)} g protein`
+			: null
+	);
 </script>
 
-<a class="recipe-card" href="/dinner/{recipe.id}">
-	<GlassSurface radius={22} squish />
+<a class="recipe-row" href="/dinner/{recipe.id}">
 	<span class="body">
 		<span class="top">
 			<span class="title">{recipe.title}</span>
-			{#if stars}<Stars value={stars} size={13} />{/if}
+			{#if stars}<Stars value={stars} size={12} />{/if}
 		</span>
 		<span class="meta">
-			<span class="time"><Icon name="clock" size={14} /> {formatMinutes(recipe.totalMinutes)}</span>
-			{#if recipe.isVegetarian}
-				<span class="veg" title={recipe.isVegan ? 'Vegan' : 'Vegetarian'}>
-					<Icon name="leaf" size={14} />
-					<span class="visually-hidden">{recipe.isVegan ? 'Vegan' : 'Vegetarian'}</span>
-				</span>
-			{/if}
-			{#if nutrition}<span class="nutrition">{nutrition}</span>{/if}
+			<span>{formatMinutes(recipe.totalMinutes)}</span>
+			{#if diet}<span class="diet">{diet}</span>{/if}
+			{#if nutrition}<span>{nutrition}</span>{/if}
 		</span>
 	</span>
-	<span class="chevron"><Icon name="chevron" size={18} /></span>
+	<Icon name="chevron" size={18} />
 </a>
 
 <style>
-	.recipe-card {
-		position: relative;
+	.recipe-row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-s);
-		border-radius: 22px;
+		gap: var(--space-m);
+		min-height: 64px;
+		padding: 12px 0;
+		border-bottom: 1px solid var(--colour-hairline);
 		color: inherit;
 		text-decoration: none;
+		transition: opacity var(--duration-quick) var(--ease-out);
+	}
+
+	.recipe-row:global([data-pressed]) {
+		opacity: 0.6;
+		transition-duration: var(--duration-press);
 	}
 
 	.body {
-		position: relative;
-		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 3px;
 		flex: 1;
 		min-width: 0;
-		padding: 16px 0 16px 18px;
 	}
 
 	.top {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		flex-wrap: wrap;
 	}
 
 	.title {
+		min-width: 0;
 		font-size: var(--text-body);
-		font-weight: var(--weight-medium);
-		line-height: 1.25;
+		line-height: 1.3;
+	}
+
+	.top :global(.stars) {
+		flex: none;
 	}
 
 	.meta {
 		display: flex;
-		align-items: center;
 		flex-wrap: wrap;
-		gap: 4px 10px;
 		font-size: var(--text-caption);
+		line-height: 1.35;
 		color: var(--colour-text-muted);
-	}
-
-	.time,
-	.veg {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-	}
-
-	.veg {
-		color: #b9dca4;
-	}
-
-	.nutrition {
 		font-variant-numeric: tabular-nums;
 	}
 
-	.chevron {
-		position: relative;
-		z-index: 1;
-		padding-right: 14px;
+	/* Spaces around the dot are part of the content, so whitespace handling can't drop them. */
+	.meta > span + span::before {
+		content: '\00a0·\00a0';
+		color: var(--colour-text-muted);
+	}
+
+	.diet {
+		color: #b9dca4;
+	}
+
+	.recipe-row > :global(svg) {
+		flex: none;
 		color: var(--colour-text-faint);
 	}
 </style>

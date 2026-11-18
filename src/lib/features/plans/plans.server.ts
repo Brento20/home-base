@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleFeedPosts, samplePlans, sampleImportedUids } from '#lib/server/sample-data.js';
 import type { ImportedPlan } from './calendar-import.server.js';
@@ -141,7 +142,7 @@ export async function listUpcomingPlans(locals: App.Locals, limit = 100): Promis
 		.order('starts_at')
 		.limit(limit);
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	return (data ?? []).map(toPlan);
 }
 
@@ -175,7 +176,7 @@ export async function getPlan(locals: App.Locals, id: string): Promise<Plan> {
 		.select(COLUMNS)
 		.eq('id', id)
 		.maybeSingle();
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	if (!data) error(404, 'That plan doesn’t exist any more.');
 	return toPlan(data);
 }
@@ -213,7 +214,7 @@ export async function createPlan(
 		.insert({ household_id: householdId, post_id: postId, ...toRow(input) })
 		.select('id')
 		.single();
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 	return data.id;
 }
 
@@ -236,7 +237,7 @@ export async function updatePlan(locals: App.Locals, id: string, input: PlanInpu
 		.update(toRow(input))
 		.eq('id', id)
 		.select('id');
-	if (updateError) error(500, updateError.message);
+	if (updateError) dbError(updateError);
 	if (!data?.length) error(404, 'That plan doesn’t exist any more.');
 }
 
@@ -250,7 +251,7 @@ export async function deletePlan(locals: App.Locals, id: string) {
 	}
 
 	const { error: deleteError } = await supabase.from('plans').delete().eq('id', id);
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 }
 
 /** Saves imported plans, skipping any already copied from the same calendar event. */
@@ -280,7 +281,7 @@ export async function importPlans(locals: App.Locals, plans: ImportedPlan[]) {
 			{ onConflict: 'household_id,source_uid', ignoreDuplicates: true }
 		)
 		.select('id');
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 	const added = data?.length ?? 0;
 	return { added, alreadyHere: plans.length - added };
 }

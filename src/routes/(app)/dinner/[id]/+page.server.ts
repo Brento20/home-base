@@ -1,16 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { getHousehold } from '#lib/features/household/household.server.js';
 import { clampServings } from '#lib/features/recipes/recipe.js';
+import { parseScheduleForm, scheduleDinner } from '#lib/features/recipes/dinners.server.js';
 import {
 	createShoppingList,
 	deleteRecipe,
 	getRecipe,
 	getRecipeRatings,
-	parseScheduleForm,
 	parseShoppingForm,
 	parseStars,
-	rateRecipe,
-	scheduleDinner
+	rateRecipe
 } from '#lib/features/recipes/recipes.server.js';
 import { todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';

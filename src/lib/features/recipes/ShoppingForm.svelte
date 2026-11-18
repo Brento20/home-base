@@ -3,6 +3,8 @@
 	 * Turns a recipe into a shopping list: every ingredient at the chosen servings, ticked to
 	 * add. Untick what's already in the cupboard (salt and the like start unticked).
 	 */
+	import { untrack } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { enhance } from '$app/forms';
 	import { describeIngredient, isPantryStaple, scaleIngredients, type Recipe } from './recipe.js';
 
@@ -15,22 +17,17 @@
 	let { recipe, servings, onsaved }: Props = $props();
 
 	const scaled = $derived(scaleIngredients(recipe, servings));
-	// Indexes of the ingredients to add; starts with everything but the pantry staples.
-	let picked = $state<Set<number> | null>(null);
-	const chosen = $derived(
-		picked ??
-			new Set(
-				recipe.ingredients.flatMap((ingredient, index) =>
-					isPantryStaple(ingredient) ? [] : [index]
-				)
-			)
+	// Indexes of the ingredients to add; starts with everything but the pantry staples. The
+	// sheet remakes this form whenever the servings change, so reading the recipe once is right.
+	const chosen = new SvelteSet<number>(
+		untrack(() =>
+			recipe.ingredients.flatMap((ingredient, index) => (isPantryStaple(ingredient) ? [] : [index]))
+		)
 	);
 
 	function toggle(index: number, on: boolean) {
-		const next = new Set(chosen);
-		if (on) next.add(index);
-		else next.delete(index);
-		picked = next;
+		if (on) chosen.add(index);
+		else chosen.delete(index);
 	}
 
 	let saving = $state(false);

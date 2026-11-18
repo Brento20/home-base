@@ -14,11 +14,10 @@
 		values?: ProfileValues;
 		errors?: FieldErrors<ProfileField>;
 		submitLabel: string;
-		cancelHref?: string;
 		today: string;
 	}
 
-	let { account, values, errors = {}, submitLabel, cancelHref, today }: Props = $props();
+	let { account, values, errors = {}, submitLabel, today }: Props = $props();
 
 	const start = $derived(values ?? account);
 
@@ -27,12 +26,9 @@
 	let preview = $state<string | null>(null);
 	let removePhoto = $state(false);
 	let photoProblem = $state<string | null>(null);
-	let nickname = $state('');
+	// Follows the form's starting value, and the field can change it (for the preview initial).
+	let nickname = $derived(start.nickname);
 	let fileInput = $state<HTMLInputElement>();
-
-	$effect.pre(() => {
-		nickname = start.nickname;
-	});
 
 	const shownAvatar = $derived(removePhoto ? null : (preview ?? account.avatarUrl));
 	const initial = $derived((Array.from(nickname.trim())[0] ?? '?').toUpperCase());
@@ -190,7 +186,6 @@
 	<p class="email">Signed up as {account.email}</p>
 
 	<div class="form-actions">
-		{#if cancelHref}<a class="button-quiet" href={cancelHref}>Cancel</a>{:else}<span></span>{/if}
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
 	</div>
 </form>

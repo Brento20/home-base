@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { avatarUrl } from '#lib/features/household/household.server.js';
 import { sampleAccount, sampleProfiles } from '#lib/server/sample-data.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
@@ -37,7 +37,7 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 		.eq('id', user.id)
 		.single();
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 
 	return {
 		email: user.email ?? '',
@@ -156,7 +156,7 @@ export async function saveProfile(
 		})
 		.eq('id', user.id);
 
-	if (saveError) error(500, saveError.message);
+	if (saveError) dbError(saveError);
 
 	await supabase
 		.from('profiles')

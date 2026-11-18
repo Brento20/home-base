@@ -133,7 +133,6 @@
 	{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}
 
 	<div class="form-actions">
-		<a class="button-quiet" href="/money/{data.group.id}">Cancel</a>
 		<button class="button-primary" disabled={saving}
 			>{saving ? 'Saving…' : 'Record repayment'}</button
 		>

@@ -31,5 +31,4 @@
 	me={data.me.id}
 	action=""
 	submitLabel="Add it"
-	cancelHref="/money/{data.group.id}"
 />

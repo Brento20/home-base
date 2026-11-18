@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError, friendlyMessage } from '#lib/server/db.js';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import {
@@ -21,13 +22,7 @@ import { isCategory, type CategoryKey } from './categories.js';
 import { parseMoney } from './money.js';
 import { type ExpenseField, type ExpenseFormValues, type ExpenseInput } from './form.js';
 import type { ReportExpense } from './report.js';
-import {
-	computeShares,
-	isSplitMethod,
-	readSplitInput,
-	type Share,
-	type SplitMethod
-} from './split.js';
+import { computeShares, isSplitMethod, readSplitInput, type SplitMethod } from './split.js';
 
 /**
  * Shared expense groups, expenses and repayments. Row-level security keeps each group to its
@@ -38,15 +33,9 @@ import {
 const GROUP_NAME_MAX = 40;
 const DESCRIPTION_MAX = 80;
 
-/** Messages raised by our own database functions are written for people; anything else isn't. */
-function messageFrom(problem: PostgrestError) {
-	if (problem.code === 'P0001') return problem.message;
-	console.error(problem);
-	return 'Something went wrong. Try again.';
-}
-
+/** Stops with a friendly error page if the database said no. */
 const fail500 = (problem: PostgrestError | null) => {
-	if (problem) error(500, problem.message);
+	if (problem) dbError(problem);
 };
 
 // Rows -------------------------------------------------------------------------------------------
@@ -226,7 +215,7 @@ export async function createGroup(
 		group_name: name,
 		member_ids: memberIds
 	});
-	if (problem) return { id: null, message: messageFrom(problem) };
+	if (problem) return { id: null, message: friendlyMessage(problem) };
 	return { id: data as string, message: null };
 }
 
@@ -253,7 +242,7 @@ export async function addGroupMembers(locals: App.Locals, id: string, memberIds:
 		target_group: id,
 		member_ids: memberIds
 	});
-	return { message: problem ? messageFrom(problem) : null };
+	return { message: problem ? friendlyMessage(problem) : null };
 }
 
 // Activity ---------------------------------------------------------------------------------------
@@ -424,7 +413,7 @@ export async function saveExpense(
 			split_input: share.input
 		}))
 	});
-	return { message: problem ? messageFrom(problem) : null };
+	return { message: problem ? friendlyMessage(problem) : null };
 }
 
 export async function deleteExpense(locals: App.Locals, groupId: string, id: string) {
@@ -494,7 +483,7 @@ export async function recordSettlement(
 		amount_cents: amountCents,
 		paid_on: values.paidOn
 	});
-	return { message: problem ? messageFrom(problem) : null };
+	return { message: problem ? friendlyMessage(problem) : null };
 }
 
 export async function getSettlement(locals: App.Locals, groupId: string, id: string) {

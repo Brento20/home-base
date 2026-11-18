@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleProfiles, sampleTasks } from '#lib/server/sample-data.js';
 import { startOfWeekISO, zonedToInstant } from '#lib/time.js';
@@ -26,7 +26,7 @@ export async function getScores(locals: App.Locals): Promise<Score[]> {
 	const { data, error: rpcError } = await supabase.rpc('household_scores', {
 		target_household: householdId
 	});
-	if (rpcError) error(500, rpcError.message);
+	if (rpcError) dbError(rpcError);
 
 	return ((data ?? []) as { profile_id: string; this_week: number; all_time: number }[]).map(
 		(row) => ({

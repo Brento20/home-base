@@ -28,15 +28,6 @@
 	values={form?.values ?? data.note}
 	errors={form?.errors}
 	submitLabel="Save"
-	cancelHref="/home"
 />
 
-<div class="danger">
-	<ConfirmDelete action="?/delete" label="Delete note" />
-</div>
-
-<style>
-	.danger {
-		margin-top: var(--space-2xl);
-	}
-</style>
+<ConfirmDelete action="?/delete" label="Delete note" />

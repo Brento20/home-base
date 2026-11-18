@@ -8,7 +8,8 @@
 
 	let { data, form }: PageProps = $props();
 
-	// Edit mode reveals remove buttons, rename and delete; the resting view stays clean.
+	// Edit mode reveals remove buttons and rename; the resting view stays clean. Deleting the
+	// list sits at the foot of the page, as it does for a task.
 	let editing = $state(false);
 </script>
 
@@ -22,9 +23,9 @@
 			><Icon name="back" size={18} /> {data.list.completedAt ? 'Past lists' : 'Lists'}</a
 		>
 	{/snippet}
-	{#snippet action()}
+	{#snippet trailing()}
 		<button
-			class="edit-toggle"
+			class="button-edit"
 			type="button"
 			aria-pressed={editing}
 			onclick={() => (editing = !editing)}
@@ -62,34 +63,14 @@
 				<p class="field-error">{form.renameErrors.name}</p>
 			{/if}
 		</form>
-		<ConfirmDelete action="?/delete" label="Delete list" />
 	</section>
 {/if}
 
+<ConfirmDelete action="?/delete" label="Delete list" />
+
 <style>
-	.edit-toggle {
-		min-width: 64px;
-		min-height: var(--tap-target);
-		padding: 0 16px;
-		border: 1px solid var(--colour-hairline-strong);
-		border-radius: var(--radius-pill);
-		background: none;
-		font-size: var(--text-small);
-		font-weight: var(--weight-medium);
-	}
-
-	.edit-toggle[aria-pressed='true'] {
-		border-color: var(--colour-accent-edge);
-		background: var(--colour-accent-soft);
-	}
-
 	.manage {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-m);
 		margin-top: var(--space-xl);
-		padding-top: var(--space-l);
-		border-top: 1px solid var(--colour-hairline);
 	}
 
 	.rename-row {

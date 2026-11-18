@@ -3,6 +3,23 @@ import type { Handle } from '@sveltejs/kit/hooks';
 import { redirectFor, stageFor } from '#lib/features/account/stage.js';
 import { createSupabaseServerClient, supabaseConfigured } from '#lib/server/supabase.js';
 
+/**
+ * Sent with every page: no sniffing file types, no embedding the app in someone else's frame
+ * (clickjacking), only the origin in referrers, and no camera, microphone or location access
+ * (photos come from the file picker, which doesn't need it).
+ */
+const SECURITY_HEADERS = {
+	'X-Content-Type-Options': 'nosniff',
+	'X-Frame-Options': 'DENY',
+	'Referrer-Policy': 'strict-origin-when-cross-origin',
+	'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()'
+};
+
+function secure(response: Response) {
+	for (const [name, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(name, value);
+	return response;
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
 	const { locals } = event;
 	locals.sampleMode = !supabaseConfigured;
@@ -14,7 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		// Sample data: everything is open, including the sign-up pages, so they can be designed.
 		locals.stage = 'ready';
 		locals.householdId = 'sample-household';
-		return resolve(event);
+		return secure(await resolve(event));
 	}
 
 	// getClaims() verifies the session token's signature and expiry against the project's public
@@ -44,8 +61,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const target = redirectFor(locals.stage, event.route.id);
 	if (target && target !== event.url.pathname) redirect(303, target);
 
-	return resolve(event, {
-		filterSerializedResponseHeaders: (name) =>
-			name === 'content-range' || name === 'x-supabase-api-version'
-	});
+	return secure(
+		await resolve(event, {
+			filterSerializedResponseHeaders: (name) =>
+				name === 'content-range' || name === 'x-supabase-api-version'
+		})
+	);
 };

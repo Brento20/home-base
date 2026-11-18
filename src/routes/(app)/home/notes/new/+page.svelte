@@ -27,5 +27,4 @@
 	values={form?.values ?? { title: '', body: '', isSecret: false }}
 	errors={form?.errors}
 	submitLabel="Pin it up"
-	cancelHref="/home"
 />

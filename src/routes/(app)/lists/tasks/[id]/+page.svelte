@@ -75,18 +75,10 @@
 	</div>
 </form>
 
-<div class="danger">
-	<ConfirmDelete action="?/delete" label="Delete task" />
-</div>
+<ConfirmDelete action="?/delete" label="Delete task" />
 
 <style>
 	.due {
 		max-width: 220px;
-	}
-
-	.danger {
-		margin-top: var(--space-xl);
-		padding-top: var(--space-m);
-		border-top: 1px solid var(--colour-hairline);
 	}
 </style>

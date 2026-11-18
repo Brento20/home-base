@@ -45,5 +45,4 @@
 	values={form?.values ?? blank}
 	errors={form?.errors}
 	submitLabel="Add to the cookbook"
-	cancelHref="/dinner"
 />

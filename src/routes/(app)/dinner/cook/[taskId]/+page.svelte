@@ -4,6 +4,7 @@
 	import MethodSteps from '#lib/features/recipes/MethodSteps.svelte';
 	import ScheduleForm from '#lib/features/recipes/ScheduleForm.svelte';
 	import Stars from '#lib/features/recipes/Stars.svelte';
+	import ActionDock from '#lib/ui/ActionDock.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -102,29 +103,27 @@
 </div>
 
 {#if !task.completedAt}
-	<div class="action-dock">
-		<div class="action-bar">
-			<form method="POST" action="?/skip" use:enhance={submit}>
-				<button
-					class="button-quiet skip"
-					class:armed={skipArmed}
-					onclick={armSkip}
-					disabled={busy}
-					aria-live="polite"
-				>
-					{skipArmed ? 'Skip it?' : 'Skip'}
-				</button>
-			</form>
-			<button type="button" class="button-secondary act" onclick={() => (rescheduling = true)}>
-				Reschedule
+	<ActionDock>
+		<form method="POST" action="?/skip" use:enhance={submit}>
+			<button
+				class="button-quiet skip"
+				class:armed={skipArmed}
+				onclick={armSkip}
+				disabled={busy}
+				aria-live="polite"
+			>
+				{skipArmed ? 'Skip it?' : 'Skip'}
 			</button>
-			<form method="POST" action="?/cooked" class="grow" use:enhance={submit}>
-				<button class="button-primary act" disabled={busy}>
-					<Icon name="check" size={18} /> Mark as cooked
-				</button>
-			</form>
-		</div>
-	</div>
+		</form>
+		<button type="button" class="button-secondary act" onclick={() => (rescheduling = true)}>
+			Reschedule
+		</button>
+		<form method="POST" action="?/cooked" class="grow" use:enhance={submit}>
+			<button class="button-primary act" disabled={busy}>
+				<Icon name="check" size={18} /> Mark as cooked
+			</button>
+		</form>
+	</ActionDock>
 
 	<Sheet open={rescheduling} title="Move dinner" onclose={() => (rescheduling = false)}>
 		<ScheduleForm
@@ -220,40 +219,9 @@
 		align-self: flex-start;
 		margin-top: calc(-1 * var(--space-m));
 		padding: 6px 0;
-		color: var(--colour-accent);
+		color: var(--colour-text-muted);
 		font-size: var(--text-small);
 		text-decoration: none;
-	}
-
-	.action-dock {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: calc(env(safe-area-inset-bottom) + 12px + 62px + 10px);
-		z-index: 28;
-		display: flex;
-		justify-content: center;
-		padding: 0 var(--page-gutter);
-		pointer-events: none;
-	}
-
-	.action-bar {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		width: min(100%, 440px);
-		padding: 6px 6px 6px 10px;
-		border-radius: var(--radius-pill);
-		background: linear-gradient(180deg, rgb(34 27 23 / 0.97), rgb(20 16 13 / 0.98));
-		box-shadow:
-			var(--glass-inner-light),
-			inset 0 0 0 1px rgb(255 255 255 / 0.09),
-			0 14px 32px -14px rgb(0 0 0 / 0.75);
-		pointer-events: auto;
-	}
-
-	.action-bar form {
-		margin: 0;
 	}
 
 	.grow {
@@ -261,12 +229,8 @@
 		min-width: 0;
 	}
 
-	.act {
+	.grow .act {
 		width: 100%;
-		min-height: 44px;
-		padding: 0 12px;
-		font-size: var(--text-small);
-		white-space: nowrap;
 	}
 
 	.button-primary.act {

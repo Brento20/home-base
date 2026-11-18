@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { dbError, friendlyMessage } from '#lib/server/db.js';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { sampleHousehold } from '#lib/server/sample-data.js';
 import type { FieldErrors } from '#lib/types.js';
@@ -17,13 +17,9 @@ const NO_MATCH = 'That name and password don’t match.';
 
 type HomeField = 'name' | 'password';
 
-/** Messages raised by our own functions are written for people; anything else isn't. */
-function messageFrom(problem: PostgrestError) {
-	if (problem.code === 'P0001') return problem.message;
-	if (problem.code === '23505') return 'That name is taken. Try another.';
-	console.error(problem);
-	return 'Something went wrong. Try again.';
-}
+/** A home name already in use is the one constraint people can run into here. */
+const messageFrom = (problem: PostgrestError) =>
+	problem.code === '23505' ? 'That name is taken. Try another.' : friendlyMessage(problem);
 
 export function parseHomeForm(form: FormData, { checkStrength }: { checkStrength: boolean }) {
 	const name = String(form.get('name') ?? '').trim();
@@ -88,6 +84,6 @@ export async function homeHasPassword(locals: App.Locals, householdId: string) {
 	const { data, error: problem } = await locals.supabase.rpc('household_has_password', {
 		target_household: householdId
 	});
-	if (problem) error(500, problem.message);
+	if (problem) dbError(problem);
 	return Boolean(data);
 }

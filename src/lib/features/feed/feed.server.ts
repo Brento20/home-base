@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { getHouseholdId } from '#lib/features/household/household.server.js';
-import { sampleFeedPosts, samplePlans, sampleProfiles } from '#lib/server/sample-data.js';
+import { dbError } from '#lib/server/db.js';
+import { getHouseholdId, myId } from '#lib/features/household/household.server.js';
+import { sampleFeedPosts, samplePlans } from '#lib/server/sample-data.js';
 import type { FeedPost, FeedReaction, FieldErrors } from '#lib/types.js';
 import { isReaction } from './reactions.js';
 
@@ -64,7 +65,6 @@ const toPost = (row: PostRow): FeedPost => ({
 });
 
 /** The signed-in person's id (sample mode: the first sample person). */
-export const myId = (locals: App.Locals) => locals.user?.id ?? sampleProfiles[0].id;
 
 /** How many posts to show, from the ?feed= count Today keeps as you scroll. */
 export function feedLimit(requested: string | null) {
@@ -91,7 +91,7 @@ export async function listFeed(
 		.order('created_at', { ascending: false })
 		.limit(limit + 1);
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	const rows = (data ?? []) as unknown as PostRow[];
 	return { posts: rows.slice(0, limit).map(toPost), hasMore: rows.length > limit };
 }
@@ -110,7 +110,7 @@ export async function getPost(locals: App.Locals, id: string): Promise<FeedPost>
 		.eq('id', id)
 		.maybeSingle();
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	if (!data) error(404, 'That post has been deleted.');
 	return toPost(data as unknown as PostRow);
 }
@@ -184,7 +184,7 @@ export async function createPost(
 
 	if (insertError) {
 		if (photoPath) await supabase.storage.from('feed-photos').remove([photoPath]);
-		error(500, insertError.message);
+		dbError(insertError);
 	}
 	return id;
 }
@@ -207,7 +207,7 @@ export async function deletePost(locals: App.Locals, id: string) {
 		.delete()
 		.eq('id', id)
 		.select('photo_path');
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 	if (!data?.length) error(403, 'Only the person who posted it can delete it.');
 
 	const path = data[0].photo_path as string | null;
@@ -256,7 +256,7 @@ export async function addReply(locals: App.Locals, postId: string, body: string)
 	const { error: insertError } = await supabase
 		.from('feed_replies')
 		.insert({ post_id: postId, body });
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 }
 
 export async function deleteReply(locals: App.Locals, postId: string, replyId: string) {
@@ -275,7 +275,7 @@ export async function deleteReply(locals: App.Locals, postId: string, replyId: s
 		.delete()
 		.eq('id', replyId)
 		.eq('post_id', postId);
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 }
 
 // Reactions -----------------------------------------------------------------------------------
@@ -303,7 +303,7 @@ export async function toggleReaction(locals: App.Locals, postId: string, reactio
 		.eq('post_id', postId)
 		.eq('profile_id', me)
 		.maybeSingle();
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 
 	const { error: writeError } =
 		current?.reaction === reaction
@@ -314,5 +314,5 @@ export async function toggleReaction(locals: App.Locals, postId: string, reactio
 						{ post_id: postId, profile_id: me, reaction },
 						{ onConflict: 'post_id,profile_id' }
 					);
-	if (writeError) error(500, writeError.message);
+	if (writeError) dbError(writeError);
 }

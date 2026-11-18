@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { sampleHousehold, sampleProfiles } from '#lib/server/sample-data.js';
 import type { Household, Profile } from '#lib/types.js';
 
@@ -54,8 +55,8 @@ export async function getHousehold(
 		]
 	);
 
-	if (homeError) error(500, homeError.message);
-	if (membersError) error(500, membersError.message);
+	if (homeError) dbError(homeError);
+	if (membersError) dbError(membersError);
 
 	const memberRows = (rows ?? []) as unknown as MemberRow[];
 	const members = memberRows
@@ -74,6 +75,9 @@ export async function getHousehold(
 
 	return { household: { id: home.id, name: home.name, members, ownerIds }, me };
 }
+
+/** Who's signed in (in sample mode, the first sample person). */
+export const myId = (locals: App.Locals) => locals.user?.id ?? sampleProfiles[0].id;
 
 export async function getHouseholdId(locals: App.Locals): Promise<string> {
 	if (locals.householdId) return locals.householdId;

@@ -3,6 +3,7 @@
 	 * Ingredients with their amounts. In the cook view they can be ticked off as you get them
 	 * out (just on this phone, for while you cook).
 	 */
+	import { SvelteSet } from 'svelte/reactivity';
 	import { describeIngredient, type Ingredient } from './recipe.js';
 
 	interface Props {
@@ -12,13 +13,11 @@
 	}
 
 	let { ingredients, tickable = false }: Props = $props();
-	let ticked = $state<Set<number>>(new Set());
+	const ticked = new SvelteSet<number>();
 
 	function toggle(index: number) {
-		const next = new Set(ticked);
-		if (next.has(index)) next.delete(index);
-		else next.add(index);
-		ticked = next;
+		if (ticked.has(index)) ticked.delete(index);
+		else ticked.add(index);
 	}
 </script>
 
@@ -95,7 +94,6 @@
 		flex: none;
 		max-width: 40%;
 		text-align: right;
-		color: var(--colour-accent);
 		font-variant-numeric: tabular-nums;
 		font-weight: var(--weight-medium);
 	}

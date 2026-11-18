@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleProfiles, sampleTasks } from '#lib/server/sample-data.js';
 import { addDays, isValidDateISO, todayISO } from '#lib/time.js';
@@ -114,19 +115,19 @@ export async function listOpenTasks(locals: App.Locals): Promise<Task[]> {
 		.order('due_on', { ascending: true, nullsFirst: false })
 		.order('created_at');
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	return (data ?? []).map(toTask);
 }
 
 /**
- * Open chores due within the next week, overdue ones included: what Today's slider shows.
- * Dinners only show on their day (an overdue one is asked about in Plan dinner instead).
+ * Open chores and dinners due within the next week: what Today's slider shows. Overdue chores
+ * stay in; a past dinner is asked about in Plan dinner instead ("Did you make it?").
  */
 export async function listTasksComingUp(locals: App.Locals, days = 7): Promise<Task[]> {
 	const today = todayISO();
 	const until = addDays(today, days - 1);
-	return (await listOpenTasks(locals)).filter((task) =>
-		task.recipeId ? task.dueOn === today : task.dueOn !== null && task.dueOn <= until
+	return (await listOpenTasks(locals)).filter(
+		(task) => task.dueOn !== null && task.dueOn <= until && (!task.recipeId || task.dueOn >= today)
 	);
 }
 
@@ -149,7 +150,7 @@ export async function listPastTasks(locals: App.Locals, limit = 100): Promise<Ta
 		.order('completed_at', { ascending: false })
 		.limit(limit);
 
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	return (data ?? []).map(toTask);
 }
 
@@ -166,7 +167,7 @@ export async function getTask(locals: App.Locals, id: string): Promise<Task> {
 		.select(COLUMNS)
 		.eq('id', id)
 		.maybeSingle();
-	if (readError) error(500, readError.message);
+	if (readError) dbError(readError);
 	if (!data) error(404, 'That task doesn’t exist any more.');
 	return toTask(data);
 }
@@ -197,7 +198,7 @@ export async function createTask(locals: App.Locals, input: TaskInput) {
 		due_on: input.dueOn,
 		repeat: input.repeat
 	});
-	if (insertError) error(500, insertError.message);
+	if (insertError) dbError(insertError);
 }
 
 export async function updateTask(locals: App.Locals, id: string, input: TaskInput) {
@@ -221,7 +222,7 @@ export async function updateTask(locals: App.Locals, id: string, input: TaskInpu
 		})
 		.eq('id', id)
 		.select('id');
-	if (updateError) error(500, updateError.message);
+	if (updateError) dbError(updateError);
 	if (!data?.length) error(404, 'That task doesn’t exist any more.');
 }
 
@@ -251,7 +252,7 @@ export async function completeTask(locals: App.Locals, id: string) {
 	}
 
 	const { error: rpcError } = await supabase.rpc('complete_task', { target_task: id });
-	if (rpcError) error(500, rpcError.message);
+	if (rpcError) dbError(rpcError);
 }
 
 /** Undoes a tick, taking back the next occurrence if it's still untouched. */
@@ -270,7 +271,7 @@ export async function reopenTask(locals: App.Locals, id: string) {
 	}
 
 	const { error: rpcError } = await supabase.rpc('reopen_task', { target_task: id });
-	if (rpcError) error(500, rpcError.message);
+	if (rpcError) dbError(rpcError);
 }
 
 export async function deleteTask(locals: App.Locals, id: string) {
@@ -282,5 +283,5 @@ export async function deleteTask(locals: App.Locals, id: string) {
 	}
 
 	const { error: deleteError } = await supabase.from('tasks').delete().eq('id', id);
-	if (deleteError) error(500, deleteError.message);
+	if (deleteError) dbError(deleteError);
 }

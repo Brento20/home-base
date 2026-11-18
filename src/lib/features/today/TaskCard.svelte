@@ -27,6 +27,8 @@
 	const assignee = $derived(people.find((person) => person.id === task.assigneeId));
 	const daysLate = $derived(task.dueOn ? -daysBetween(today, task.dueOn) : 0);
 	const dinner = $derived(Boolean(task.recipe));
+	// A dinner can only be marked cooked from its day on; a chore can be ticked off any time.
+	const canFinish = $derived(!dinner || (task.dueOn !== null && task.dueOn <= today));
 	const when = $derived(
 		dinner
 			? formatDinnerWhen(task.dueOn!, task.dueTime, today)
@@ -62,36 +64,36 @@
 				{/if}
 				{assignee ? assignee.displayName : 'Anyone'}{dinner ? ' cooking' : ''}
 			</span>
-			<form
-				method="POST"
-				action="?/completeTask"
-				use:enhance={() => {
-					done = true;
-					return async ({ result, update }) => {
-						if (result.type === 'success') {
-							// Show the point landing before the card leaves the row.
-							pops += 1;
-							await new Promise((resolve) => setTimeout(resolve, 700));
-							ondone?.(task.id);
-						} else {
-							done = false;
-						}
-						await update({ reset: false });
-					};
-				}}
-			>
-				<input type="hidden" name="taskId" value={task.id} />
-				<PointPop count={pops} />
-				<button
-					class="done-button"
-					aria-label={dinner
-						? `Mark ${task.title} as cooked, earns a point`
-						: `Tick off ${task.title}, earns a point`}
-					disabled={done}
+			{#if canFinish}<form
+					method="POST"
+					action="?/completeTask"
+					use:enhance={() => {
+						done = true;
+						return async ({ result, update }) => {
+							if (result.type === 'success') {
+								// Show the point landing before the card leaves the row.
+								pops += 1;
+								await new Promise((resolve) => setTimeout(resolve, 700));
+								ondone?.(task.id);
+							} else {
+								done = false;
+							}
+							await update({ reset: false });
+						};
+					}}
 				>
-					<Icon name="check" size={18} />
-				</button>
-			</form>
+					<input type="hidden" name="taskId" value={task.id} />
+					<PointPop count={pops} />
+					<button
+						class="done-button"
+						aria-label={dinner
+							? `Mark ${task.title} as cooked, earns a point`
+							: `Tick off ${task.title}, earns a point`}
+						disabled={done}
+					>
+						<Icon name="check" size={18} />
+					</button>
+				</form>{/if}
 		</span>
 	</div>
 </div>

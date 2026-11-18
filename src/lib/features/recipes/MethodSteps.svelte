@@ -38,11 +38,11 @@
 		width: 28px;
 		height: 28px;
 		border-radius: 50%;
-		background: var(--colour-accent-soft);
-		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
-		color: var(--colour-accent);
-		font-size: var(--text-small);
-		font-weight: var(--weight-strong);
+		box-shadow: inset 0 0 0 1.5px var(--colour-hairline-strong);
+		color: var(--colour-text-muted);
+		font-size: var(--text-caption);
+		font-weight: var(--weight-medium);
+		font-variant-numeric: tabular-nums;
 	}
 
 	p {

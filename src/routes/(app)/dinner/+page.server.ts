@@ -3,14 +3,16 @@ import { getHousehold } from '#lib/features/household/household.server.js';
 import {
 	checkIn,
 	getDinnerPrompt,
-	getMyStars,
-	listRecipeSummaries,
 	markCooked,
 	parseScheduleForm,
-	parseStars,
-	rateRecipe,
 	rescheduleDinner,
 	skipDinner
+} from '#lib/features/recipes/dinners.server.js';
+import {
+	getMyStars,
+	listRecipeSummaries,
+	parseStars,
+	rateRecipe
 } from '#lib/features/recipes/recipes.server.js';
 import { todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';

@@ -1,20 +1,19 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import IngredientList from '#lib/features/recipes/IngredientList.svelte';
 	import MethodSteps from '#lib/features/recipes/MethodSteps.svelte';
+	import NutritionGrid from '#lib/features/recipes/NutritionGrid.svelte';
+	import RecipeRatings from '#lib/features/recipes/RecipeRatings.svelte';
 	import {
 		cuisineLabel,
 		DEFAULT_SERVINGS,
 		formatMinutes,
 		NUTRITION_CREDIT,
-		scaleIngredients,
-		SERVINGS_MAX,
-		SERVINGS_MIN
+		scaleIngredients
 	} from '#lib/features/recipes/recipe.js';
 	import ScheduleForm from '#lib/features/recipes/ScheduleForm.svelte';
+	import ServingsStepper from '#lib/features/recipes/ServingsStepper.svelte';
 	import ShoppingForm from '#lib/features/recipes/ShoppingForm.svelte';
-	import Stars from '#lib/features/recipes/Stars.svelte';
-	import Avatar from '#lib/ui/Avatar.svelte';
+	import ActionDock from '#lib/ui/ActionDock.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -28,6 +27,14 @@
 	let servings = $state(DEFAULT_SERVINGS);
 	const ingredients = $derived(scaleIngredients(recipe, servings));
 
+	// Cuisine and diet as one quiet line under the title.
+	const kind = $derived(
+		[
+			[cuisineLabel(recipe.cuisine), false],
+			[recipe.isVegan ? 'Vegan' : recipe.isVegetarian ? 'Vegetarian' : null, true]
+		].filter(([label]) => label) as [string, boolean][]
+	);
+
 	const times = $derived(
 		[
 			['Prep', recipe.prepMinutes],
@@ -35,24 +42,6 @@
 			['Rest', recipe.restMinutes]
 		].filter(([, minutes]) => Number(minutes) > 0) as [string, number][]
 	);
-
-	const ratingFor = (profileId: string) =>
-		data.ratings.find((rating) => rating.profileId === profileId)?.stars ?? null;
-	const others = $derived(data.household.members.filter((person) => person.id !== data.me.id));
-
-	const nutrition = $derived(
-		recipe.nutrition
-			? [
-					['Protein', recipe.nutrition.proteinG],
-					['Carbs', recipe.nutrition.carbsG],
-					['Fat', recipe.nutrition.fatG],
-					['Sugars', recipe.nutrition.sugarsG],
-					['Fibre', recipe.nutrition.fibreG]
-				].filter(([, grams]) => grams !== null)
-			: []
-	);
-	const grams = (value: unknown) =>
-		`${Number(value).toLocaleString('en-AU', { maximumFractionDigits: 1 })} g`;
 
 	let sheet = $state<'shop' | 'schedule' | null>(null);
 	let notice = $state<{ text: string; href: string; link: string } | null>(null);
@@ -97,21 +86,18 @@
 	{#snippet lead()}
 		<a class="button-quiet" href="/dinner"><Icon name="back" size={18} /> Dinner</a>
 	{/snippet}
-	{#snippet action()}
-		{#if recipe.custom}<a class="button-quiet" href="/dinner/{recipe.id}/edit">Edit</a>{/if}
+	{#snippet trailing()}
+		{#if recipe.custom}<a class="button-edit" href="/dinner/{recipe.id}/edit">Edit</a>{/if}
 	{/snippet}
 </PageHeader>
 
 <div class="detail">
 	<section class="facts" aria-label="About this recipe">
-		<div class="tags">
-			{#if recipe.cuisine}<span class="tag">{cuisineLabel(recipe.cuisine)}</span>{/if}
-			{#if recipe.isVegan}
-				<span class="tag green"><Icon name="leaf" size={14} /> Vegan</span>
-			{:else if recipe.isVegetarian}
-				<span class="tag green"><Icon name="leaf" size={14} /> Vegetarian</span>
-			{/if}
-		</div>
+		{#if kind.length}
+			<p class="kind">
+				{#each kind as [label, green] (label)}<span class:green>{label}</span>{/each}
+			</p>
+		{/if}
 		<dl class="times">
 			{#each times as [label, minutes] (label)}
 				<div>
@@ -125,54 +111,6 @@
 			</div>
 		</dl>
 	</section>
-
-	<section class="ratings" aria-label="Ratings">
-		<form
-			method="POST"
-			action="?/rate"
-			class="rating mine"
-			use:enhance={() =>
-				async ({ update }) =>
-					update({ reset: false })}
-		>
-			<span class="who">Your rating</span>
-			<Stars value={ratingFor(data.me.id)} name="stars" label={recipe.title} size={22} autosubmit />
-		</form>
-		{#each others as person (person.id)}
-			{@const stars = ratingFor(person.id)}
-			<div class="rating">
-				<span class="who"><Avatar {person} size={20} dot /> {person.displayName}</span>
-				{#if stars}
-					<Stars value={stars} size={16} />
-				{:else}
-					<span class="unrated">Hasn’t rated it</span>
-				{/if}
-			</div>
-		{/each}
-	</section>
-
-	{#if recipe.nutrition}
-		<section aria-labelledby="nutrition">
-			<h2 id="nutrition">Per serve</h2>
-			<div class="nutrition">
-				<div class="energy">
-					<strong>{recipe.nutrition.energyKj.toLocaleString('en-AU')} kJ</strong>
-					<span>{Math.round(recipe.nutrition.energyKj / 4.184).toLocaleString('en-AU')} Cal</span>
-				</div>
-				{#each nutrition as [label, value] (label)}
-					<div>
-						<strong>{grams(value)}</strong>
-						<span>{label}</span>
-					</div>
-				{/each}
-			</div>
-			{#if !recipe.custom}
-				<p class="small-print">
-					{NUTRITION_CREDIT}{recipe.nutritionNote ? ` ${recipe.nutritionNote}` : ''}
-				</p>
-			{/if}
-		</section>
-	{/if}
 
 	<section aria-labelledby="ingredients">
 		<h2 id="ingredients">
@@ -195,53 +133,53 @@
 		</section>
 	{/if}
 
+	{#if recipe.nutrition}
+		<section aria-labelledby="nutrition">
+			<h2 id="nutrition">Per serve</h2>
+			<NutritionGrid nutrition={recipe.nutrition} />
+			{#if !recipe.custom}
+				<details class="small-print">
+					<summary>About these numbers</summary>
+					<p>{NUTRITION_CREDIT}{recipe.nutritionNote ? ` ${recipe.nutritionNote}` : ''}</p>
+				</details>
+			{/if}
+		</section>
+	{/if}
+
+	<section aria-labelledby="ratings">
+		<h2 id="ratings">Ratings</h2>
+		<RecipeRatings
+			title={recipe.title}
+			ratings={data.ratings}
+			people={data.household.members}
+			meId={data.me.id}
+		/>
+	</section>
+
 	{#if recipe.custom}
-		<div class="danger">
-			<ConfirmDelete action="?/delete" label="Delete recipe" />
-		</div>
+		<ConfirmDelete action="?/delete" label="Delete recipe" />
 	{/if}
 </div>
 
 <!-- Servings and the two things you can do with them, above the tab bar. -->
-<div class="action-dock">
-	{#if notice}
-		<div class="notice" role="status">
-			<Icon name="check" size={18} />
-			<span>{notice.text}</span>
-			<a href={notice.href}>{notice.link}</a>
-		</div>
-	{/if}
-	<div class="action-bar">
-		<div class="servings" role="group" aria-label="Servings">
-			<button
-				type="button"
-				aria-label="Fewer servings"
-				disabled={servings <= SERVINGS_MIN}
-				onclick={() => (servings = Math.max(SERVINGS_MIN, servings - 1))}
-			>
-				<Icon name="minus" size={18} />
-			</button>
-			<span class="count" aria-live="polite">
-				<strong>{servings}</strong>
-				<span>{servings === 1 ? 'serve' : 'serves'}</span>
-			</span>
-			<button
-				type="button"
-				aria-label="More servings"
-				disabled={servings >= SERVINGS_MAX}
-				onclick={() => (servings = Math.min(SERVINGS_MAX, servings + 1))}
-			>
-				<Icon name="plus" size={18} />
-			</button>
-		</div>
-		<button type="button" class="button-secondary act" onclick={() => (sheet = 'shop')}>
-			Add to Lists
-		</button>
-		<button type="button" class="button-primary act" onclick={() => (sheet = 'schedule')}>
-			Schedule
-		</button>
-	</div>
-</div>
+<ActionDock>
+	{#snippet above()}
+		{#if notice}
+			<div class="notice" role="status">
+				<Icon name="check" size={18} />
+				<span>{notice.text}</span>
+				<a href={notice.href}>{notice.link}</a>
+			</div>
+		{/if}
+	{/snippet}
+	<ServingsStepper bind:value={servings} />
+	<button type="button" class="button-secondary act" onclick={() => (sheet = 'shop')}>
+		Add to Lists
+	</button>
+	<button type="button" class="button-primary act" onclick={() => (sheet = 'schedule')}>
+		Schedule
+	</button>
+</ActionDock>
 
 <Sheet open={sheet === 'shop'} title="Add to Lists" onclose={() => (sheet = null)}>
 	{#key servings}
@@ -287,33 +225,22 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-m);
-		margin-top: calc(-1 * var(--space-m));
+		margin-top: calc(-1 * var(--space-s));
 	}
 
-	.tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-s);
-	}
-
-	.tags:empty {
-		display: none;
-	}
-
-	.tag {
-		display: inline-flex;
-		align-items: center;
-		gap: 5px;
-		padding: 4px 10px;
-		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.06);
+	.kind {
+		margin: calc(-1 * var(--space-s)) 0 0;
+		font-size: var(--text-small);
 		color: var(--colour-text-muted);
-		font-size: var(--text-caption);
 	}
 
-	.tag.green {
-		background: rgb(140 200 120 / 0.12);
+	.green {
 		color: #b9dca4;
+	}
+
+	.kind span + span::before {
+		content: ' · ';
+		color: var(--colour-text-muted);
 	}
 
 	.times {
@@ -337,86 +264,25 @@
 	.times dd {
 		margin: 0;
 		font-weight: var(--weight-medium);
-	}
-
-	.total dd {
-		color: var(--colour-accent);
-	}
-
-	.ratings {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-s);
-		padding: var(--space-m);
-		border-radius: 22px;
-		background: rgb(255 255 255 / 0.04);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
-	}
-
-	.rating {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-m);
-		min-height: 40px;
-		margin: 0;
-	}
-
-	.who {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		font-size: var(--text-small);
-	}
-
-	.mine .who {
-		font-weight: var(--weight-medium);
-	}
-
-	.mine :global(.stars) {
-		margin-right: -7px;
-	}
-
-	.unrated {
-		font-size: var(--text-small);
-		color: var(--colour-text-faint);
-	}
-
-	.nutrition {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 8px;
-	}
-
-	.nutrition div {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		padding: 12px;
-		border-radius: 16px;
-		background: rgb(255 255 255 / 0.04);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
-	}
-
-	.nutrition strong {
-		font-weight: var(--weight-medium);
 		font-variant-numeric: tabular-nums;
 	}
 
-	.nutrition span {
-		font-size: var(--text-caption);
-		color: var(--colour-text-muted);
-	}
-
-	.nutrition .energy strong {
-		color: var(--colour-accent);
-	}
-
 	.small-print {
-		margin: var(--space-s) 0 0;
+		margin-top: var(--space-m);
 		font-size: var(--text-caption);
 		line-height: 1.45;
 		color: var(--colour-text-faint);
+	}
+
+	.small-print summary {
+		width: fit-content;
+		padding: 6px 0;
+		color: var(--colour-text-muted);
+		cursor: pointer;
+	}
+
+	.small-print p {
+		margin: var(--space-xs) 0 0;
 	}
 
 	.tips {
@@ -430,97 +296,15 @@
 		margin-top: 6px;
 	}
 
-	.danger {
-		padding-top: var(--space-m);
-		border-top: 1px solid var(--colour-hairline);
+	/* The column's gap already spaces it. */
+	.detail > :global(.confirm-delete) {
+		margin-top: 0;
 	}
 
-	/* The bar sits just above the tab bar (52px tabs + 10px of padding + its 12px gap). */
-	.action-dock {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: calc(env(safe-area-inset-bottom) + 12px + 62px + 10px);
-		z-index: 28;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 8px;
-		padding: 0 var(--page-gutter);
-		pointer-events: none;
-	}
-
-	.action-bar,
-	.notice {
-		width: min(100%, 440px);
-		pointer-events: auto;
-	}
-
-	.action-bar {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 6px;
-		border-radius: var(--radius-pill);
-		background: linear-gradient(180deg, rgb(34 27 23 / 0.97), rgb(20 16 13 / 0.98));
-		box-shadow:
-			var(--glass-inner-light),
-			inset 0 0 0 1px rgb(255 255 255 / 0.09),
-			0 14px 32px -14px rgb(0 0 0 / 0.75);
-	}
-
-	.servings {
-		display: flex;
-		align-items: center;
-		flex: none;
-	}
-
-	.servings button {
-		display: grid;
-		place-items: center;
-		width: 38px;
-		height: 44px;
-		border: 0;
-		border-radius: var(--radius-pill);
-		background: none;
-		color: var(--colour-text);
-		transition: transform var(--duration-release) var(--spring-gentle);
-	}
-
-	.servings button:disabled {
-		color: var(--colour-text-faint);
-	}
-
-	.servings button:global([data-pressed]) {
-		transform: scale(0.85);
-		transition-duration: var(--duration-press);
-	}
-
-	.count {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		min-width: 38px;
-		line-height: 1.05;
-	}
-
-	.count strong {
-		font-size: 1.15rem;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.count span {
-		font-size: 11px;
-		color: var(--colour-text-muted);
-	}
-
+	/* The two actions share the bar's width after the stepper. */
 	.act {
 		flex: 1;
 		min-width: 0;
-		min-height: 44px;
-		padding: 0 10px;
-		font-size: var(--text-small);
-		white-space: nowrap;
 	}
 
 	.notice {

@@ -10,10 +10,9 @@
 		values: { title: string; body: string; isSecret: boolean };
 		errors?: FieldErrors<'title' | 'body'>;
 		submitLabel: string;
-		cancelHref: string;
 	}
 
-	let { action, values, errors = {}, submitLabel, cancelHref }: Props = $props();
+	let { action, values, errors = {}, submitLabel }: Props = $props();
 	let saving = $state(false);
 </script>
 
@@ -69,7 +68,6 @@
 	</div>
 
 	<div class="form-actions">
-		<a class="button-quiet" href={cancelHref}>Cancel</a>
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
 	</div>
 </form>

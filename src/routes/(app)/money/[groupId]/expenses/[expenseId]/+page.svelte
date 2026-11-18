@@ -33,16 +33,7 @@
 		me={data.me.id}
 		action="?/save"
 		submitLabel="Save"
-		cancelHref="/money/{data.group.id}"
 	/>
 {/key}
 
-<div class="danger">
-	<ConfirmDelete action="?/delete" label="Delete expense" />
-</div>
-
-<style>
-	.danger {
-		margin-top: var(--space-2xl);
-	}
-</style>
+<ConfirmDelete action="?/delete" label="Delete expense" />

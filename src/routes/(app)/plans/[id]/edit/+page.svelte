@@ -28,17 +28,6 @@
 	errors={form?.errors}
 	action="?/save"
 	submitLabel="Save"
-	cancelHref="/plans/{data.plan.id}"
 />
 
-<div class="danger">
-	<ConfirmDelete action="?/delete" label="Delete plan" />
-</div>
-
-<style>
-	.danger {
-		margin-top: var(--space-xl);
-		padding-top: var(--space-m);
-		border-top: 1px solid var(--colour-hairline);
-	}
-</style>
+<ConfirmDelete action="?/delete" label="Delete plan" />

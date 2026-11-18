@@ -7,9 +7,3 @@ bun.lockb
 
 # Miscellaneous
 /static/
-
-# Vendored, keep byte-for-byte
-src/lib/vendor/
-
-# Vendored skill
-.claude/

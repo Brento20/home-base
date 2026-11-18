@@ -20,12 +20,11 @@
 		action: string;
 		submitLabel: string;
 		/** Shows a Cancel link back to where you came from. */
-		cancelHref?: string;
 		/** The feed post this plan is being made from, kept with the plan when it's saved. */
 		postId?: string | null;
 	}
 
-	let { values, errors = {}, action, submitLabel, cancelHref, postId = null }: Props = $props();
+	let { values, errors = {}, action, submitLabel, postId = null }: Props = $props();
 	let saving = $state(false);
 
 	const wherePlaceholder = pick(PLACEHOLDERS.planWhere);
@@ -164,7 +163,6 @@
 
 	<div class="form-actions">
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
-		{#if cancelHref}<a class="button-quiet" href={cancelHref}>Cancel</a>{/if}
 	</div>
 </form>
 
@@ -177,71 +175,11 @@
 		display: none;
 	}
 
-	/* Optional fields stay tucked away until their chip is tapped, and the chip then goes. */
+	/* Optional fields stay tucked away until their chip is tapped (chip styles: forms.css). */
 	.plan-form:has(#plan-add-where:not(:checked)) .where,
 	.plan-form:has(#plan-add-notes:not(:checked)) .notes,
-	.extra-toggle:checked + .extra-chip,
 	.plan-form:has(#plan-add-where:checked):has(#plan-add-notes:checked) .extras {
 		display: none;
-	}
-
-	.extras {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-	}
-
-	.extra-toggle {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.extra-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		min-height: 40px;
-		padding: 0 16px 0 12px;
-		border: 1px solid rgb(255 255 255 / 0.14);
-		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.05);
-		color: var(--colour-text-muted);
-		font-size: var(--text-small);
-		cursor: pointer;
-		transition:
-			background-color var(--duration-quick) var(--ease-out),
-			transform var(--duration-release) var(--spring-gentle);
-	}
-
-	.extra-chip:global([data-pressed]) {
-		background: rgb(255 255 255 / 0.1);
-		transform: scale(0.95);
-		transition-duration: var(--duration-press);
-		transition-timing-function: var(--ease-out);
-	}
-
-	.extra-toggle:focus-visible + .extra-chip {
-		outline: 2px solid var(--colour-accent);
-		outline-offset: 2px;
-	}
-
-	/* A field opening from its chip eases in rather than popping. */
-	.extra {
-		animation: extra-in 320ms var(--ease-out);
-	}
-
-	@keyframes extra-in {
-		from {
-			opacity: 0;
-			transform: translateY(-6px);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.extra {
-			animation: none;
-		}
 	}
 
 	.all-day {
