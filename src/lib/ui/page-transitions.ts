@@ -1,4 +1,4 @@
-import { onNavigate, preloadCode } from '$app/navigation';
+import { afterNavigate, onNavigate, preloadCode } from '$app/navigation';
 import { TABS, tabIndexFor } from './tabs.js';
 
 /**
@@ -22,8 +22,11 @@ import { TABS, tabIndexFor } from './tabs.js';
  * soon as it's recognised (AppGestures). A swipe hands over mid-gesture: the old screen
  * leaves from where your finger let go.
  *
- * Browsers without view transitions swap screens instantly. Query-only changes (a report's
- * month) don't animate. Call once, from the root layout.
+ * As a screen arrives, its sections fade and rise in one after another, top to bottom (the
+ * reveal below), so a screen settles in rather than appearing all at once.
+ *
+ * Browsers without view transitions swap screens instantly (the reveal still plays).
+ * Query-only changes (a report's month) don't animate. Call once, from the root layout.
  */
 export function usePageTransitions() {
 	onNavigate((navigation) => {
@@ -49,6 +52,52 @@ export function usePageTransitions() {
 			transition.finished.finally(() => delete root.dataset.nav);
 		});
 	});
+
+	afterNavigate((navigation) => {
+		const { from, to, type } = navigation;
+		// Not on first load: the server-rendered page is already showing, and hiding it to fade
+		// it back in would flash.
+		if (type === 'enter' || !from || !to || from.url.pathname === to.url.pathname) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		reveal();
+	});
+}
+
+const REVEAL_MS = 440;
+const REVEAL_STEP = 45;
+/** Sections after this many all come in together, so a long screen never makes you wait. */
+const REVEAL_MAX_STEPS = 6;
+const REVEAL_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+/**
+ * Fades the screen's sections up into place, one after another, top to bottom. A section is a
+ * direct child of the page, except the page's main stack or form, whose own children step in
+ * one by one. Only sections you can see animate. Opacity and transform, on the compositor.
+ */
+function reveal() {
+	const page = document.querySelector<HTMLElement>('[data-page]');
+	if (!page) return;
+	const sections = [...page.children].flatMap((child) =>
+		child.matches('.stack, .form-stack') ? [...child.children] : [child]
+	);
+	let step = 0;
+	for (const section of sections) {
+		if (!(section instanceof HTMLElement)) continue;
+		if (section.getBoundingClientRect().top > innerHeight) break;
+		section.animate(
+			[
+				{ opacity: 0, transform: 'translateY(14px)' },
+				{ opacity: 1, transform: 'none' }
+			],
+			{
+				duration: REVEAL_MS,
+				delay: Math.min(step, REVEAL_MAX_STEPS) * REVEAL_STEP,
+				easing: REVEAL_EASE,
+				fill: 'backwards'
+			}
+		);
+		step += 1;
+	}
 }
 
 /** Loads every tab's code in a quiet moment after the app opens, so the first visit is quick. */

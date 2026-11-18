@@ -34,7 +34,7 @@
 </svelte:head>
 
 <div class="app">
-	<div class="app-backdrop" aria-hidden="true"></div>
+	<div class="app-backdrop backdrop-paint" aria-hidden="true"></div>
 	{@render children()}
 </div>
 
@@ -51,14 +51,6 @@
 		position: fixed;
 		inset: 0;
 		z-index: -1;
-		background-color: var(--colour-ground);
-		background-image: var(--grain), var(--mesh-one), var(--mesh-two), var(--mesh-three);
-		background-size:
-			var(--grain-size) var(--grain-size),
-			100% 100%,
-			100% 100%,
-			100% 100%;
-		background-repeat: repeat, no-repeat, no-repeat, no-repeat;
 		transition: background-color var(--duration-settle) var(--ease-out);
 	}
 </style>

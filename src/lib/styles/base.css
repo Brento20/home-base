@@ -126,6 +126,22 @@ a {
 }
 
 /*
+ * The app's backdrop: grain over three soft glows, sized to the screen. The backdrop itself
+ * (root layout) and the edge fades (app layout) both paint it, lined up, so a fade melts the
+ * page into exactly what's behind it.
+ */
+.backdrop-paint {
+	background-color: var(--colour-ground);
+	background-image: var(--grain), var(--mesh-one), var(--mesh-two), var(--mesh-three);
+	background-size:
+		var(--grain-size) var(--grain-size),
+		100vw 100dvh,
+		100vw 100dvh,
+		100vw 100dvh;
+	background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+
+/*
  * Page transitions (src/lib/ui/page-transitions.ts). Only the page moves: the backdrop and
  * tab bar stay put. The new screen glides in from the direction of travel and settles; the
  * old one drifts the other way and fades out quickly, so the two never read as overlapping.
@@ -178,9 +194,9 @@ html[data-nav='pop'] {
 	--page-to: 32px;
 }
 
+/* No fade here: the screen's sections fade in one by one (the reveal in page-transitions.ts). */
 @keyframes page-in {
 	from {
-		opacity: 0;
 		transform: translateX(var(--page-from, 0));
 	}
 }

@@ -2,9 +2,12 @@
 	/**
 	 * The tab bar: Today, Plans, Lists, Money, Home. The URL decides the active tab.
 	 *
-	 * A frosted bar with a lit rim and a glass pill that springs between tabs (PillNav). It's the
-	 * only blurred surface that stays on screen, so it's the one place the app pays for a live
-	 * backdrop blur; everything about it is plain CSS that the phone's compositor runs.
+	 * A frosted bar with a lit rim and a glass pill that glides between tabs (PillNav).
+	 *
+	 * The page fades out before it reaches the bar (the edge fades in the app layout), so only a
+	 * soft ghost of it passes behind the frost. That matters on iOS, where Safari now and then
+	 * drops a fixed element's blur and fill for a frame as content scrolls under it: with the
+	 * page already faded, there's nothing sharp to flash through.
 	 */
 	import { page } from '$app/state';
 	import Icon from './Icon.svelte';
@@ -31,10 +34,8 @@
 		left: 0;
 		right: 0;
 		bottom: calc(env(safe-area-inset-bottom) + 12px);
-		/* Above the page and anything on it, on a layer of its own, so content scrolling under
-		   the bar (cards that animate get layers too) can never be drawn over it on iOS. */
+		/* Above the page and its edge fades. */
 		z-index: 30;
-		transform: translateZ(0);
 		display: flex;
 		justify-content: center;
 		padding: 0 var(--page-gutter);
@@ -45,7 +46,7 @@
 		position: relative;
 		width: min(100%, 420px);
 		border-radius: var(--radius-pill);
-		background: rgb(20 15 13 / 0.72);
+		background: rgb(20 15 13 / 0.6);
 		-webkit-backdrop-filter: blur(20px) saturate(150%);
 		backdrop-filter: blur(20px) saturate(150%);
 		box-shadow:
