@@ -45,8 +45,6 @@
 		position: relative;
 		min-height: 100dvh;
 		isolation: isolate;
-		/* Rows that bleed past the screen (the Today carousel) never make the page scroll sideways. */
-		overflow-x: clip;
 	}
 
 	.app-backdrop {

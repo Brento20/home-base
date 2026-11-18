@@ -31,7 +31,10 @@
 		left: 0;
 		right: 0;
 		bottom: calc(env(safe-area-inset-bottom) + 12px);
-		z-index: 10;
+		/* Above the page and anything on it, on a layer of its own, so content scrolling under
+		   the bar (cards that animate get layers too) can never be drawn over it on iOS. */
+		z-index: 30;
+		transform: translateZ(0);
 		display: flex;
 		justify-content: center;
 		padding: 0 var(--page-gutter);

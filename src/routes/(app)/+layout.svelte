@@ -11,15 +11,26 @@
 	onMount(() => startLiveRefresh());
 </script>
 
-<main class="screen" data-page>
-	{@render children()}
-</main>
+<!--
+	Clips rows that bleed past the screen (the Today carousel) so the page never scrolls or zooms
+	sideways. It's a still wrapper: the page inside moves with swipes and the clip edge stays at
+	the screen edge, and the tab bar sits outside it, so it's never redrawn as part of the page.
+-->
+<div class="page-clip">
+	<main class="screen" data-page>
+		{@render children()}
+	</main>
+</div>
 
 <TabBar />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->
 <AppGestures />
 
 <style>
+	.page-clip {
+		overflow-x: clip;
+	}
+
 	.screen {
 		max-width: 480px;
 		margin: 0 auto;

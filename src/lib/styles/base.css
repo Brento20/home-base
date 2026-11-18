@@ -131,7 +131,12 @@ a {
  * old one drifts the other way and fades out quickly, so the two never read as overlapping.
  * Transform and opacity only, so the compositor does it all.
  */
-[data-page] {
+/*
+ * Named only while a transition runs (page-transitions.ts sets data-nav first). A permanent
+ * name makes the page its own layer the whole time, which iOS Safari can draw over the tab bar
+ * as content scrolls under it.
+ */
+html[data-nav] [data-page] {
 	view-transition-name: page;
 }
 
