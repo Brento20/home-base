@@ -122,7 +122,7 @@
 		transition: background-color var(--duration-quick) var(--ease-out);
 	}
 
-	.post:not(.full) .body:has(.open:active) {
+	.post:not(.full) .body:has(.open:global([data-pressed])) {
 		background-color: rgb(255 255 255 / 0.03);
 	}
 

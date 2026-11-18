@@ -65,7 +65,7 @@
 			var(--glass-highlight);
 	}
 
-	.list-card:active .body {
+	.list-card:global([data-pressed]) .body {
 		background-color: rgb(255 255 255 / 0.04);
 	}
 

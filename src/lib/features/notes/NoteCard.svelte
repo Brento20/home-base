@@ -122,7 +122,7 @@
 		color: var(--colour-accent);
 	}
 
-	.action:active {
+	.action:global([data-pressed]) {
 		background: var(--colour-accent-soft);
 	}
 </style>

@@ -83,6 +83,8 @@
 	--colour-accent: #f4a86e;
 	--colour-accent-soft: rgb(255 172 112 / 0.1);
 	--colour-accent-edge: rgb(255 192 142 / 0.26);
+	/* An accent button under the finger: a shade deeper, whatever the time of day. */
+	--colour-accent-pressed: color-mix(in oklab, var(--colour-accent), #000 14%);
 	--glow-event: 0 24px 60px -18px rgb(232 112 44 / 0.5);
 	--mesh-one: radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%);
 	--mesh-two: radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%);
@@ -194,6 +196,50 @@
 		1,
 		1,
 		1,
+		1
+	);
+	/* Gentle (damping 0.62, about 8% overshoot): presses springing back, the refresh tick. */
+	--spring-gentle: linear(
+		0,
+		0.029,
+		0.103,
+		0.206,
+		0.325,
+		0.449,
+		0.57,
+		0.681,
+		0.78,
+		0.865,
+		0.934,
+		0.988,
+		1.028,
+		1.056,
+		1.073,
+		1.082,
+		1.083,
+		1.08,
+		1.073,
+		1.065,
+		1.054,
+		1.044,
+		1.034,
+		1.025,
+		1.017,
+		1.01,
+		1.005,
+		1,
+		0.997,
+		0.995,
+		0.994,
+		0.993,
+		0.993,
+		0.993,
+		0.994,
+		0.995,
+		0.996,
+		0.996,
+		0.997,
+		0.998,
 		1
 	);
 	--duration-press: 110ms;

@@ -17,7 +17,7 @@
 		glow?: boolean;
 		/**
 		 * Press feedback for tappable cards: the whole card, glass and content together, grows
-		 * wider and shorter while it's pressed and springs back on release.
+		 * wider and shorter while it's pressed and springs back gently on release.
 		 */
 		squish?: boolean;
 	}
@@ -30,14 +30,14 @@
 	const PRESSED = '1.025 0.97';
 	const PRESSED_REDUCED = '0.985';
 
-	/** The app's bouncy spring (tokens.css), with a stand-in where linear() easing isn't supported. */
+	/** The app's gentle spring (tokens.css), with a stand-in where linear() easing isn't supported. */
 	function springEasing() {
 		const spring = getComputedStyle(document.documentElement)
-			.getPropertyValue('--spring-bouncy')
+			.getPropertyValue('--spring-gentle')
 			.trim();
 		return CSS.supports('transition-timing-function', spring)
 			? spring
-			: 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+			: 'cubic-bezier(0.34, 1.3, 0.64, 1)';
 	}
 
 	onMount(() => {
@@ -46,10 +46,16 @@
 
 		// The Web Animations API rather than a CSS transition, so a card's own `transition`
 		// (highlights, colours) can't override the spring. `scale` adds to any transform the
-		// card already has. Driven by pointer events: iOS Safari often skips :active on a tap.
+		// card already has.
+		//
+		// Timing comes from press.ts, which marks whatever's under the finger with
+		// data-pressed: it waits a beat so a scroll that starts on a card doesn't squish it,
+		// and holds quick taps long enough to be felt. The card squishes when it is pressed
+		// itself or through its own link, not when a button inside it (a tick) is.
 		const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 		const easing = springEasing();
 		let animation: Animation | undefined;
+		let pressed = false;
 
 		const press = () => {
 			animation?.cancel();
@@ -74,13 +80,19 @@
 			animation.onfinish = () => (animation = undefined);
 		};
 
-		const ends = ['pointerup', 'pointercancel', 'pointerleave'] as const;
-		target.addEventListener('pointerdown', press);
-		for (const type of ends) target.addEventListener(type, release);
+		const watch = new MutationObserver(() => {
+			const now =
+				target.hasAttribute('data-pressed') ||
+				target.querySelector('a[href][data-pressed]') !== null;
+			if (now === pressed) return;
+			pressed = now;
+			if (now) press();
+			else release();
+		});
+		watch.observe(target, { attributes: true, attributeFilter: ['data-pressed'], subtree: true });
 		return () => {
+			watch.disconnect();
 			animation?.cancel();
-			target.removeEventListener('pointerdown', press);
-			for (const type of ends) target.removeEventListener(type, release);
 		};
 	});
 </script>

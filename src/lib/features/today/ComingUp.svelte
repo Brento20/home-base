@@ -156,8 +156,20 @@
 
 <style>
 	.coming-up {
-		/* Bleed to the screen edges so the next card peeks in from the right. */
-		margin-inline: calc(-1 * var(--page-gutter));
+		/*
+		 * Bleed past the screen edges so the next card peeks in from the right. On a phone the
+		 * row runs an extra 64px off each side, so when a swipe pulls the page sideways the
+		 * scroller's edge stays off screen and the next card slides in whole, rather than
+		 * showing a hard cut. (The app clips sideways overflow at the screen edge.)
+		 */
+		--bleed: calc(var(--page-gutter) + 64px);
+		margin-inline: calc(-1 * var(--bleed));
+	}
+
+	@media (min-width: 520px) {
+		.coming-up {
+			--bleed: var(--page-gutter);
+		}
 	}
 
 	.track {
@@ -170,12 +182,12 @@
 		 * there still reach the to-do list.
 		 */
 		margin: -24px 0 -56px;
-		padding: 24px var(--page-gutter) 80px;
+		padding: 24px var(--bleed) 80px;
 		list-style: none;
 		overflow-x: auto;
 		overscroll-behavior-x: contain;
 		scroll-snap-type: x mandatory;
-		scroll-padding-inline: var(--page-gutter);
+		scroll-padding-inline: var(--bleed);
 		scrollbar-width: none;
 		-webkit-overflow-scrolling: touch;
 	}
@@ -294,7 +306,7 @@
 		text-decoration: none;
 	}
 
-	.more-body a:active {
+	.more-body a:global([data-pressed]) {
 		background: rgb(255 255 255 / 0.05);
 	}
 

@@ -87,7 +87,7 @@
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
 			border-color var(--duration-quick) var(--ease-out),
-			transform var(--duration-release) var(--spring-bouncy);
+			transform var(--duration-release) var(--spring-gentle);
 	}
 
 	/* Untouched reactions sit back so the ones people gave stand out. */
@@ -96,9 +96,10 @@
 		filter: grayscale(0.6);
 	}
 
-	.reaction:active {
-		transform: scale(1.08, 0.9);
+	.reaction:global([data-pressed]) {
+		transform: scale(0.9);
 		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	.mine {

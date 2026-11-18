@@ -7,7 +7,8 @@
 	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
-	import { usePageTransitions } from '#lib/ui/page-transitions.js';
+	import { preloadTabs, usePageTransitions } from '#lib/ui/page-transitions.js';
+	import { installPress } from '#lib/ui/press.js';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -18,8 +19,13 @@
 		// From here on, each screen opened gets a fresh heading (src/lib/copy/pick.ts).
 		markHydrated();
 		applyDaypart();
+		preloadTabs();
+		const removePress = installPress();
 		const timer = setInterval(applyDaypart, 5 * 60 * 1000);
-		return () => clearInterval(timer);
+		return () => {
+			clearInterval(timer);
+			removePress();
+		};
 	});
 </script>
 
@@ -39,6 +45,8 @@
 		position: relative;
 		min-height: 100dvh;
 		isolation: isolate;
+		/* Rows that bleed past the screen (the Today carousel) never make the page scroll sideways. */
+		overflow-x: clip;
 	}
 
 	.app-backdrop {

@@ -140,7 +140,7 @@
 		color: #14100d;
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
-			transform var(--duration-quick) var(--ease-spring);
+			transform var(--duration-release) var(--spring-gentle);
 	}
 
 	/* Anyone: a dashed ring. */
@@ -148,8 +148,10 @@
 		border-style: dashed;
 	}
 
-	.toggle:active .ring {
-		transform: scale(0.88);
+	.toggle:global([data-pressed]) .ring {
+		transform: scale(0.86);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	.ticking .ring {

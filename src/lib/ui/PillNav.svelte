@@ -86,8 +86,17 @@
 		border-radius: var(--radius-pill);
 		color: inherit;
 		text-decoration: none;
-		transition: color var(--duration-quick) var(--ease-out);
+		transition:
+			color var(--duration-quick) var(--ease-out),
+			transform var(--duration-release) var(--spring-gentle);
 		-webkit-tap-highlight-color: transparent;
+	}
+
+	/* The tab under your finger sinks a touch while the pill sets off towards it. */
+	a:global([data-pressed]) {
+		transform: scale(0.92);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	a.on {

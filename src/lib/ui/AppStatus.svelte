@@ -139,5 +139,15 @@
 		color: var(--colour-on-accent);
 		font-size: var(--text-small);
 		font-weight: var(--weight-strong);
+		transition:
+			transform var(--duration-release) var(--spring-gentle),
+			background-color var(--duration-quick) var(--ease-out);
+	}
+
+	button:global([data-pressed]) {
+		transform: scale(0.94);
+		background: var(--colour-accent-pressed);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 </style>

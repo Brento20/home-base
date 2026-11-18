@@ -10,7 +10,7 @@
 	 * left alone. All listeners are passive, so scrolling is never held up.
 	 */
 	import { onMount } from 'svelte';
-	import { afterNavigate, goto, refreshAll } from '$app/navigation';
+	import { afterNavigate, goto, preloadData, refreshAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import Icon from './Icon.svelte';
 	import { GESTURE, rubber, swipeAction, type SwipeAction } from './gestures.js';
@@ -25,6 +25,8 @@
 
 	// How many steps back we can go inside the app, for "back" (vs. leaving the app).
 	let depth = 0;
+	// Where the current swipe has started loading, so it's fetched once per gesture.
+	let preloaded: string | null = null;
 	afterNavigate((navigation) => {
 		if (navigation.type === 'enter') depth = 0;
 		else if (navigation.type === 'popstate') depth = Math.max(0, depth + (navigation.delta ?? -1));
@@ -68,6 +70,7 @@
 
 		function onStart(event: TouchEvent) {
 			if (event.touches.length !== 1 || refresh === 'refreshing') return;
+			preloaded = null;
 			const touch = event.touches[0];
 			const target = event.target as Element;
 			const blocked = !!target.closest?.(ignore);
@@ -97,6 +100,14 @@
 
 			if (mode === 'swipe') {
 				const action = swipeAction(page.url.pathname, dx);
+				// Start fetching where this swipe is heading while the finger is still moving, so
+				// the slide can begin the moment it's let go.
+				const heading =
+					action?.kind === 'tab' ? action.href : action && depth === 0 ? action.fallback : null;
+				if (heading && heading !== preloaded) {
+					preloaded = heading;
+					preloadData(heading).catch(() => {});
+				}
 				const travel = action ? GESTURE.swipeTravel : 12;
 				swipe = {
 					action,
@@ -272,6 +283,19 @@
 	.armed .glyph,
 	.done .glyph {
 		color: #f6b37a;
+	}
+
+	/* The tick stands upright (the arrow's wind-up turn doesn't apply to it) and pops in. */
+	.done .glyph {
+		transform: none;
+		animation: tick-in 360ms var(--spring-gentle) both;
+	}
+
+	@keyframes tick-in {
+		from {
+			opacity: 0;
+			transform: scale(0.5);
+		}
 	}
 
 	.refreshing .glyph {

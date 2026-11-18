@@ -101,7 +101,7 @@
 		color: var(--colour-text-muted);
 	}
 
-	.trigger:active {
+	.trigger:global([data-pressed]) {
 		background: rgb(255 255 255 / 0.06);
 	}
 
@@ -150,7 +150,7 @@
 		text-decoration: none;
 	}
 
-	.item:active {
+	.item:global([data-pressed]) {
 		background: rgb(255 255 255 / 0.06);
 	}
 

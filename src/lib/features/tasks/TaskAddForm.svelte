@@ -133,6 +133,16 @@
 		border-radius: 50%;
 		background: var(--colour-accent);
 		color: var(--colour-on-accent);
+		transition:
+			transform var(--duration-release) var(--spring-gentle),
+			background-color var(--duration-quick) var(--ease-out);
+	}
+
+	.add-button:global([data-pressed]) {
+		transform: scale(0.9);
+		background: var(--colour-accent-pressed);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	.options {

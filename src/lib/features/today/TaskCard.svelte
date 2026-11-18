@@ -239,11 +239,14 @@
 		color: var(--colour-accent);
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
-			transform var(--duration-quick) var(--ease-spring);
+			transform var(--duration-release) var(--spring-gentle);
 	}
 
-	.done-button:active {
-		transform: scale(0.92);
+	.done-button:global([data-pressed]) {
+		transform: scale(0.88);
+		background-color: var(--colour-accent-soft);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	.done .done-button {

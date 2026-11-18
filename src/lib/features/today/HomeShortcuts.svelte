@@ -105,7 +105,7 @@
 		transition: background-color var(--duration-settle) var(--ease-out);
 	}
 
-	.tile:active .tile-body {
+	.tile:global([data-pressed]) .tile-body {
 		background-color: rgb(255 255 255 / 0.04);
 	}
 

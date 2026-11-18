@@ -211,12 +211,14 @@
 		cursor: pointer;
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
-			transform var(--duration-quick) var(--ease-out);
+			transform var(--duration-release) var(--spring-gentle);
 	}
 
-	.extra-chip:active {
+	.extra-chip:global([data-pressed]) {
 		background: rgb(255 255 255 / 0.1);
-		transform: scale(0.97);
+		transform: scale(0.95);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
 	}
 
 	.extra-toggle:focus-visible + .extra-chip {

@@ -29,12 +29,15 @@
 		border-radius: 50%;
 		background: var(--colour-accent);
 		color: var(--colour-on-accent);
-		transition: transform var(--duration-release) var(--spring-bouncy);
+		transition:
+			transform var(--duration-release) var(--spring-gentle),
+			background-color var(--duration-quick) var(--ease-out);
 	}
 
-	/* A round drop of liquid: flattens when pressed and bounces back. */
-	.round-button:active {
-		transform: scale(1.1, 0.86);
+	/* Sinks under the finger and deepens a shade, then springs back with a little give. */
+	.round-button:global([data-pressed]) {
+		transform: scale(0.9);
+		background: var(--colour-accent-pressed);
 		transition-duration: var(--duration-press);
 		transition-timing-function: var(--ease-out);
 	}

@@ -115,7 +115,7 @@ legend.field-label {
 		background-color var(--duration-quick) var(--ease-out),
 		color var(--duration-quick) var(--ease-out),
 		border-color var(--duration-quick) var(--ease-out),
-		transform var(--duration-release) var(--spring-bouncy);
+		transform var(--duration-release) var(--spring-gentle);
 }
 
 .choice-pill input {
@@ -146,7 +146,10 @@ legend.field-label {
 	color: var(--colour-on-accent);
 	font-weight: var(--weight-strong);
 	text-decoration: none;
-	transition: transform var(--duration-release) var(--spring-bouncy);
+	transition:
+		transform var(--duration-release) var(--spring-gentle),
+		background-color var(--duration-quick) var(--ease-out),
+		opacity var(--duration-quick) var(--ease-out);
 }
 
 .button-primary:disabled {
@@ -164,6 +167,7 @@ legend.field-label {
 	font-size: var(--text-small);
 	color: var(--colour-text-muted);
 	text-decoration: none;
+	transition: opacity var(--duration-quick) var(--ease-out);
 }
 
 .form-actions {
@@ -190,7 +194,9 @@ legend.field-label {
 	color: var(--colour-text);
 	font-weight: var(--weight-medium);
 	text-decoration: none;
-	transition: transform var(--duration-release) var(--spring-bouncy);
+	transition:
+		transform var(--duration-release) var(--spring-gentle),
+		background-color var(--duration-quick) var(--ease-out);
 }
 
 .form-message {
@@ -229,15 +235,53 @@ legend.field-label {
 }
 
 /*
- * Liquid press: pressed buttons and pills squish (wider and shorter) quickly, then spring back
- * with a little wobble when released, like the liquid glass controls.
+ * Presses (src/lib/ui/press.ts sets data-pressed on whatever's under the finger). Buttons sink
+ * a little and deepen a shade, fast; on release they spring back with a little give. Quiet
+ * text buttons just dim. Cards squish instead (GlassSurface).
  */
-.button-primary:active,
-.button-secondary:active,
-.choice-pill:active {
-	transform: scale(1.04, 0.92);
+.button-primary[data-pressed],
+.button-secondary[data-pressed],
+.choice-pill[data-pressed] {
+	transform: scale(0.96);
 	transition-duration: var(--duration-press);
 	transition-timing-function: var(--ease-out);
+}
+
+.button-primary[data-pressed] {
+	background: var(--colour-accent-pressed);
+}
+
+.button-secondary[data-pressed],
+.choice-pill[data-pressed] {
+	background-color: rgb(255 255 255 / 0.08);
+}
+
+.button-quiet[data-pressed] {
+	opacity: 0.55;
+	transition-duration: 60ms;
+}
+
+/*
+ * Everything else you can tap (text links, small row buttons, "See all") dims under the
+ * finger, as text buttons do on iOS. Things with a press of their own are left out: cards
+ * (they squish), and the controls listed here, which style data-pressed themselves.
+ */
+:where(a[href], button, summary, [role='button'])[data-pressed]:not(
+		:has(.glass-slot),
+		.button-primary,
+		.button-secondary,
+		.round-button,
+		.add-button,
+		.reaction,
+		.done-button,
+		.toggle,
+		.action,
+		.trigger,
+		.tile,
+		.item,
+		.pill-nav a
+	) {
+	opacity: 0.6;
 }
 
 /*
