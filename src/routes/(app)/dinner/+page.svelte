@@ -247,6 +247,12 @@
 		background: rgb(255 255 255 / 0.08);
 		color: var(--colour-text-muted);
 	}
+	/* A bigger tap area than the little circle shows. */
+	.clear::after {
+		content: '';
+		position: absolute;
+		inset: -6px;
+	}
 
 	.chips {
 		display: flex;
@@ -273,7 +279,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		min-height: 38px;
+		min-height: var(--tap-target);
 		padding: 0 14px;
 		border: 1px solid var(--colour-hairline-strong);
 		border-radius: var(--radius-pill);

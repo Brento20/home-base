@@ -83,6 +83,7 @@
 					}}
 				>
 					<input type="hidden" name="taskId" value={task.id} />
+					<input type="hidden" name="title" value={task.title} />
 					<PointPop count={pops} />
 					<button
 						class="done-button"

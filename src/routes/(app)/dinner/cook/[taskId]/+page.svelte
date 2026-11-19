@@ -217,8 +217,8 @@
 		align-items: center;
 		gap: 4px;
 		align-self: flex-start;
-		margin-top: calc(-1 * var(--space-m));
-		padding: 6px 0;
+		min-height: var(--tap-target);
+		margin: calc(-1 * var(--space-m)) 0 -6px;
 		color: var(--colour-text-muted);
 		font-size: var(--text-small);
 		text-decoration: none;

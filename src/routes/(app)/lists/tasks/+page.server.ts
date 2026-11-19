@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { getHousehold } from '#lib/features/household/household.server.js';
 import {
 	completeTask,
+	reopenTask,
 	createTask,
 	listOpenTasks,
 	parseTaskForm
@@ -43,9 +44,19 @@ export const actions: Actions = {
 		return { assist: 'filled' as const, values };
 	},
 
-	complete: async ({ request, locals }) => {
+	/** The Undo in the toast after ticking something off. */
+	undo: async ({ request, locals }) => {
 		const taskId = String((await request.formData()).get('taskId') ?? '');
 		if (!taskId) return fail(400, { message: 'Missing task.' });
+		await reopenTask(locals, taskId);
+	},
+
+	complete: async ({ request, locals }) => {
+		const form = await request.formData();
+		const taskId = String(form.get('taskId') ?? '');
+		if (!taskId) return fail(400, { message: 'Missing task.' });
 		await completeTask(locals, taskId);
+		// For the "Ticked off · Undo" toast.
+		return { ticked: { id: taskId, title: String(form.get('title') ?? '').slice(0, 160) } };
 	}
 };

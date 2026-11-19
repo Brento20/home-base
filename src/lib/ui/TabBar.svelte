@@ -19,7 +19,13 @@
 
 <div class="tab-bar-dock">
 	<div class="tab-bar" data-still="tab-bar">
-		<PillNav items={TABS} indexFor={tabIndexFor} {current} label="Main" variant="tabs">
+		<PillNav
+			items={TABS}
+			indexFor={(url) => tabIndexFor(url.pathname)}
+			{current}
+			label="Main"
+			variant="tabs"
+		>
 			{#snippet item(tab)}
 				<Icon name={tab.icon} />
 				<span>{tab.label}</span>

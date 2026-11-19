@@ -19,7 +19,7 @@
 
 <PageHeader title={heading}>
 	{#snippet lead()}
-		<a class="button-quiet" href="/plans/{data.plan.id}"><Icon name="back" size={18} /> Back</a>
+		<a class="button-quiet" href="/plans/{data.plan.id}"><Icon name="back" size={18} /> Plan</a>
 	{/snippet}
 </PageHeader>
 

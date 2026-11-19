@@ -279,8 +279,10 @@
 	}
 
 	.small-print summary {
+		display: flex;
+		align-items: center;
 		width: fit-content;
-		padding: 6px 0;
+		min-height: var(--tap-target);
 		color: var(--colour-text-muted);
 		cursor: pointer;
 	}
@@ -339,7 +341,10 @@
 	}
 
 	.notice a {
-		padding: 8px 12px;
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap-target);
+		padding: 0 12px;
 		border-radius: var(--radius-pill);
 		color: var(--colour-accent);
 		font-weight: var(--weight-medium);

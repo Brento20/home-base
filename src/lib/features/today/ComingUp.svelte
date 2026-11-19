@@ -318,7 +318,15 @@
 		margin-top: 4px;
 	}
 
+	/* Swiping is the main way; the dots still take a forgiving tap. */
+	.dot::after {
+		content: '';
+		position: absolute;
+		inset: -12px -3px;
+	}
+
 	.dot {
+		position: relative;
 		width: 6px;
 		height: 6px;
 		padding: 0;

@@ -57,6 +57,7 @@
 </script>
 
 <form
+	novalidate
 	method="POST"
 	enctype="multipart/form-data"
 	class="form-stack"

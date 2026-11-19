@@ -71,7 +71,15 @@
 		margin: 0;
 	}
 
+	/* Slim pills, with a 44px-tall tap area. */
+	.reaction::after {
+		content: '';
+		position: absolute;
+		inset: -5px 0;
+	}
+
 	.reaction {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		gap: 5px;

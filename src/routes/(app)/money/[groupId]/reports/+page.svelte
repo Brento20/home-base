@@ -3,6 +3,7 @@
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { page } from '$app/state';
 	import CategoryBars from '#lib/features/expenses/CategoryBars.svelte';
+	import SegmentedNav from '#lib/ui/SegmentedNav.svelte';
 	import CompareBars from '#lib/features/expenses/CompareBars.svelte';
 	import TrendChart from '#lib/features/expenses/TrendChart.svelte';
 	import { categoryColour, categoryLabel } from '#lib/features/expenses/categories.js';
@@ -59,12 +60,15 @@
 	{/snippet}
 </PageHeader>
 
-<nav class="modes" aria-label="Report type">
-	<a href={base} aria-current={data.mode === 'overview' ? 'page' : undefined}>Overview</a>
-	<a href="{base}?mode=compare" aria-current={data.mode === 'compare' ? 'page' : undefined}
-		>Compare</a
-	>
-</nav>
+<div class="modes">
+	<SegmentedNav
+		label="Report type"
+		items={[
+			{ href: base, label: 'Overview' },
+			{ href: `${base}?mode=compare`, label: 'Compare' }
+		]}
+	/>
+</div>
 
 {#snippet drillList(expenses: ReportExpense[])}
 	{#if expenses.length === 0}
@@ -280,28 +284,7 @@
 
 <style>
 	.modes {
-		display: inline-flex;
-		gap: 4px;
 		margin-bottom: var(--space-l);
-		padding: 4px;
-		border: 1px solid var(--colour-hairline-strong);
-		border-radius: var(--radius-pill);
-	}
-
-	.modes a {
-		display: inline-flex;
-		align-items: center;
-		min-height: 36px;
-		padding: 0 16px;
-		border-radius: var(--radius-pill);
-		font-size: var(--text-small);
-		color: var(--colour-text-muted);
-		text-decoration: none;
-	}
-
-	.modes a[aria-current] {
-		background: var(--colour-accent-soft);
-		color: var(--colour-text);
 	}
 
 	.period {

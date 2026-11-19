@@ -71,7 +71,14 @@
 		text-align: center;
 	}
 
+	/* No underlines: an accent link with a full-height tap area, like the rest of the app. */
 	footer :global(a) {
-		color: var(--colour-text);
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap-target);
+		padding: 0 4px;
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
+		text-decoration: none;
 	}
 </style>

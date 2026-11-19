@@ -110,4 +110,10 @@
 		justify-content: center;
 		gap: var(--space-l);
 	}
+
+	/* Two quiet options side by side, so they match Sign out. */
+	.links a {
+		font-weight: var(--weight-regular, 400);
+		color: var(--colour-text-muted);
+	}
 </style>

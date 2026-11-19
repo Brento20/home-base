@@ -52,6 +52,7 @@
 </script>
 
 <form
+	novalidate
 	method="POST"
 	{action}
 	class="form-stack recipe-form"

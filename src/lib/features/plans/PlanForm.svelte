@@ -42,6 +42,7 @@
 </script>
 
 <form
+	novalidate
 	method="POST"
 	{action}
 	class="form-stack plan-form"

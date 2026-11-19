@@ -139,9 +139,22 @@
 	{#if photo !== 'only'}
 		<div class="box">
 			{#if multiline}
-				<textarea name="text" rows="3" {placeholder} bind:value={text} maxlength="20000"></textarea>
+				<textarea
+					name="text"
+					rows="3"
+					aria-label={label}
+					{placeholder}
+					bind:value={text}
+					maxlength="20000"></textarea>
 			{:else}
-				<input name="text" {placeholder} bind:value={text} autocomplete="off" maxlength="300" />
+				<input
+					name="text"
+					aria-label={label}
+					{placeholder}
+					bind:value={text}
+					autocomplete="off"
+					maxlength="300"
+				/>
 			{/if}
 		</div>
 	{/if}

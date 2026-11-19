@@ -6,9 +6,10 @@
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { formatTodayHeading } from '#lib/time.js';
+	import UndoToast from '#lib/ui/UndoToast.svelte';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	const heading = $derived(formatTodayHeading(new Date(`${data.today}T12:00:00Z`)));
 	const tonight = $derived(
@@ -45,6 +46,15 @@
 		me={data.me.id}
 	/>
 </div>
+
+{#if form && 'ticked' in form && form.ticked}
+	<UndoToast
+		key={form.ticked.id}
+		message="Ticked off: {form.ticked.title}"
+		action="?/undoTask"
+		fields={{ taskId: form.ticked.id }}
+	/>
+{/if}
 
 <style>
 	.header {

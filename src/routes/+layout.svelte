@@ -4,7 +4,8 @@
 	import '#lib/styles/base.css';
 	import '#lib/styles/forms.css';
 	import '#lib/styles/ai.css';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
+	import { page } from '$app/state';
 	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
@@ -15,6 +16,21 @@
 	let { children }: LayoutProps = $props();
 
 	usePageTransitions();
+
+	// When a form comes back with mistakes, take you to the first one (forms use novalidate, so
+	// the app's own inline messages show instead of the browser's bubbles).
+	$effect(() => {
+		const form = page.form as { errors?: Record<string, unknown> } | null;
+		if (!form?.errors || Object.keys(form.errors).length === 0) return;
+		// After the page has finished redrawing (a form may remount to show what you typed).
+		tick().then(() =>
+			requestAnimationFrame(() => {
+				const first = document.querySelector<HTMLElement>('[aria-invalid="true"]');
+				first?.focus({ preventScroll: true });
+				first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			})
+		);
+	});
 
 	onMount(() => {
 		// From here on, each screen opened gets a fresh heading (src/lib/copy/pick.ts).

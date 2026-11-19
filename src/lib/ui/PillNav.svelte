@@ -13,8 +13,12 @@
 
 	interface Props {
 		items: T[];
-		/** The item for a path, or -1 for none. */
-		indexFor: (pathname: string) => number;
+		/** The item for a URL, or -1 for none. */
+		indexFor: (url: {
+			pathname: string;
+			href: string;
+			searchParams: { get(name: string): string | null };
+		}) => number;
 		current: number;
 		label: string;
 		variant: 'tabs' | 'segmented';
@@ -27,7 +31,7 @@
 	const shown = $derived(heading ?? current);
 
 	beforeNavigate((navigation) => {
-		const next = navigation.to ? indexFor(navigation.to.url.pathname) : -1;
+		const next = navigation.to ? indexFor(navigation.to.url) : -1;
 		if (next < 0 || next === current) return;
 		heading = next;
 		navigation.complete.then(
@@ -126,6 +130,13 @@
 		height: 34px;
 		padding: 0 20px;
 		font-size: var(--text-small);
+	}
+
+	/* The pill stays slim, but the tap area reaches the outline: 44px tall. */
+	.segmented a::after {
+		content: '';
+		position: absolute;
+		inset: calc(var(--inset) * -1) 0;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

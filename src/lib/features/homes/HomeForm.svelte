@@ -19,6 +19,7 @@
 </script>
 
 <form
+	novalidate
 	method="POST"
 	class="form-stack"
 	use:enhance={() => {

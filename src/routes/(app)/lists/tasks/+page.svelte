@@ -3,6 +3,7 @@
 	import TaskAddForm from '#lib/features/tasks/TaskAddForm.svelte';
 	import TaskList from '#lib/features/tasks/TaskList.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import UndoToast from '#lib/ui/UndoToast.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -24,3 +25,12 @@
 />
 
 <TaskList tasks={data.tasks} people={data.household.members} today={data.today} />
+
+{#if form && 'ticked' in form && form.ticked}
+	<UndoToast
+		key={form.ticked.id}
+		message="Ticked off: {form.ticked.title}"
+		action="?/undo"
+		fields={{ taskId: form.ticked.id }}
+	/>
+{/if}

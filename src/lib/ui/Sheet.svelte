@@ -118,9 +118,9 @@
 	.close {
 		display: grid;
 		place-items: center;
-		width: 40px;
-		height: 40px;
-		margin-right: -8px;
+		width: var(--tap-target);
+		height: var(--tap-target);
+		margin-right: -10px;
 		border: 0;
 		border-radius: 50%;
 		background: rgb(255 255 255 / 0.06);

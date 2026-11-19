@@ -56,6 +56,7 @@
 		}}
 	>
 		<input type="hidden" name="taskId" value={task.id} />
+		<input type="hidden" name="title" value={task.title} />
 		<input type="hidden" name="done" value="true" />
 		<span class="pop-anchor"><PointPop count={pops} /></span>
 		<button
@@ -68,7 +69,11 @@
 			<span class="ring"
 				>{#if ticking}<Icon name="check" size={14} />{/if}</span
 			>
-			<span class="title">{task.title}</span>
+			<span class="words">
+				<span class="title">{task.title}</span>
+				<!-- Says whose it is in words too, so the ring colour isn't the only clue. -->
+				<span class="who" aria-hidden="true">{assignee ? assignee.displayName : 'Anyone'}</span>
+			</span>
 			<span class="meta">
 				{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
 						><Icon name="repeat" size={14} /></span
@@ -164,11 +169,22 @@
 		border-color: transparent;
 	}
 
-	.title {
+	.words {
+		display: flex;
+		flex-direction: column;
 		flex: 1;
 		min-width: 0;
+		padding: 8px 0;
+	}
+
+	.title {
 		font-size: var(--text-body);
 		overflow-wrap: anywhere;
+	}
+
+	.who {
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
 	}
 
 	.ticking .title {

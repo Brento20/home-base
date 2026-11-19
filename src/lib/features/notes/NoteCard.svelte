@@ -81,7 +81,8 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--space-s);
-		min-height: 32px;
+		min-height: var(--tap-target);
+		margin: -6px 0;
 		font-weight: var(--weight-strong);
 		color: inherit;
 		text-decoration: none;
@@ -108,11 +109,11 @@
 	.actions {
 		display: flex;
 		gap: var(--space-s);
-		margin: 2px -6px 0;
+		margin: -2px -10px -8px;
 	}
 
 	.action {
-		min-height: 36px;
+		min-height: var(--tap-target);
 		padding: 0 10px;
 		border: 0;
 		border-radius: var(--radius-pill);

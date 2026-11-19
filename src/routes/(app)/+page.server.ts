@@ -4,7 +4,7 @@ import { FEED_PAGE, feedLimit, listFeed } from '#lib/features/feed/feed.server.j
 import { listActiveLists } from '#lib/features/lists/lists.server.js';
 import { listUpcomingPlans, pickComingUp } from '#lib/features/plans/plans.server.js';
 import { getScores } from '#lib/features/points/points.server.js';
-import { completeTask, listTasksComingUp } from '#lib/features/tasks/tasks.server.js';
+import { completeTask, listTasksComingUp, reopenTask } from '#lib/features/tasks/tasks.server.js';
 import { mergeComingUp } from '#lib/features/today/coming-up.js';
 import { weekSummary } from '#lib/features/today/week.server.js';
 import { todayISO } from '#lib/time.js';
@@ -34,8 +34,18 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	completeTask: async ({ request, locals }) => {
-		const taskId = String((await request.formData()).get('taskId') ?? '');
+		const form = await request.formData();
+		const taskId = String(form.get('taskId') ?? '');
 		if (!taskId) return fail(400, { message: 'Missing task.' });
 		await completeTask(locals, taskId);
+		// For the "Ticked off · Undo" toast.
+		return { ticked: { id: taskId, title: String(form.get('title') ?? '').slice(0, 160) } };
+	},
+
+	/** The Undo in the toast after ticking a chore off a card. */
+	undoTask: async ({ request, locals }) => {
+		const taskId = String((await request.formData()).get('taskId') ?? '');
+		if (!taskId) return fail(400, { message: 'Missing task.' });
+		await reopenTask(locals, taskId);
 	}
 };

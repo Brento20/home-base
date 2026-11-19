@@ -104,7 +104,7 @@ legend.field-label {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--space-s);
-	min-height: 40px;
+	min-height: var(--tap-target);
 	padding: 0 16px;
 	border-radius: var(--radius-pill);
 	border: 1px solid var(--colour-hairline-strong);
