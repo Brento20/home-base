@@ -128,6 +128,7 @@
 		<span class="money-input total">
 			<span class="currency" aria-hidden="true">$</span>
 			<input
+				id="expense-amount"
 				class="field-input"
 				name="amount"
 				inputmode="decimal"

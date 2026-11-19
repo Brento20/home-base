@@ -58,6 +58,7 @@
 	<label class="field">
 		<span class="field-label">What’s happening?</span>
 		<input
+			id="plan-title"
 			class="field-input"
 			name="title"
 			value={values.title}

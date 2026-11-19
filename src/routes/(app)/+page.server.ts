@@ -1,23 +1,29 @@
 import { fail } from '@sveltejs/kit';
+import { listGroups } from '#lib/features/expenses/expenses.server.js';
 import { FEED_PAGE, feedLimit, listFeed } from '#lib/features/feed/feed.server.js';
 import { listActiveLists } from '#lib/features/lists/lists.server.js';
 import { listUpcomingPlans, pickComingUp } from '#lib/features/plans/plans.server.js';
 import { getScores } from '#lib/features/points/points.server.js';
 import { completeTask, listTasksComingUp } from '#lib/features/tasks/tasks.server.js';
 import { mergeComingUp } from '#lib/features/today/coming-up.js';
+import { weekSummary } from '#lib/features/today/week.server.js';
 import { todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const [plans, tasks, lists, scores, feed] = await Promise.all([
+	const [plans, tasks, lists, scores, feed, groups] = await Promise.all([
 		listUpcomingPlans(locals, 20),
 		listTasksComingUp(locals),
 		listActiveLists(locals),
 		getScores(locals),
 		// ?feed= grows as you scroll down the feed, so older posts stay loaded and refreshed.
-		listFeed(locals, feedLimit(url.searchParams.get('feed')))
+		listFeed(locals, feedLimit(url.searchParams.get('feed'))),
+		// Only for the week line's money bit.
+		listGroups(locals)
 	]);
+	const week = weekSummary(locals, plans, tasks, groups);
 	return {
+		week: { plain: week.plain, fingerprint: week.key },
 		comingUp: mergeComingUp(pickComingUp(plans, 6), tasks),
 		lists: lists.slice(0, 4),
 		scores,

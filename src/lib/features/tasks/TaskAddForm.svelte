@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import { pick } from '#lib/copy/pick.js';
+	import { AI_OOPS, PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { isRepeat, type Repeat } from './repeat.js';
 	import { enhance } from '$app/forms';
@@ -14,10 +15,16 @@
 		/** Values and messages from a failed submit. */
 		values?: Record<string, string>;
 		errors?: Record<string, string | undefined>;
+		/** Whether the ✨ quick-add button shows (an AI key is set). */
+		ai?: boolean;
+		/** What the last ✨ did. */
+		assist?: 'filled' | 'failed' | null;
 	}
 
-	let { people, values, errors }: Props = $props();
+	let { people, values, errors, ai = false, assist = null }: Props = $props();
 	let input = $state<HTMLInputElement>();
+	let reading = $state(false);
+	const oops = pick(AI_OOPS);
 </script>
 
 <!--
@@ -28,11 +35,18 @@
 	class="task-add"
 	method="POST"
 	action="?/add"
-	use:enhance={() =>
-		async ({ result, update }) => {
-			await update({ reset: result.type === 'success' });
-			if (result.type === 'success') input?.focus();
-		}}
+	use:enhance={({ action }) => {
+		const quick = action.search.includes('/quick');
+		reading = quick;
+		return async ({ result, update }) => {
+			reading = false;
+			// A ✨ fill keeps the form as filled; a real add clears it for the next one.
+			const added = result.type === 'success' && !quick;
+			await update({ reset: added });
+			if (added || quick) input?.focus();
+		};
+	}}
+	aria-busy={reading}
 >
 	<div class="title-row">
 		<GlassSurface radius={18} />
@@ -50,9 +64,28 @@
 			aria-invalid={errors?.title ? 'true' : undefined}
 			required
 		/>
+		{#if ai}
+			<!-- Same form, other action: reads the words and fills the options below. -->
+			<button
+				class="quick-button"
+				formaction="?/quick"
+				formnovalidate
+				aria-label="Fill in who and when from what I typed"
+				disabled={reading}
+			>
+				{#if reading}<span class="spinner" aria-hidden="true"></span>{:else}<Icon
+						name="sparkle"
+						size={20}
+					/>{/if}
+			</button>
+		{/if}
 		<button class="add-button" aria-label="Add task"><Icon name="plus" size={20} /></button>
 	</div>
 	{#if errors?.title}<p class="field-error">{errors.title}</p>{/if}
+	{#if assist === 'failed' && !reading}<p class="assist-note" role="status">{oops}</p>{/if}
+	{#if assist === 'filled' && !reading}<p class="assist-note" role="status">
+			Filled in below. Tap + if it looks right.
+		</p>{/if}
 
 	<div class="options">
 		<AssigneeChoice {people} value={values?.assigneeId ?? ''} error={errors?.assigneeId} />
@@ -143,6 +176,52 @@
 		background: var(--colour-accent-pressed);
 		transition-duration: var(--duration-press);
 		transition-timing-function: var(--ease-out);
+	}
+
+	/* Only once there's something typed for it to read. */
+	.quick-button {
+		position: relative;
+		z-index: 1;
+		display: none;
+		place-items: center;
+		width: var(--tap-target);
+		height: var(--tap-target);
+		border: 0;
+		border-radius: 50%;
+		background: none;
+		color: var(--colour-accent);
+		transition: transform var(--duration-release) var(--spring-gentle);
+	}
+
+	.task-add:has(input[name='title']:not(:placeholder-shown)) .quick-button {
+		display: grid;
+	}
+
+	.quick-button:global([data-pressed]) {
+		transform: scale(0.88);
+		transition-duration: var(--duration-press);
+	}
+
+	.spinner {
+		width: 16px;
+		height: 16px;
+		border: 2px solid currentColor;
+		border-right-color: transparent;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.assist-note {
+		margin: 0;
+		padding: 0 4px;
+		font-size: var(--text-small);
+		color: var(--colour-text-muted);
 	}
 
 	.options {

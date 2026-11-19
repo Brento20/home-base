@@ -2,6 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { getPost } from '#lib/features/feed/feed.server.js';
 import { draftFromPost } from '#lib/features/feed/plan-draft.js';
 import { createPlan, parsePlanForm } from '#lib/features/plans/plans.server.js';
+import { readPlan } from '#lib/features/plans/quick.server.js';
+import { aiConfigured } from '#lib/server/ai.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -17,7 +19,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	create: async ({ request, locals }) => {
 		const form = await request.formData();
 		const { input, errors, values, valid } = parsePlanForm(form);
 		const postId = String(form.get('postId') ?? '') || null;
@@ -27,5 +29,18 @@ export const actions: Actions = {
 		if (postId) await getPost(locals, postId);
 		const id = await createPlan(locals, input, postId);
 		redirect(303, `/plans/${id}`);
+	},
+
+	/** "Describe it": fills the form from a sentence, or says to fill it in by hand. */
+	describe: async ({ request }) => {
+		const form = await request.formData();
+		const text = String(form.get('text') ?? '')
+			.trim()
+			.slice(0, 300);
+		const postId = String(form.get('postId') ?? '') || null;
+		if (!aiConfigured || !text) return { assist: 'failed' as const, postId };
+		const values = await readPlan(text, todayISO());
+		if (!values) return { assist: 'failed' as const, postId };
+		return { assist: 'filled' as const, values, postId };
 	}
 };

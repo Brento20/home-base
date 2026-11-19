@@ -8,50 +8,18 @@
 	import { RECIPE_TITLE } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import Icon from '#lib/ui/Icon.svelte';
-	import { proteinLabel } from './recipe.js';
-
-	export interface RecipeFormValues {
-		title: string;
-		baseServings: string;
-		prepMinutes: string;
-		cookMinutes: string;
-		restMinutes: string;
-		cuisine: string;
-		isVegetarian: boolean;
-		isVegan: boolean;
-		proteins: string[];
-		ingredients: string;
-		steps: string;
-		energyKj: string;
-		proteinG: string;
-		carbsG: string;
-		fatG: string;
-		sugarsG: string;
-		fibreG: string;
-		notes: string;
-	}
+	import { PROTEIN_OPTIONS as PROTEINS, proteinLabel, type RecipeFormValues } from './recipe.js';
 
 	interface Props {
 		values: RecipeFormValues;
 		errors?: Partial<Record<string, string>>;
 		submitLabel: string;
+		/** Where it posts: '?/create' on Add a recipe, which also has the import action. */
+		action?: string;
 	}
 
-	let { values, errors = {}, submitLabel }: Props = $props();
+	let { values, errors = {}, submitLabel, action }: Props = $props();
 
-	const PROTEINS = [
-		'chicken',
-		'beef',
-		'pork',
-		'turkey',
-		'fish',
-		'shellfish',
-		'egg',
-		'tofu',
-		'legumes',
-		'dairy',
-		'nuts'
-	];
 	const INGREDIENTS_EXAMPLE = [
 		'One per line, for the servings above:',
 		'200 g chicken thigh, sliced',
@@ -85,6 +53,7 @@
 
 <form
 	method="POST"
+	{action}
 	class="form-stack recipe-form"
 	use:enhance={() => {
 		saving = true;
@@ -97,6 +66,7 @@
 	<label class="field">
 		<span class="field-label">What’s it called?</span>
 		<input
+			id="recipe-title"
 			class="field-input"
 			name="title"
 			value={values.title}

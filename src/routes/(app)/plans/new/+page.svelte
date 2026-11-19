@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import PlanForm from '#lib/features/plans/PlanForm.svelte';
+	import AssistBox from '#lib/ui/AssistBox.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
@@ -13,7 +14,7 @@
 
 	const postId = $derived(form?.postId ?? data.fromPost?.id ?? null);
 	const values = $derived(
-		form?.values ?? {
+		(form && 'values' in form ? form.values : null) ?? {
 			title: data.fromPost?.title ?? '',
 			notes: data.fromPost?.notes ?? '',
 			location: '',
@@ -43,7 +44,27 @@
 	<p class="from-post">From the home feed. Pick a time and it’ll show on the post too.</p>
 {/if}
 
-<PlanForm {values} errors={form?.errors} action="" submitLabel="Lock it in" {postId} />
+{#if data.ai && !postId}
+	<AssistBox
+		action="?/describe"
+		label="Say it how you’d text it, and I’ll fill in the rest."
+		placeholder="Dinner with Sam at Fratelli, Saturday 7"
+		submitLabel="Fill it in"
+		busyLabel="Reading it…"
+		outcome={form && 'assist' in form ? form.assist : null}
+		focusOnFail="#plan-title"
+	/>
+{/if}
+
+{#key form}
+	<PlanForm
+		{values}
+		errors={form && 'errors' in form ? form.errors : undefined}
+		action="?/create"
+		submitLabel="Lock it in"
+		{postId}
+	/>
+{/key}
 
 <style>
 	.from-post {

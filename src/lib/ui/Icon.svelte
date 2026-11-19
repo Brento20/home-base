@@ -22,7 +22,9 @@
 		| 'clock'
 		| 'minus'
 		| 'filter'
-		| 'leaf';
+		| 'leaf'
+		| 'sparkle'
+		| 'camera';
 </script>
 
 <script lang="ts">
@@ -86,6 +88,15 @@
 		<rect x="3.5" y="5" width="17" height="14" rx="3" />
 		<circle cx="9" cy="10" r="1.6" />
 		<path d="M4 17l4.5-4.5 3.5 3.5 3-3 5 5" />
+	{:else if name === 'sparkle'}
+		<path
+			d="M12 3.5l1.8 5.2a2 2 0 0 0 1.5 1.5l5.2 1.8-5.2 1.8a2 2 0 0 0-1.5 1.5L12 20.5l-1.8-5.2a2 2 0 0 0-1.5-1.5L3.5 12l5.2-1.8a2 2 0 0 0 1.5-1.5z"
+		/>
+	{:else if name === 'camera'}
+		<path
+			d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"
+		/>
+		<circle cx="12" cy="12.5" r="3.2" />
 	{:else if name === 'refresh'}
 		<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
 		<path d="M19.5 4.5v4h-4" />

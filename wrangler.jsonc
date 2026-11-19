@@ -4,7 +4,8 @@
 // SUPABASE_URL lives here because every deploy replaces plain variables with this file's `vars`.
 // SUPABASE_PUBLISHABLE_KEY is a secret, set once in the Cloudflare dashboard (Workers ›
 // home-base › Settings › Variables and Secrets); secrets survive deploys and stay out of git.
-// For a local `npm run preview:cf`, put both in .dev.vars (ignored by git).
+// ANTHROPIC_API_KEY (optional, turns on the AI helpers) is a secret too, set the same way.
+// For a local `npm run preview:cf`, put them in .dev.vars (ignored by git).
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "home-base",

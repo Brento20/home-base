@@ -374,3 +374,62 @@ export function ingredientLine(ingredient: Ingredient) {
 		(ingredient.prepNote ? `, ${ingredient.prepNote}` : '')
 	);
 }
+
+/** The add/edit recipe form's values, as typed: ingredients and steps one per line. */
+export interface RecipeFormValues {
+	title: string;
+	baseServings: string;
+	prepMinutes: string;
+	cookMinutes: string;
+	restMinutes: string;
+	cuisine: string;
+	isVegetarian: boolean;
+	isVegan: boolean;
+	proteins: string[];
+	ingredients: string;
+	steps: string;
+	energyKj: string;
+	proteinG: string;
+	carbsG: string;
+	fatG: string;
+	sugarsG: string;
+	fibreG: string;
+	notes: string;
+}
+
+/** A new recipe's starting values. */
+export const BLANK_RECIPE_FORM: RecipeFormValues = {
+	title: '',
+	baseServings: String(DEFAULT_SERVINGS),
+	prepMinutes: '',
+	cookMinutes: '',
+	restMinutes: '',
+	cuisine: '',
+	isVegetarian: false,
+	isVegan: false,
+	proteins: [],
+	ingredients: '',
+	steps: '',
+	energyKj: '',
+	proteinG: '',
+	carbsG: '',
+	fatG: '',
+	sugarsG: '',
+	fibreG: '',
+	notes: ''
+};
+
+/** The proteins a home recipe can be tagged with (the library's filter uses the same words). */
+export const PROTEIN_OPTIONS = [
+	'chicken',
+	'beef',
+	'pork',
+	'turkey',
+	'fish',
+	'shellfish',
+	'egg',
+	'tofu',
+	'legumes',
+	'dairy',
+	'nuts'
+] as const;

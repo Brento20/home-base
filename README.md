@@ -54,6 +54,7 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 - **Sign up and homes**: a landing page at /welcome, sign up with email and password, confirm by email, then a profile (name, nickname, pronouns, date of birth, photo). Then "Welcome home": build a home (name + password to share) or join one. Five wrong join attempts in 15 minutes locks you out for a while.
 - **Home**: everyone in your home, notes anyone can add (wifi, bins, the spare key), with "Hide until tapped" and Copy. Home settings lets an owner rename the home and set its password.
 - **Installed app**: add it to the Home Screen and it opens full screen with its own launch screen. Pages you've opened are saved, so they still open with no signal (an "Offline" pill says so); pages never opened show a friendly offline screen. When a new version is deployed, a "New version ready" notice appears and refreshes only when tapped. Signing out deletes every saved page.
+- **AI helpers** (optional, they need a Claude API key): **recipe import** on Add a recipe (paste a link or the recipe, or snap a cookbook page; a link uses the site's own recipe data when it has it, with no AI at all), **quick add** in plain words (✨ in the Tasks field: "bins out every Tuesday, Chris"; and "Say it how you'd text it" on New plan), **receipt scan** on Add expense, and **the week in a line** under Today's date. Every helper only fills in the normal form for you to check and save. If one can't manage, it says "Oops! I can't work out a thing today! Enter it manually 👉👈" and the form is right there; with no key, the helpers don't show at all.
 - Everyone's phones stay in step by refreshing when the app comes back to the foreground and every 20 seconds.
 
 ## Step 4: connect Supabase
@@ -92,6 +93,9 @@ holds the deploy settings.
   replaces plain variables with that file's `vars`. `SUPABASE_PUBLISHABLE_KEY` is a secret: add
   it once in the Cloudflare dashboard (Workers › home-base › Settings › Variables and Secrets,
   type Secret). Secrets survive deploys. Without the key the live site runs on sample data.
+- **AI helpers**: add `ANTHROPIC_API_KEY` the same way, as a Secret (create the key at
+  platform.claude.com › API keys). Without it the helpers hide. Locally, put it in `.dev.vars`.
+  Quick jobs use Claude Haiku and photos use Claude Sonnet (`src/lib/server/ai.ts`).
 - **Your own domain**: Workers › home-base › Settings › Domains & Routes › Add › Custom domain
   (the domain's DNS has to be on Cloudflare). Then update Supabase's Site URL and Redirect URLs.
 - **Deploy on every push** (optional): connect the GitHub repo under Workers › home-base ›

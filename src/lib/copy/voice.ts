@@ -264,3 +264,15 @@ export const EMPTY = {
 		'Nothing in the cookbook for that.'
 	]
 } as const;
+
+// AI helpers ------------------------------------------------------------------------------------
+
+/**
+ * When an AI helper can't do it (no answer, a timeout, a blurry photo, not a recipe), the form
+ * stays right there to fill by hand. The first line is the one the household asked for.
+ */
+export const AI_OOPS = [
+	'Oops! I can’t work out a thing today! Enter it manually 👉👈',
+	'Hmm, that one stumped me. Mind popping it in by hand? 👉👈',
+	'My brain’s gone blank! Fill it in below and I’ll owe you one 👉👈'
+] as const;

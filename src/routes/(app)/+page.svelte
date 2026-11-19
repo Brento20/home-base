@@ -4,6 +4,7 @@
 	import HomeShortcuts from '#lib/features/today/HomeShortcuts.svelte';
 	import ComingUp from '#lib/features/today/ComingUp.svelte';
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
+	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { formatTodayHeading } from '#lib/time.js';
 	import type { PageProps } from './$types';
 
@@ -22,10 +23,13 @@
 </svelte:head>
 
 <header class="header">
-	<h1>
-		{heading.primary}
-		<span class="month">{heading.secondary}</span>
-	</h1>
+	<div class="heading">
+		<h1>
+			{heading.primary}
+			<span class="month">{heading.secondary}</span>
+		</h1>
+		<WeekSummary plain={data.week.plain} fingerprint={data.week.fingerprint} ai={data.ai} />
+	</div>
 	<ScoreAvatars people={data.household.members} scores={data.scores} />
 </header>
 
@@ -48,6 +52,10 @@
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: var(--space-m);
+	}
+
+	.heading {
+		min-width: 0;
 	}
 
 	h1 {
