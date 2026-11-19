@@ -2,9 +2,11 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
 	import { groupPlansByDay } from '#lib/features/plans/describe.js';
+	import PlanCalendar from '#lib/features/plans/PlanCalendar.svelte';
 	import PlanRow from '#lib/features/plans/PlanRow.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import RoundButton from '#lib/ui/RoundButton.svelte';
+	import SegmentedNav from '#lib/ui/SegmentedNav.svelte';
 	import type { Plan } from '#lib/types.js';
 	import type { PageProps } from './$types';
 
@@ -29,7 +31,28 @@
 	{/snippet}
 </PageHeader>
 
-{#if groups.length === 0}
+<div class="views">
+	<SegmentedNav
+		label="Show plans as"
+		active={data.view === 'calendar' ? 1 : 0}
+		items={[
+			{ href: '/plans?view=list', label: 'List' },
+			{ href: '/plans?view=calendar', label: 'Calendar' }
+		]}
+	/>
+</div>
+
+{#if data.view === 'calendar'}
+	<PlanCalendar
+		month={data.month}
+		plans={data.plans}
+		dinners={data.dinners}
+		people={data.household.members}
+		today={data.today}
+		now={data.now}
+	/>
+	<p class="footer"><a class="button-quiet" href="/plans/import">Import from Apple Calendar</a></p>
+{:else if groups.length === 0}
 	<div class="empty">
 		<p>{emptyLine}</p>
 		<a class="button-quiet" href="/plans/import">Import from Apple Calendar</a>
@@ -49,6 +72,10 @@
 {/if}
 
 <style>
+	.views {
+		margin-bottom: var(--space-l);
+	}
+
 	.day + .day {
 		margin-top: 28px;
 	}

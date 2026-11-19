@@ -132,6 +132,37 @@ export async function getDinner(locals: App.Locals, taskId: string): Promise<Tas
 	return task;
 }
 
+/**
+ * Dinners due from `fromISO` up to (not including) `untilISO`, cooked or not: for the month
+ * view on Plans.
+ */
+export async function listDinnersBetween(
+	locals: App.Locals,
+	fromISO: string,
+	untilISO: string
+): Promise<Task[]> {
+	const { supabase } = locals;
+	if (!supabase) {
+		return sampleTasks.filter(
+			(task) => task.recipeId && task.dueOn && task.dueOn >= fromISO && task.dueOn < untilISO
+		);
+	}
+
+	const householdId = await getHouseholdId(locals);
+	const { data, error: readError } = await supabase
+		.from('tasks')
+		.select(TASK_COLUMNS)
+		.eq('household_id', householdId)
+		.not('recipe_id', 'is', null)
+		.gte('due_on', fromISO)
+		.lt('due_on', untilISO)
+		.order('due_on')
+		.limit(200);
+
+	if (readError) dbError(readError);
+	return (data ?? []).map(toTask);
+}
+
 /** Moves a dinner to another day or time, or changes who's cooking. */
 export async function rescheduleDinner(locals: App.Locals, taskId: string, input: ScheduleInput) {
 	await getDinner(locals, taskId);

@@ -165,11 +165,15 @@
 				class="button-secondary photo"
 				class:has={chosen}
 				class:ai-busy={busy && photo === 'only'}
+				class:tucked={busy && photo === 'optional'}
+				aria-label={busy && photo === 'optional' ? (chosen ? 'Photo added' : 'Photo') : undefined}
 			>
 				<Icon name={photo === 'only' ? 'sparkle' : 'camera'} size={18} />
-				{#if photo === 'only'}{busy ? working : submitLabel}{:else}{chosen
-						? 'Photo added'
-						: 'Photo'}{/if}
+				<span class="text"
+					>{#if photo === 'only'}{busy ? working : submitLabel}{:else}{chosen
+							? 'Photo added'
+							: 'Photo'}{/if}</span
+				>
 				<input
 					class="visually-hidden"
 					type="file"
@@ -182,7 +186,7 @@
 		{#if photo !== 'only'}
 			<button class="button-secondary go" class:ai-busy={busy} disabled={!ready || busy}>
 				<Icon name="sparkle" size={18} />
-				{busy ? working : submitLabel}
+				<span class="text">{busy ? working : submitLabel}</span>
 			</button>
 		{/if}
 	</div>
@@ -257,8 +261,14 @@
 		gap: var(--space-s);
 	}
 
+	/*
+	 * The buttons share the row and can never push it wider than the screen: a long "Reading
+	 * the cookbook page…" gets the room (the photo button shrinks to its icon while it works)
+	 * and trims with an ellipsis if it still doesn't fit.
+	 */
 	.row > * {
-		flex: 1;
+		flex: 1 1 0;
+		min-width: 0;
 	}
 
 	.photo,
@@ -267,7 +277,24 @@
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
+		padding: 0 18px;
 		white-space: nowrap;
+	}
+
+	.text {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.photo.tucked {
+		flex: 0 0 auto;
+		width: 50px;
+		padding: 0;
+	}
+
+	.photo.tucked .text {
+		display: none;
 	}
 
 	.photo {

@@ -1,0 +1,506 @@
+<script lang="ts">
+	/**
+	 * Plans and dinners as a month: a glass calendar with dots under each day (the accent for plans,
+	 * lilac for dinner) and the chosen day listed underneath. Tap a day to see it; swipe the
+	 * calendar or use the arrows to change month.
+	 */
+	import { fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
+	import GlassSurface from '#lib/ui/GlassSurface.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
+	import { formatDayLabel, formatLongDate, formatTimeOfDay } from '#lib/time.js';
+	import type { Plan, Profile, Task } from '#lib/types.js';
+	import { entriesByDate, monthGrid, monthLabel, monthOf, shiftMonth } from './calendar.js';
+	import PlanRow from './PlanRow.svelte';
+
+	interface Props {
+		month: string;
+		plans: Plan[];
+		dinners: Task[];
+		people: Profile[];
+		today: string;
+		now: string;
+	}
+
+	let { month, plans, dinners, people, today, now }: Props = $props();
+
+	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+	const weeks = $derived(monthGrid(month));
+	const byDate = $derived(entriesByDate(plans, dinners));
+	const shownDates = $derived(new Set(weeks.flat().map((day) => day.date)));
+
+	// The day you tapped, or today when it's on screen, or the 1st.
+	let picked = $state<string | null>(null);
+	const selected = $derived.by(() => {
+		if (picked && shownDates.has(picked)) return picked;
+		return monthOf(today) === month ? today : `${month}-01`;
+	});
+	const dayEntries = $derived(byDate.get(selected) ?? []);
+
+	const monthHref = (target: string) => `/plans?view=calendar&month=${target}`;
+
+	function counts(date: string) {
+		const entries = byDate.get(date) ?? [];
+		const dinner = entries.filter((entry) => entry.kind === 'dinner').length;
+		return { plans: entries.length - dinner, dinner };
+	}
+
+	function dayName(date: string) {
+		const { plans: planCount, dinner } = counts(date);
+		const parts = [
+			planCount === 1 ? '1 plan' : planCount ? `${planCount} plans` : '',
+			dinner ? 'dinner planned' : ''
+		].filter(Boolean);
+		return [formatLongDate(date, today), ...parts].join(', ');
+	}
+
+	const isOver = (plan: Plan) =>
+		!plan.allDay && new Date(plan.endsAt ?? plan.startsAt).getTime() < new Date(now).getTime();
+
+	// "Today · Thursday 19 November"; other days just the date.
+	function dayHeading(date: string) {
+		const near = formatDayLabel(date, today);
+		const long = formatLongDate(date, today);
+		return ['Today', 'Tomorrow', 'Yesterday'].includes(near) ? `${near} · ${long}` : long;
+	}
+
+	function cook(dinner: Task) {
+		if (dinner.completedAt) return 'Cooked';
+		const person = people.find((member) => member.id === dinner.assigneeId);
+		return `${person ? person.displayName : 'Anyone'} cooking`;
+	}
+
+	// Cooked dinners open the recipe; ones still to come open the cook view.
+	const dinnerHref = (dinner: Task) =>
+		dinner.completedAt && dinner.recipeId
+			? `/dinner/${dinner.recipeId}`
+			: `/dinner/cook/${dinner.id}`;
+
+	// Which way the next month slides in: 1 from the right (later), -1 from the left.
+	let direction = $state(1);
+	const reduceMotion =
+		typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	function changeMonth(step: 1 | -1) {
+		direction = step;
+		goto(monthHref(shiftMonth(month, step)), { replace: true, reset: false });
+	}
+
+	// A sideways swipe on the calendar changes month (an up-and-down one still scrolls).
+	let touchStart: { x: number; y: number } | null = null;
+
+	function onTouchStart(event: TouchEvent) {
+		if (event.touches.length !== 1) return;
+		touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+	}
+
+	function onTouchEnd(event: TouchEvent) {
+		if (!touchStart) return;
+		const touch = event.changedTouches[0];
+		const dx = touch.clientX - touchStart.x;
+		const dy = touch.clientY - touchStart.y;
+		touchStart = null;
+		if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+		changeMonth(dx < 0 ? 1 : -1);
+	}
+</script>
+
+<section class="calendar" aria-label="Plans by month">
+	<header class="month-bar">
+		<h2 class="month">{monthLabel(month, today)}</h2>
+		<div class="month-actions">
+			{#if monthOf(today) !== month}
+				<a
+					class="today-link"
+					href={monthHref(monthOf(today))}
+					data-sveltekit-replacestate
+					data-sveltekit-reset="false"
+					onclick={() => (direction = monthOf(today) > month ? 1 : -1)}>Today</a
+				>
+			{/if}
+			<a
+				class="step"
+				href={monthHref(shiftMonth(month, -1))}
+				aria-label="Previous month"
+				data-sveltekit-replacestate
+				data-sveltekit-reset="false"
+				onclick={() => (direction = -1)}
+			>
+				<Icon name="back" size={20} />
+			</a>
+			<a
+				class="step"
+				href={monthHref(shiftMonth(month, 1))}
+				aria-label="Next month"
+				data-sveltekit-replacestate
+				data-sveltekit-reset="false"
+				onclick={() => (direction = 1)}
+			>
+				<Icon name="chevron" size={20} />
+			</a>
+		</div>
+	</header>
+
+	<!-- Its own swipe (months), so the app's swipe between tabs leaves it alone. -->
+	<div
+		class="grid-card"
+		role="group"
+		aria-label="{monthLabel(month, today)} calendar"
+		data-gesture-ignore
+		ontouchstart={onTouchStart}
+		ontouchend={onTouchEnd}
+		ontouchcancel={() => (touchStart = null)}
+	>
+		<GlassSurface radius={26} />
+		{#key month}
+			<div
+				class="grid"
+				in:fly={{ x: reduceMotion ? 0 : direction * 36, duration: reduceMotion ? 0 : 260 }}
+			>
+				<div class="weekdays" aria-hidden="true">
+					{#each WEEKDAYS as name (name)}<span>{name.slice(0, 1)}</span>{/each}
+				</div>
+				{#each weeks as week (week[0].date)}
+					<div class="week">
+						{#each week as day (day.date)}
+							{@const count = counts(day.date)}
+							<button
+								type="button"
+								class="day"
+								class:outside={!day.inMonth}
+								class:today={day.date === today}
+								class:selected={day.date === selected}
+								aria-pressed={day.date === selected}
+								aria-label={dayName(day.date)}
+								onclick={() => (picked = day.date)}
+							>
+								<span class="number">{Number(day.date.slice(8))}</span>
+								<span class="dots" aria-hidden="true">
+									{#each { length: Math.min(count.plans, count.dinner ? 2 : 3) } as _, index (index)}<span
+											class="dot"
+										></span>{/each}{#if count.dinner}<span class="dot dinner"></span>{/if}
+								</span>
+							</button>
+						{/each}
+					</div>
+				{/each}
+			</div>
+		{/key}
+	</div>
+
+	<p class="key" aria-hidden="true">
+		<span><span class="dot"></span> Plans</span>
+		<span><span class="dot dinner"></span> Dinner</span>
+	</p>
+
+	<section class="day-plans" aria-live="polite" aria-labelledby="selected-day">
+		<h3 id="selected-day" class="day-label">{dayHeading(selected)}</h3>
+		{#if dayEntries.length}
+			<ul>
+				{#each dayEntries as entry (entry.kind + entry.id)}
+					{#if entry.kind === 'plan'}
+						<PlanRow plan={entry.plan} past={isOver(entry.plan)} />
+					{:else}
+						{@const dinner = entry.dinner}
+						<li>
+							<a class="dinner-card" class:past={!!dinner.completedAt} href={dinnerHref(dinner)}>
+								<GlassSurface radius={22} squish />
+								<span class="body">
+									<span class="when">
+										<Icon name="dinner" size={14} />
+										Dinner{dinner.dueTime ? ` · ${formatTimeOfDay(dinner.dueTime)}` : ''}
+									</span>
+									<span class="title">{dinner.recipe?.title ?? dinner.title}</span>
+									<span class="detail">{cook(dinner)}</span>
+									<span class="chevron"><Icon name="chevron" size={18} /></span>
+								</span>
+							</a>
+						</li>
+					{/if}
+				{/each}
+			</ul>
+		{:else}
+			<p class="nothing">
+				Nothing on.
+				{#if selected >= today}
+					<a class="add" href="/plans/new?date={selected}">
+						<Icon name="plus" size={16} /> Add a plan
+					</a>
+				{/if}
+			</p>
+		{/if}
+	</section>
+</section>
+
+<style>
+	.month-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-s);
+		margin-bottom: var(--space-s);
+	}
+
+	/* Smaller than the page title, so "Plans" stays the heading. */
+	.month {
+		margin: 0 0 0 4px;
+		font-size: 1.375rem;
+		font-weight: var(--weight-strong);
+		letter-spacing: var(--tracking-tight);
+	}
+
+	.month-actions {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.today-link {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--tap-target);
+		padding: 0 10px;
+		font-size: var(--text-small);
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
+		text-decoration: none;
+	}
+
+	.step {
+		display: grid;
+		place-items: center;
+		width: var(--tap-target);
+		height: var(--tap-target);
+		border-radius: 50%;
+		color: var(--colour-text);
+	}
+
+	.step:active {
+		background: var(--colour-hairline);
+	}
+
+	.grid-card {
+		position: relative;
+		border-radius: 26px;
+	}
+
+	.grid-card {
+		overflow: hidden;
+	}
+
+	.grid {
+		position: relative;
+		padding: 10px 8px 8px;
+	}
+
+	.weekdays,
+	.week {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+	}
+
+	.weekdays span {
+		padding-bottom: 6px;
+		font-size: var(--text-caption);
+		font-weight: var(--weight-medium);
+		text-align: center;
+		color: var(--colour-text-faint);
+	}
+
+	.day {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 3px;
+		min-height: 48px;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--colour-text);
+		font: inherit;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.number {
+		display: grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		font-size: var(--text-small);
+		font-variant-numeric: tabular-nums;
+		transition: background var(--duration-quick) var(--ease-out);
+	}
+
+	.outside .number {
+		color: var(--colour-text-faint);
+	}
+
+	.today .number {
+		color: var(--colour-accent);
+		font-weight: var(--weight-strong);
+	}
+
+	.selected .number {
+		background: var(--colour-accent);
+		color: var(--colour-on-accent);
+		font-weight: var(--weight-strong);
+	}
+
+	.day:focus-visible {
+		outline: none;
+	}
+
+	.day:focus-visible .number {
+		box-shadow: 0 0 0 2px var(--colour-accent);
+	}
+
+	.dots {
+		display: flex;
+		gap: 3px;
+		height: 5px;
+	}
+
+	.dot {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: var(--colour-accent);
+	}
+
+	.dot.dinner {
+		background: var(--colour-dinner);
+	}
+
+	.outside .dot {
+		opacity: 0.45;
+	}
+
+	/* Says what the colours mean, so colour isn't the only clue. */
+	.key {
+		display: flex;
+		justify-content: center;
+		gap: var(--space-l);
+		margin: 10px 0 0;
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
+	}
+
+	.key > span {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	li {
+		list-style: none;
+	}
+
+	/* The same card as a plan (PlanRow.svelte), with a lilac dinner label. */
+	.dinner-card {
+		position: relative;
+		display: block;
+		border-radius: 22px;
+		color: inherit;
+		text-decoration: none;
+		-webkit-touch-callout: none;
+		transition: opacity var(--duration-quick) var(--ease-out);
+	}
+
+	.dinner-card.past {
+		opacity: 0.55;
+	}
+
+	.body {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: var(--space-m);
+		min-height: var(--row-height);
+		padding: 14px 14px 14px 18px;
+		border-radius: inherit;
+		box-shadow:
+			inset 0 0 0 1px var(--colour-hairline),
+			var(--glass-highlight);
+		transition: background-color var(--duration-quick) var(--ease-out);
+	}
+
+	.dinner-card:global([data-pressed]) .body {
+		background-color: rgb(255 255 255 / 0.04);
+	}
+
+	.when {
+		display: inline-flex;
+		grid-column: 1;
+		align-items: center;
+		gap: 6px;
+		font-size: var(--text-caption);
+		font-weight: var(--weight-medium);
+		letter-spacing: var(--tracking-label);
+		color: var(--colour-dinner);
+	}
+
+	.title {
+		grid-column: 1;
+		margin-top: 3px;
+		font-size: var(--text-body);
+		font-weight: var(--weight-medium);
+		overflow-wrap: anywhere;
+	}
+
+	.detail {
+		grid-column: 1;
+		margin-top: 2px;
+		font-size: var(--text-caption);
+		color: var(--colour-text-muted);
+	}
+
+	.chevron {
+		grid-column: 2;
+		grid-row: 1 / span 3;
+		align-self: center;
+		color: var(--colour-text-faint);
+	}
+
+	.day-plans {
+		margin-top: 28px;
+	}
+
+	.day-label {
+		margin: 0 0 10px 4px;
+		font-size: var(--text-caption);
+		font-weight: var(--weight-medium);
+		letter-spacing: var(--tracking-label);
+		color: var(--colour-text-muted);
+	}
+
+	ul {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin: 0;
+		padding: 0;
+	}
+
+	.nothing {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 4px 12px;
+		margin: 0 0 0 4px;
+		color: var(--colour-text-muted);
+	}
+
+	.add {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: var(--tap-target);
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
+		text-decoration: none;
+	}
+</style>

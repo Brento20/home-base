@@ -11,9 +11,11 @@
 	interface Props {
 		items: Item[];
 		label: string;
+		/** Which item is on, when the page knows better than the URL (a remembered choice). */
+		active?: number;
 	}
 
-	let { items, label }: Props = $props();
+	let { items, label, active }: Props = $props();
 
 	/**
 	 * Longest matching href wins, so /lists/tasks beats /lists. An href with a query
@@ -41,7 +43,7 @@
 		return best;
 	}
 
-	const current = $derived(indexFor(page.url));
+	const current = $derived(active ?? indexFor(page.url));
 </script>
 
 <PillNav {items} {indexFor} {current} {label} variant="segmented">

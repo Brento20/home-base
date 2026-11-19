@@ -147,6 +147,38 @@ export async function listUpcomingPlans(locals: App.Locals, limit = 100): Promis
 }
 
 /**
+ * Plans on any day from `fromISO` up to (not including) `untilISO`, household-local dates:
+ * for the month view. A plan that started earlier but is still going counts too.
+ */
+export async function listPlansBetween(
+	locals: App.Locals,
+	fromISO: string,
+	untilISO: string
+): Promise<Plan[]> {
+	const from = zonedToInstant(fromISO).toISOString();
+	const until = zonedToInstant(untilISO).toISOString();
+	const { supabase } = locals;
+	if (!supabase) {
+		return samplePlans
+			.filter((plan) => plan.startsAt < until && (plan.endsAt ?? plan.startsAt) >= from)
+			.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+	}
+
+	const householdId = await getHouseholdId(locals);
+	const { data, error: readError } = await supabase
+		.from('plans')
+		.select(COLUMNS)
+		.eq('household_id', householdId)
+		.lt('starts_at', until)
+		.or(`starts_at.gte.${from},ends_at.gte.${from}`)
+		.order('starts_at')
+		.limit(500);
+
+	if (readError) dbError(readError);
+	return (data ?? []).map(toPlan);
+}
+
+/**
  * What's still on, soonest first: an all-day plan counts for its whole day, a timed plan
  * until it ends (or 30 minutes after it starts when it has no end time).
  */

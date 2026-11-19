@@ -80,6 +80,8 @@
 	--colour-ground: #0b0807;
 	--colour-accent: #f4a86e;
 	--colour-accent-soft: rgb(255 172 112 / 0.1);
+	/* Dinners on the Plans calendar: lilac stays distinct from every time-of-day accent, colour-blind eyes included. */
+	--colour-dinner: #b49cf5;
 	--colour-accent-edge: rgb(255 192 142 / 0.26);
 	/* An accent button under the finger: a shade deeper, whatever the time of day. */
 	--colour-accent-pressed: color-mix(in oklab, var(--colour-accent), #000 14%);
