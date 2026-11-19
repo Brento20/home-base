@@ -28,7 +28,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			fatG: text(recipe.nutrition?.fatG ?? null),
 			sugarsG: text(recipe.nutrition?.sugarsG ?? null),
 			fibreG: text(recipe.nutrition?.fibreG ?? null),
-			notes: recipe.tips[0] ?? ''
+			notes: recipe.tips[0] ?? '',
+			sourceNote: recipe.nutritionNote ?? ''
 		}
 	};
 };

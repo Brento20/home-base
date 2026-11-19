@@ -12,14 +12,12 @@
 	const heading = pick(HEADINGS.newRecipe);
 
 	const FILLED_FROM = {
-		link: 'Filled in from the link.',
-		text: 'Filled in from what you pasted.',
-		photo: 'Filled in from your photo.'
+		link: 'Filled in with AI from the link.',
+		text: 'Filled in with AI from what you pasted.',
+		photo: 'Filled in with AI from your photo.'
 	};
 	const filledNote = $derived(
-		form && 'source' in form && form.source
-			? `${FILLED_FROM[form.source]} Check it over, then save.`
-			: undefined
+		form && 'source' in form && form.source ? FILLED_FROM[form.source] : undefined
 	);
 </script>
 
@@ -36,12 +34,15 @@
 {#if data.ai}
 	<AssistBox
 		action="?/import"
-		label="Got it somewhere else? Paste a link or the recipe, or snap a cookbook page."
+		target=".recipe-form"
+		label="Got it somewhere else? Paste a link or the recipe, or snap a cookbook page, and AI will fill in the form."
 		placeholder="https://… or paste the recipe"
 		multiline
 		photo="optional"
-		submitLabel="Fill it in"
-		busyLabel="Reading it…"
+		submitLabel="Fill in with AI"
+		busyLabel="Reading your recipe…"
+		linkBusyLabel="Reading the recipe page…"
+		photoBusyLabel="Reading the cookbook page…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		{filledNote}
 		focusOnFail="#recipe-title"

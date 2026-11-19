@@ -5,6 +5,7 @@
 	 * so it's only asked for again when something about the week changes.
 	 */
 	import { onMount } from 'svelte';
+	import Icon from '#lib/ui/Icon.svelte';
 
 	interface Props {
 		plain: string;
@@ -55,7 +56,16 @@
 </script>
 
 <p class="week" aria-live="polite">
-	{#key friendly}<span class="line">{friendly ?? plain}</span>{/key}
+	{#key friendly}
+		<span class="line">
+			{#if friendly}
+				<!-- Marked as AI-written, as Apple's guidance asks. -->
+				<span class="mark"><Icon name="sparkle" size={13} /></span><span class="ai-said">
+					Written by AI:
+				</span>{friendly}
+			{:else}{plain}{/if}
+		</span>
+	{/key}
 </p>
 
 <style>
@@ -64,6 +74,12 @@
 		font-size: var(--text-small);
 		line-height: 1.4;
 		color: var(--colour-text-muted);
+	}
+
+	.mark {
+		display: inline-block;
+		margin-right: 5px;
+		vertical-align: -1px;
 	}
 
 	.line {

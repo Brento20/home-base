@@ -3,7 +3,7 @@ import { dbError } from '#lib/server/db.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleProfiles, sampleTasks } from '#lib/server/sample-data.js';
 import { addDays, isValidDateISO, todayISO } from '#lib/time.js';
-import { isRepeat, nextDueDate } from './repeat.js';
+import { nextDueDate, repeatFromForm } from './repeat.js';
 import type { FieldErrors, Profile, Task } from '#lib/types.js';
 
 /**
@@ -68,13 +68,12 @@ const byDue = (a: Task, b: Task) => (a.dueOn ?? '9999').localeCompare(b.dueOn ??
  * needs a day to repeat from, so it defaults to today.
  */
 export function parseTaskForm(form: FormData, members: Profile[], today = todayISO()) {
-	const repeatValue = String(form.get('repeat') ?? '');
 	const values = {
 		title: String(form.get('title') ?? '').trim(),
 		assigneeId: String(form.get('assigneeId') ?? ''),
 		due: String(form.get('due') ?? (form.get('dueDate') ? 'date' : 'none')),
 		dueDate: String(form.get('dueDate') ?? ''),
-		repeat: isRepeat(repeatValue) ? repeatValue : ('none' as const)
+		repeat: repeatFromForm(form)
 	};
 	const errors: FieldErrors<TaskField> = {};
 

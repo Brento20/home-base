@@ -3,7 +3,11 @@
 	import { AI_OOPS, PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { isRepeat, type Repeat } from './repeat.js';
+	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { clearFilled, markFilled, restore, snapshot, type Snapshot } from '#lib/ui/ai-fill.js';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { Profile } from '#lib/types.js';
@@ -23,8 +27,34 @@
 
 	let { people, values, errors, ai = false, assist = null }: Props = $props();
 	let input = $state<HTMLInputElement>();
+	let form = $state<HTMLFormElement>();
 	let reading = $state(false);
+	let before: Snapshot | null = null;
 	const oops = pick(AI_OOPS);
+
+	// What's typed and picked lives here, so redrawing the form (when ✨ starts or stops) can't
+	// put back the starting values over it. A new result from the server (a fill, an error)
+	// resets them.
+	let title = $state('');
+	let due = $state('none');
+	let dueDate = $state('');
+	$effect.pre(() => {
+		title = values?.title ?? '';
+		due = values?.due ?? 'none';
+		dueDate = values?.dueDate ?? '';
+	});
+
+	/** Back to what was typed before ✨: the page drops the fill, then the snapshot goes back. */
+	async function undo() {
+		const saved = before;
+		clearFilled(form);
+		await goto(page.url.pathname + page.url.search, { replace: true, reset: false });
+		await tick();
+		if (saved) restore(form, saved);
+		clearFilled(form);
+		before = null;
+		input?.focus();
+	}
 </script>
 
 <!--
@@ -32,23 +62,34 @@
 	Pure CSS (:has), no script needed.
 -->
 <form
+	bind:this={form}
 	class="task-add"
 	method="POST"
 	action="?/add"
 	use:enhance={({ action }) => {
 		const quick = action.search.includes('/quick');
 		reading = quick;
+		if (quick) before = snapshot(form);
 		return async ({ result, update }) => {
-			reading = false;
 			// A ✨ fill keeps the form as filled; a real add clears it for the next one.
 			const added = result.type === 'success' && !quick;
 			await update({ reset: added });
+			await tick();
+			reading = false;
+			if (quick && result.type === 'success' && result.data?.assist === 'filled')
+				markFilled(form, before ?? new Map());
+			if (added) {
+				clearFilled(form);
+				title = '';
+				due = 'none';
+				dueDate = '';
+			}
 			if (added || quick) input?.focus();
 		};
 	}}
 	aria-busy={reading}
 >
-	<div class="title-row">
+	<div class="title-row" data-ai-ring>
 		<GlassSurface radius={18} />
 		<label class="visually-hidden" for="task-title">New task</label>
 		<input
@@ -60,7 +101,7 @@
 			autocomplete="off"
 			enterkeyhint="done"
 			maxlength="160"
-			value={values?.title ?? ''}
+			bind:value={title}
 			aria-invalid={errors?.title ? 'true' : undefined}
 			required
 		/>
@@ -68,24 +109,33 @@
 			<!-- Same form, other action: reads the words and fills the options below. -->
 			<button
 				class="quick-button"
+				class:ai-busy={reading}
 				formaction="?/quick"
 				formnovalidate
-				aria-label="Fill in who and when from what I typed"
+				aria-label={reading
+					? 'Working out who and when…'
+					: 'Fill in who, when and how often with AI'}
+				title="Fill in with AI"
 				disabled={reading}
 			>
-				{#if reading}<span class="spinner" aria-hidden="true"></span>{:else}<Icon
-						name="sparkle"
-						size={20}
-					/>{/if}
+				<Icon name="sparkle" size={20} />
 			</button>
 		{/if}
 		<button class="add-button" aria-label="Add task"><Icon name="plus" size={20} /></button>
 	</div>
 	{#if errors?.title}<p class="field-error">{errors.title}</p>{/if}
-	{#if assist === 'failed' && !reading}<p class="assist-note" role="status">{oops}</p>{/if}
-	{#if assist === 'filled' && !reading}<p class="assist-note" role="status">
-			Filled in below. Tap + if it looks right.
-		</p>{/if}
+	{#if reading}
+		<p class="assist-note" role="status">Working out who, when and how often…</p>
+	{:else if assist === 'failed'}
+		<p class="assist-note" role="status">{oops}</p>
+	{:else if assist === 'filled'}
+		<div class="assist-note filled" role="status">
+			<p>
+				Filled in with AI: the glowing ones. AI can get things wrong, so tap + if it looks right.
+			</p>
+			<button type="button" class="undo" onclick={undo}>Undo</button>
+		</div>
+	{/if}
 
 	<div class="options">
 		<AssigneeChoice {people} value={values?.assigneeId ?? ''} error={errors?.assigneeId} />
@@ -95,7 +145,7 @@
 			<div class="choice-pills">
 				{#each [['none', 'No date'], ['today', 'Today'], ['tomorrow', 'Tomorrow'], ['date', 'Pick a date']] as [value, label] (value)}
 					<label class="choice-pill">
-						<input type="radio" name="due" {value} checked={(values?.due ?? 'none') === value} />
+						<input type="radio" name="due" {value} bind:group={due} />
 						{label}
 					</label>
 				{/each}
@@ -106,7 +156,7 @@
 				class="field-input due-date"
 				type="date"
 				name="dueDate"
-				value={values?.dueDate ?? ''}
+				bind:value={dueDate}
 			/>
 			{#if errors?.dueOn}<p class="field-error">{errors.dueOn}</p>{/if}
 		</fieldset>
@@ -178,11 +228,12 @@
 		transition-timing-function: var(--ease-out);
 	}
 
-	/* Only once there's something typed for it to read. */
+	/* Always there, so it's easy to find; dimmed until there's something typed for it to read. */
 	.quick-button {
 		position: relative;
 		z-index: 1;
-		display: none;
+		display: grid;
+		flex: none;
 		place-items: center;
 		width: var(--tap-target);
 		height: var(--tap-target);
@@ -193,8 +244,14 @@
 		transition: transform var(--duration-release) var(--spring-gentle);
 	}
 
-	.task-add:has(input[name='title']:not(:placeholder-shown)) .quick-button {
-		display: grid;
+	.task-add:has(input[name='title']:placeholder-shown) .quick-button {
+		opacity: 0.4;
+		pointer-events: none;
+	}
+
+	/* The title row gets the ring when ✨ rewrites the title. */
+	.title-row:global([data-ai-filled]) {
+		border: 1.5px solid transparent;
 	}
 
 	.quick-button:global([data-pressed]) {
@@ -202,26 +259,34 @@
 		transition-duration: var(--duration-press);
 	}
 
-	.spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid currentColor;
-		border-right-color: transparent;
-		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
 	.assist-note {
 		margin: 0;
 		padding: 0 4px;
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
+	}
+
+	.assist-note.filled {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--space-m);
+	}
+
+	.assist-note p {
+		flex: 1;
+		margin: 0;
+	}
+
+	.undo {
+		flex: none;
+		min-height: var(--tap-target);
+		margin: -12px 0;
+		padding: 0 4px;
+		border: 0;
+		background: none;
+		color: var(--colour-text);
+		font-size: var(--text-small);
+		font-weight: var(--weight-medium);
 	}
 
 	.options {

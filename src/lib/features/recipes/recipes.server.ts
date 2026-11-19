@@ -68,7 +68,7 @@ const toRecipe = (row: RecipeRow): Recipe => ({
 	ingredients: row.ingredients,
 	steps: row.steps,
 	nutrition: row.nutrition,
-	nutritionNote: null,
+	nutritionNote: row.nutrition?.note ?? null,
 	tips: row.notes ? [row.notes] : [],
 	custom: true
 });
@@ -167,6 +167,9 @@ export function parseRecipeForm(form: FormData) {
 		fatG: String(form.get('fatG') ?? ''),
 		sugarsG: String(form.get('sugarsG') ?? ''),
 		fibreG: String(form.get('fibreG') ?? ''),
+		sourceNote: String(form.get('sourceNote') ?? '')
+			.trim()
+			.slice(0, 400),
 		notes: String(form.get('notes') ?? '').trim()
 	};
 	const errors: FieldErrors<RecipeField> = {};
@@ -220,7 +223,8 @@ export function parseRecipeForm(form: FormData) {
 				carbsG,
 				fatG,
 				sugarsG,
-				fibreG
+				fibreG,
+				...(values.sourceNote ? { note: values.sourceNote } : {})
 			};
 		}
 	}
@@ -264,7 +268,7 @@ const sampleRecipe = (id: string, input: RecipeInput): Recipe => ({
 	...input,
 	totalMinutes: input.prepMinutes + input.cookMinutes + input.restMinutes,
 	tags: [],
-	nutritionNote: null,
+	nutritionNote: input.nutrition?.note ?? null,
 	tips: input.notes ? [input.notes] : [],
 	custom: true
 });

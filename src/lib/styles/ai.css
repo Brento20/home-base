@@ -1,0 +1,103 @@
+/*
+ * The AI look, in one place: a Siri-style spectrum ring.
+ *
+ * - `.ai-busy` on a button while an AI helper works: the ring spins until the answer arrives.
+ * - `[data-ai-filled]` on each field (or choice pill) the answer filled: the same ring spins
+ *   twice, then fades back to the normal border. src/lib/ui/ai-fill.ts adds and removes it.
+ * - The sparkle icon is drawn in the same spectrum (the gradient is defined once in the root
+ *   layout), so anything AI is recognisable at a glance.
+ *
+ * The ring is a conic gradient under a solid fill (background-clip), turned by animating a
+ * registered angle. It only runs for a few seconds on a few small elements. With reduced motion
+ * it doesn't spin; it just shows and fades.
+ */
+
+@property --ai-angle {
+	syntax: '<angle>';
+	inherits: false;
+	initial-value: 0deg;
+}
+
+@property --ai-strength {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 1;
+}
+
+.ai-busy,
+[data-ai-filled] {
+	--ai-ring: conic-gradient(
+		from var(--ai-angle),
+		rgb(255 106 193 / var(--ai-strength)),
+		rgb(255 168 88 / var(--ai-strength)),
+		rgb(255 226 110 / var(--ai-strength)),
+		rgb(110 231 183 / var(--ai-strength)),
+		rgb(106 184 255 / var(--ai-strength)),
+		rgb(167 139 250 / var(--ai-strength)),
+		rgb(255 106 193 / var(--ai-strength))
+	);
+	--ai-fill: var(--colour-ground);
+	border-color: transparent !important;
+	background:
+		linear-gradient(var(--ai-fill), var(--ai-fill)) padding-box,
+		var(--ai-ring) border-box,
+		linear-gradient(var(--colour-hairline-strong), var(--colour-hairline-strong)) border-box !important;
+	box-shadow:
+		-8px 0 22px -10px rgb(255 106 193 / calc(0.7 * var(--ai-strength))),
+		8px 0 22px -10px rgb(106 184 255 / calc(0.7 * var(--ai-strength))),
+		0 -6px 20px -12px rgb(255 226 110 / calc(0.6 * var(--ai-strength))),
+		0 8px 22px -12px rgb(167 139 250 / calc(0.7 * var(--ai-strength))) !important;
+}
+
+/* The AI button while it works: a slightly bolder ring that keeps spinning. */
+.ai-busy {
+	--ai-fill: color-mix(in srgb, var(--colour-ground) 92%, white);
+	border: 2px solid transparent !important;
+	animation: ai-spin 1.6s linear infinite;
+}
+
+/* A filled field: spins twice as if handed over from the button, then settles back. */
+[data-ai-filled] {
+	animation:
+		ai-spin 1.6s linear 2,
+		ai-fade 1.4s var(--ease-out) 2.6s forwards;
+}
+
+/* A filled choice pill keeps looking selected under the ring. */
+.choice-pill[data-ai-filled],
+label[data-ai-filled]:has(input:checked) {
+	--ai-fill: color-mix(in srgb, var(--colour-ground) 86%, var(--colour-accent));
+	color: var(--colour-text);
+}
+
+@keyframes ai-spin {
+	to {
+		--ai-angle: 360deg;
+	}
+}
+
+@keyframes ai-fade {
+	to {
+		--ai-strength: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ai-busy {
+		animation: none;
+	}
+
+	[data-ai-filled] {
+		animation: ai-fade 1.4s var(--ease-out) 2.6s forwards;
+	}
+}
+
+/* Text that's only for screen readers, e.g. "Written by AI". */
+.ai-said {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

@@ -26,6 +26,8 @@ export interface Nutrition {
 	carbsG: number | null;
 	sugarsG: number | null;
 	fibreG: number | null;
+	/** A home recipe's "About these numbers": where an import got them (which were estimated). */
+	note?: string | null;
 }
 
 export interface Recipe {
@@ -395,6 +397,8 @@ export interface RecipeFormValues {
 	sugarsG: string;
 	fibreG: string;
 	notes: string;
+	/** From an import: which numbers were estimated. Saved as the nutrition's note. */
+	sourceNote: string;
 }
 
 /** A new recipe's starting values. */
@@ -416,7 +420,8 @@ export const BLANK_RECIPE_FORM: RecipeFormValues = {
 	fatG: '',
 	sugarsG: '',
 	fibreG: '',
-	notes: ''
+	notes: '',
+	sourceNote: ''
 };
 
 /** The proteins a home recipe can be tagged with (the library's filter uses the same words). */

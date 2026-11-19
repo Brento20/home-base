@@ -100,7 +100,7 @@
 <form
 	method="POST"
 	{action}
-	class="form-stack"
+	class="form-stack expense-form"
 	use:enhance={() => {
 		saving = true;
 		return async ({ update }) => {

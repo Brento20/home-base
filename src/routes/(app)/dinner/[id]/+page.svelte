@@ -137,10 +137,14 @@
 		<section aria-labelledby="nutrition">
 			<h2 id="nutrition">Per serve</h2>
 			<NutritionGrid nutrition={recipe.nutrition} />
-			{#if !recipe.custom}
+			{#if !recipe.custom || recipe.nutritionNote}
 				<details class="small-print">
 					<summary>About these numbers</summary>
-					<p>{NUTRITION_CREDIT}{recipe.nutritionNote ? ` ${recipe.nutritionNote}` : ''}</p>
+					<p>
+						{recipe.custom
+							? recipe.nutritionNote
+							: `${NUTRITION_CREDIT}${recipe.nutritionNote ? ` ${recipe.nutritionNote}` : ''}`}
+					</p>
 				</details>
 			{/if}
 		</section>

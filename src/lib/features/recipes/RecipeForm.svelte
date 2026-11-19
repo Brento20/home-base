@@ -274,6 +274,15 @@
 		{/each}
 	</div>
 
+	{#if values.sourceNote}
+		<!-- Kept with the recipe and shown under "About these numbers". -->
+		<input type="hidden" name="sourceNote" value={values.sourceNote} />
+		<p class="source-note">
+			<strong>About these numbers</strong>
+			{values.sourceNote}
+		</p>
+	{/if}
+
 	<div class="form-actions">
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
 	</div>
@@ -301,6 +310,20 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-s);
+	}
+
+	.source-note {
+		margin: 0;
+		font-size: var(--text-caption);
+		line-height: 1.45;
+		color: var(--colour-text-faint);
+	}
+
+	.source-note strong {
+		display: block;
+		margin-bottom: 2px;
+		color: var(--colour-text-muted);
+		font-weight: var(--weight-medium);
 	}
 
 	.short {

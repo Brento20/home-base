@@ -47,10 +47,11 @@
 {#if data.ai && !postId}
 	<AssistBox
 		action="?/describe"
-		label="Say it how you’d text it, and I’ll fill in the rest."
+		target=".plan-form"
+		label="Say it how you’d text it, and AI will fill in the day, time and place."
 		placeholder="Dinner with Sam at Fratelli, Saturday 7"
-		submitLabel="Fill it in"
-		busyLabel="Reading it…"
+		submitLabel="Fill in with AI"
+		busyLabel="Working out when and where…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		focusOnFail="#plan-title"
 	/>

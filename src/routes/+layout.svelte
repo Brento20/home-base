@@ -3,6 +3,7 @@
 	import '#lib/styles/tokens.css';
 	import '#lib/styles/base.css';
 	import '#lib/styles/forms.css';
+	import '#lib/styles/ai.css';
 	import { onMount } from 'svelte';
 	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
@@ -29,6 +30,19 @@
 	});
 </script>
 
+<!-- The AI spectrum, used by the sparkle icon wherever AI is offered (see ai.css). -->
+<svg class="ai-defs" aria-hidden="true" width="0" height="0">
+	<defs>
+		<linearGradient id="ai-spectrum" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#ff6ac1" />
+			<stop offset="0.3" stop-color="#ffb259" />
+			<stop offset="0.55" stop-color="#6ee7b7" />
+			<stop offset="0.8" stop-color="#6ab8ff" />
+			<stop offset="1" stop-color="#a78bfa" />
+		</linearGradient>
+	</defs>
+</svg>
+
 <svelte:head>
 	<title>home base</title>
 </svelte:head>
@@ -41,6 +55,13 @@
 <AppStatus />
 
 <style>
+	.ai-defs {
+		position: absolute;
+		width: 0;
+		height: 0;
+		overflow: hidden;
+	}
+
 	.app {
 		position: relative;
 		min-height: 100dvh;

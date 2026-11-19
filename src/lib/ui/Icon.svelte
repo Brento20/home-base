@@ -89,7 +89,9 @@
 		<circle cx="9" cy="10" r="1.6" />
 		<path d="M4 17l4.5-4.5 3.5 3.5 3-3 5 5" />
 	{:else if name === 'sparkle'}
+		<!-- Always drawn in the AI spectrum: the sparkle only ever means AI. -->
 		<path
+			stroke="url(#ai-spectrum)"
 			d="M12 3.5l1.8 5.2a2 2 0 0 0 1.5 1.5l5.2 1.8-5.2 1.8a2 2 0 0 0-1.5 1.5L12 20.5l-1.8-5.2a2 2 0 0 0-1.5-1.5L3.5 12l5.2-1.8a2 2 0 0 0 1.5-1.5z"
 		/>
 	{:else if name === 'camera'}

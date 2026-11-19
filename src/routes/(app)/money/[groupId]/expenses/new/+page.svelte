@@ -28,12 +28,14 @@
 {#if data.ai}
 	<AssistBox
 		action="?/receipt"
-		label="Got a receipt? Snap it and I’ll fill in the total."
+		target=".expense-form"
+		label="Got a receipt? Snap it and AI will fill in the total, what it was and the day."
 		photo="only"
-		submitLabel="Snap a receipt"
+		submitLabel="Scan a receipt with AI"
 		busyLabel="Reading the receipt…"
+		photoBusyLabel="Reading the receipt…"
 		outcome={form && 'assist' in form ? form.assist : null}
-		filledNote="Filled in from the receipt. Check the total and split, then add it."
+		filledNote="Filled in with AI from the receipt. Who paid and the split are as usual."
 		focusOnFail="#expense-amount"
 	/>
 {/if}
