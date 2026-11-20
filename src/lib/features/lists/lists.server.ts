@@ -239,6 +239,21 @@ export async function setListItemChecked(locals: App.Locals, itemId: string, che
 	if (updateError) dbError(updateError);
 }
 
+export async function renameListItem(locals: App.Locals, itemId: string, name: string) {
+	const { supabase } = locals;
+	if (!supabase) {
+		const item = sampleLists.flatMap((list) => list.items).find((entry) => entry.id === itemId);
+		if (item) item.name = name;
+		return;
+	}
+
+	const { error: updateError } = await supabase
+		.from('list_items')
+		.update({ name })
+		.eq('id', itemId);
+	if (updateError) dbError(updateError);
+}
+
 export async function deleteListItem(locals: App.Locals, itemId: string) {
 	const { supabase } = locals;
 	if (!supabase) {

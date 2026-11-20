@@ -10,7 +10,7 @@ import { weekSummary } from '#lib/features/today/week.server.js';
 import { todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url, parent }) => {
 	const [plans, tasks, lists, scores, feed, groups] = await Promise.all([
 		listUpcomingPlans(locals, 20),
 		listTasksComingUp(locals),
@@ -18,10 +18,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		getScores(locals),
 		// ?feed= grows as you scroll down the feed, so older posts stay loaded and refreshed.
 		listFeed(locals, feedLimit(url.searchParams.get('feed'))),
-		// Only for the week line's money bit.
+		// For the line under the date: who owes whom.
 		listGroups(locals)
 	]);
-	const week = weekSummary(locals, plans, tasks, groups);
+	const { household } = await parent();
+	const week = weekSummary(locals, plans, tasks, groups, household.members);
 	return {
 		week: { plain: week.plain, fingerprint: week.key },
 		comingUp: mergeComingUp(pickComingUp(plans, 6), tasks),

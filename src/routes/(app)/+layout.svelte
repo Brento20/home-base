@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import AppGestures from '#lib/ui/AppGestures.svelte';
 	import TabBar from '#lib/ui/TabBar.svelte';
+	import { drift } from '#lib/ui/backdrop-drift.js';
 	import { startLiveRefresh } from '#lib/ui/live-refresh.js';
 	import type { LayoutProps } from './$types';
 
@@ -27,8 +28,13 @@
 	paint the backdrop itself over the page, faded in, so content dissolves rather than slides
 	under hard edges. Static layers, so scrolling past them costs nothing.
 -->
-<div class="edge-fade top backdrop-paint" data-still="fade-top" aria-hidden="true"></div>
-<div class="edge-fade bottom backdrop-paint" data-still="fade-bottom" aria-hidden="true"></div>
+<div class="edge-fade top backdrop-paint" data-still="fade-top" aria-hidden="true" use:drift></div>
+<div
+	class="edge-fade bottom backdrop-paint"
+	data-still="fade-bottom"
+	aria-hidden="true"
+	use:drift
+></div>
 
 <TabBar />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->

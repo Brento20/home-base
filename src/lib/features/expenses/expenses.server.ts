@@ -150,7 +150,11 @@ export async function listGroups(locals: App.Locals): Promise<ExpenseGroupSummar
 	return Promise.all(
 		groups.map(async (group) => {
 			const balances = await readBalances(locals, group);
-			return { ...group, myNetCents: balances.find((b) => b.profileId === me)?.netCents ?? 0 };
+			return {
+				...group,
+				myNetCents: balances.find((b) => b.profileId === me)?.netCents ?? 0,
+				myDebts: simplifyDebts(balances).filter((debt) => debt.from === me || debt.to === me)
+			};
 		})
 	);
 }

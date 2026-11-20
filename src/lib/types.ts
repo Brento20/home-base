@@ -129,6 +129,8 @@ export interface ExpenseGroup {
 export interface ExpenseGroupSummary extends ExpenseGroup {
 	/** Positive: you're owed. Negative: you owe. */
 	myNetCents: number;
+	/** Who you'd pay, or who'd pay you, to settle up (the simplified transfers that involve you). */
+	myDebts: { from: string; to: string; cents: number }[];
 }
 
 export interface ExpenseShare {

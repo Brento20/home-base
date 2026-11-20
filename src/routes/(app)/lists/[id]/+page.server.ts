@@ -7,6 +7,7 @@ import {
 	ITEM_NAME_MAX,
 	parseListName,
 	renameList,
+	renameListItem,
 	setListItemChecked
 } from '#lib/features/lists/lists.server.js';
 import type { Actions, PageServerLoad } from './$types';
@@ -29,6 +30,18 @@ export const actions: Actions = {
 		const itemId = String(form.get('itemId') ?? '');
 		if (!itemId) return fail(400, { message: 'Missing item.' });
 		await setListItemChecked(locals, itemId, form.get('checked') === 'true');
+	},
+
+	/** Tapping an item's name lets you fix it. */
+	renameItem: async ({ request, locals }) => {
+		const form = await request.formData();
+		const itemId = String(form.get('itemId') ?? '');
+		const name = String(form.get('name') ?? '').trim();
+		if (!itemId) return fail(400, { message: 'Missing item.' });
+		if (!name) return fail(400, { message: 'An item needs a name. To get rid of it, tap Edit.' });
+		if (name.length > ITEM_NAME_MAX)
+			return fail(400, { message: `Keep it under ${ITEM_NAME_MAX} characters.` });
+		await renameListItem(locals, itemId, name);
 	},
 
 	deleteItem: async ({ request, locals }) => {

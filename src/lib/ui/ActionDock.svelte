@@ -6,6 +6,7 @@
 	 * Give the page's content about 84px of bottom padding so its end clears the bar.
 	 */
 	import type { Snippet } from 'svelte';
+	import { drift } from './backdrop-drift.js';
 
 	interface Props {
 		children: Snippet;
@@ -16,7 +17,7 @@
 </script>
 
 <!-- The page melts away a little higher here, so nothing reads through the bar. -->
-<div class="dock-fade backdrop-paint" data-still="action-fade" aria-hidden="true"></div>
+<div class="dock-fade backdrop-paint" data-still="action-fade" aria-hidden="true" use:drift></div>
 <div class="action-dock" data-still="action-dock">
 	{@render above?.()}
 	<div class="action-bar">{@render children()}</div>

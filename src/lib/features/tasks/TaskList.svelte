@@ -23,7 +23,13 @@
 	<p class="summary" aria-live="polite">{tasks.length} to do</p>
 	<ul class="rows">
 		{#each tasks as task (task.id)}
-			<TaskRow {task} {people} {today} action="?/complete" editHref="/lists/tasks/{task.id}" />
+			<TaskRow
+				{task}
+				{people}
+				{today}
+				action="?/complete"
+				openHref={task.recipeId ? `/dinner/cook/${task.id}` : `/lists/tasks/${task.id}`}
+			/>
 		{/each}
 	</ul>
 {/if}

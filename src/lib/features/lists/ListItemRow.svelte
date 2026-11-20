@@ -1,5 +1,8 @@
 <script lang="ts">
-	/** One item in a list: tap to tick it off, or remove it in edit mode. */
+	/**
+	 * One item in a list: tap the circle to tick it off, tap the name to fix it (Return saves,
+	 * Escape puts it back), or remove it in edit mode.
+	 */
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { ListItem } from '#lib/types.js';
@@ -15,6 +18,25 @@
 
 	let { item, ringColour, editing = false, onoptimistic }: Props = $props();
 	let removing = $state(false);
+	let renaming = $state(false);
+	let draft = $state('');
+
+	function startRename() {
+		draft = item.name;
+		renaming = true;
+	}
+
+	function focusAndSelect(input: HTMLInputElement) {
+		input.focus();
+		input.select();
+	}
+
+	// Leaving the field saves a change; an empty or unchanged name just puts it back.
+	function finish(event: FocusEvent) {
+		const form = (event.currentTarget as HTMLInputElement).form;
+		if (draft.trim() && draft.trim() !== item.name) form?.requestSubmit();
+		else renaming = false;
+	}
 </script>
 
 <li class="item-row" class:removing>
@@ -54,13 +76,49 @@
 		>
 			<input type="hidden" name="itemId" value={item.id} />
 			<input type="hidden" name="checked" value={String(!item.checked)} />
-			<button class="item" aria-pressed={item.checked}>
+			<button
+				class="tick"
+				aria-pressed={item.checked}
+				aria-label={item.checked ? `Untick ${item.name}` : `Tick off ${item.name}`}
+			>
 				<span class="ring" class:checked={item.checked} style:--ring-colour={ringColour}>
 					{#if item.checked}<Icon name="check" size={14} />{/if}
 				</span>
-				<span class="name" class:checked={item.checked}>{item.name}</span>
 			</button>
 		</form>
+		{#if renaming}
+			<form
+				class="rename"
+				method="POST"
+				action="?/renameItem"
+				use:enhance={() => {
+					return async ({ update }) => {
+						await update({ reset: false });
+						renaming = false;
+					};
+				}}
+			>
+				<input type="hidden" name="itemId" value={item.id} />
+				<input
+					class="name-input"
+					name="name"
+					aria-label="Item name"
+					maxlength="120"
+					autocomplete="off"
+					enterkeyhint="done"
+					bind:value={draft}
+					use:focusAndSelect
+					onblur={finish}
+					onkeydown={(event) => {
+						if (event.key === 'Escape') renaming = false;
+					}}
+				/>
+			</form>
+		{:else}
+			<button class="name-button" aria-label="Rename {item.name}" onclick={startRename}>
+				<span class="name" class:checked={item.checked}>{item.name}</span>
+			</button>
+		{/if}
 	{/if}
 </li>
 
@@ -82,6 +140,57 @@
 
 	.item-row > form:only-child {
 		flex: 1;
+	}
+
+	/* Just the circle, with a full-height tap area. */
+	.tick {
+		display: grid;
+		place-items: center start;
+		width: calc(24px + var(--space-m));
+		min-height: var(--row-height);
+		padding: 0;
+		border: 0;
+		background: none;
+	}
+
+	.tick:global([data-pressed]) .ring {
+		transform: scale(0.86);
+		transition-duration: var(--duration-press);
+		transition-timing-function: var(--ease-out);
+	}
+
+	/* The rest of the row: tap the name to fix it. */
+	.name-button {
+		display: flex;
+		align-items: center;
+		flex: 1;
+		min-width: 0;
+		min-height: var(--row-height);
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		text-align: left;
+	}
+
+	.rename {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.name-input {
+		flex: 1;
+		min-width: 0;
+		min-height: var(--row-height);
+		padding: 0;
+		border: 0;
+		border-bottom: 1px solid var(--colour-accent);
+		background: none;
+		color: var(--colour-text);
+		font-size: var(--text-body);
+		outline: none;
 	}
 
 	.item {

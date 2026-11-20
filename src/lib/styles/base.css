@@ -133,11 +133,17 @@ a {
 .backdrop-paint {
 	background-color: var(--colour-ground);
 	background-image: var(--grain), var(--mesh-one), var(--mesh-two), var(--mesh-three);
+	/* The glow layers overhang the screen by a fifth on every side, so they can drift. */
 	background-size:
 		var(--grain-size) var(--grain-size),
-		100vw 100dvh,
-		100vw 100dvh,
-		100vw 100dvh;
+		140vw 140dvh,
+		140vw 140dvh,
+		140vw 140dvh;
+	background-position:
+		0 0,
+		-20vw -20dvh,
+		-20vw -20dvh,
+		-20vw -20dvh;
 	background-repeat: repeat, no-repeat, no-repeat, no-repeat;
 }
 

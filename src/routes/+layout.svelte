@@ -9,6 +9,7 @@
 	import { markHydrated } from '#lib/copy/pick.js';
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
+	import { drift } from '#lib/ui/backdrop-drift.js';
 	import { preloadTabs, usePageTransitions } from '#lib/ui/page-transitions.js';
 	import { installPress } from '#lib/ui/press.js';
 	import type { LayoutProps } from './$types';
@@ -64,7 +65,7 @@
 </svelte:head>
 
 <div class="app">
-	<div class="app-backdrop backdrop-paint" aria-hidden="true"></div>
+	<div class="app-backdrop backdrop-paint" aria-hidden="true" use:drift></div>
 	{@render children()}
 </div>
 

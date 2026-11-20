@@ -106,6 +106,9 @@
 			required
 		/>
 		{#if ai}
+			<!-- Return on the keyboard presses a form's first button, so this one is first: it
+			     adds the task, as the visible + does. Screen readers and Tab skip it. -->
+			<button class="visually-hidden" tabindex="-1" aria-hidden="true">Add task</button>
 			<!-- Same form, other action: reads the words and fills the options below. -->
 			<button
 				class="quick-button"

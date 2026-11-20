@@ -1,5 +1,8 @@
 <script lang="ts">
-	/** One task with its tick ring. Ticking it off pops a +1 point, then it moves to Past tasks. */
+	/**
+	 * One task: tap the circle to tick it off (a +1 point pops, then it moves to Past tasks), or
+	 * anywhere else on the row to open it.
+	 */
 	import { describeRepeat, repeatLabel } from './repeat.js';
 	import { enhance } from '$app/forms';
 	import PointPop from '#lib/features/points/PointPop.svelte';
@@ -13,11 +16,11 @@
 		today: string;
 		/** Form action that ticks it off, e.g. "?/complete". */
 		action: string;
-		/** Adds a trailing button to the edit page. */
-		editHref?: string;
+		/** Where tapping the task's name goes: its page, with all its details. */
+		openHref?: string;
 	}
 
-	let { task, people, today, action, editHref }: Props = $props();
+	let { task, people, today, action, openHref }: Props = $props();
 
 	// Ticked straight away; the row leaves for Past tasks once the server confirms.
 	let ticking = $state(false);
@@ -39,6 +42,7 @@
 </script>
 
 <li class="task-row" class:ticking>
+	<!-- Only the circle ticks it off; the rest of the row opens the task. -->
 	<form
 		method="POST"
 		{action}
@@ -69,24 +73,23 @@
 			<span class="ring"
 				>{#if ticking}<Icon name="check" size={14} />{/if}</span
 			>
-			<span class="words">
-				<span class="title">{task.title}</span>
-				<!-- Says whose it is in words too, so the ring colour isn't the only clue. -->
-				<span class="who" aria-hidden="true">{assignee ? assignee.displayName : 'Anyone'}</span>
-			</span>
-			<span class="meta">
-				{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
-						><Icon name="repeat" size={14} /></span
-					>{/if}
-				{#if dueLabel}<span class="due" class:overdue>{dueLabel}</span>{/if}
-			</span>
 		</button>
 	</form>
-	{#if editHref}
-		<a class="edit" href={editHref} aria-label="Edit {task.title}"
-			><Icon name="chevron" size={18} /></a
-		>
-	{/if}
+	<svelte:element this={openHref ? 'a' : 'div'} class="open" href={openHref}>
+		<span class="words">
+			<span class="title">{task.title}</span>
+			<!-- Says whose it is in words too, so the ring colour isn't the only clue. -->
+			<span class="who">{assignee ? assignee.displayName : 'Anyone'}</span>
+		</span>
+		<span class="meta">
+			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
+					><Icon name="repeat" size={14} /></span
+				>{/if}
+			{#if dueLabel}<span class="due" class:overdue>{dueLabel}</span>{/if}
+		</span>
+		{#if openHref}<span class="chevron" aria-hidden="true"><Icon name="chevron" size={18} /></span
+			>{/if}
+	</svelte:element>
 </li>
 
 <style>
@@ -103,8 +106,7 @@
 
 	form {
 		position: relative;
-		flex: 1;
-		min-width: 0;
+		flex: none;
 		margin: 0;
 	}
 
@@ -117,17 +119,15 @@
 		height: 0;
 	}
 
-	/* The whole row is the target; the ring colour says whose it is. */
+	/* Just the circle, with a full-height tap area that reaches the row's left edge. */
 	.toggle {
-		display: flex;
-		align-items: center;
-		gap: var(--space-m);
-		width: 100%;
+		display: grid;
+		place-items: center start;
+		width: calc(24px + var(--space-m));
 		min-height: var(--row-height);
 		padding: 0;
 		border: 0;
 		background: none;
-		text-align: left;
 	}
 
 	.toggle:disabled {
@@ -167,6 +167,26 @@
 	.ticking .anyone .ring {
 		background: var(--colour-text-muted);
 		border-color: transparent;
+	}
+
+	/* Everything after the circle: opens the task. */
+	.open {
+		display: flex;
+		align-items: center;
+		gap: var(--space-s);
+		flex: 1;
+		min-width: 0;
+		min-height: var(--row-height);
+		margin-right: -12px;
+		padding-right: 4px;
+		color: inherit;
+		text-decoration: none;
+		-webkit-tap-highlight-color: transparent;
+		transition: opacity var(--duration-quick) var(--ease-out);
+	}
+
+	a.open:global([data-pressed]) {
+		opacity: 0.6;
 	}
 
 	.words {
@@ -210,13 +230,9 @@
 		color: var(--colour-accent);
 	}
 
-	.edit {
+	.chevron {
 		display: grid;
-		place-items: center;
 		flex: none;
-		width: var(--tap-target);
-		height: var(--tap-target);
-		margin-right: -12px;
 		color: var(--colour-text-faint);
 	}
 </style>
