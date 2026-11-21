@@ -1,11 +1,14 @@
 <script lang="ts">
 	/**
 	 * The day in a line, under Today's date. The plain line is always there; with the AI on, a
-	 * cheekier one fades in once it's ready. It's kept in the browser against the facts' key,
-	 * so it's only asked for again when the day or the facts change (a new task, a different
-	 * balance). If the AI came back empty, it tries again after an hour at most.
+	 * cheekier one fades in once it's ready.
+	 *
+	 * Each AI line belongs to one set of facts (the fingerprint, which changes when a task, plan,
+	 * dinner or balance does, or the day ticks over). It's kept in the browser against that key,
+	 * shown only while the facts still match, and asked for again whenever they change, not just
+	 * when Today first appears: Today often appears from its kept copy and gets fresh facts a
+	 * moment later. If the AI came back empty, it tries again after a while.
 	 */
-	import { onMount } from 'svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 
 	interface Props {
@@ -16,16 +19,23 @@
 	}
 
 	let { plain, fingerprint, ai }: Props = $props();
-	let friendly = $state<string | null>(null);
-	const STORE = 'home-base:week-line';
-	/** After an empty answer (AI busy or off), when to try again for the same facts. */
-	const RETRY_EMPTY_MS = 60 * 60_000;
 
-	/** The saved line for today's facts: a string, null (asked, and the plain line won), or undefined (not asked yet). */
-	function remembered(): string | null | undefined {
+	/** The newest AI line and the facts it was written for. */
+	let written = $state<{ key: string; line: string | null } | null>(null);
+	/** Only shown while it matches the facts on screen; otherwise the (fresh) plain line. */
+	const friendly = $derived(written?.key === fingerprint ? written.line : null);
+
+	const STORE = 'home-base:week-line';
+	/** After an empty answer (AI busy, over the limit, or a line that got a number wrong). */
+	const RETRY_EMPTY_MS = 15 * 60_000;
+	/** The facts a request is out for, so the same ones aren't asked for twice at once. */
+	let asking: string | null = null;
+
+	/** The saved line for these facts: a string, null (asked, and the plain line won), or undefined (not asked yet). */
+	function remembered(key: string): string | null | undefined {
 		try {
 			const saved = JSON.parse(localStorage.getItem(STORE) ?? 'null');
-			if (saved?.key !== fingerprint) return undefined;
+			if (saved?.key !== key) return undefined;
 			if (saved.line === null && Date.now() - (saved.at ?? 0) > RETRY_EMPTY_MS) return undefined;
 			return saved.line;
 		} catch {
@@ -33,35 +43,38 @@
 		}
 	}
 
-	function remember(line: string | null) {
+	function remember(key: string, line: string | null) {
 		try {
-			localStorage.setItem(STORE, JSON.stringify({ key: fingerprint, line, at: Date.now() }));
+			localStorage.setItem(STORE, JSON.stringify({ key, line, at: Date.now() }));
 		} catch {
 			// Private mode or full storage: it'll just ask again next time.
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
 		if (!ai) return;
-		// Asked already for these facts (even if it came back empty): don't ask again until the
-		// day or the facts change, so it's at most one AI call a day unless something changes.
-		const saved = remembered();
+		const key = fingerprint;
+		const saved = remembered(key);
 		if (saved !== undefined) {
-			friendly = saved;
+			written = { key, line: saved };
 			return;
 		}
-		const asked = fingerprint;
+		if (asking === key) return;
+		asking = key;
 		fetch('/summary')
 			.then((response) => (response.ok ? response.json() : null))
 			.then((answer: { key: string; line: string | null } | null) => {
-				// Only if the week hasn't changed while it was being written.
-				if (answer && answer.key === asked && asked === fingerprint) {
-					friendly = answer.line;
-					remember(answer.line);
-				}
+				if (!answer) return;
+				// Kept under the facts the server wrote it for. If those are newer than the ones on
+				// screen (Today was showing its kept copy), it shows the moment the fresh facts land.
+				remember(answer.key, answer.line);
+				written = answer;
 			})
 			.catch(() => {
 				// Offline or failed: the plain line stays, which is fine.
+			})
+			.finally(() => {
+				if (asking === key) asking = null;
 			});
 	});
 </script>
