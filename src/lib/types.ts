@@ -318,3 +318,20 @@ export interface SitterLink {
 	createdAt: string;
 	expiresAt: string;
 }
+
+/** What anyone signed in can see of someone (src/lib/features/friends/public-profile.ts). */
+export interface PublicProfile {
+	id: string;
+	name: string;
+	initials: string;
+	colour: string;
+	/** Only for yourself, your home and your friends. */
+	avatarUrl: string | null;
+	pronouns: string;
+	bio: string;
+	homeName: string | null;
+	fields: import('#lib/features/friends/public-profile.js').PublicFields;
+	isYou: boolean;
+	isFriend: boolean;
+	sharesHome: boolean;
+}

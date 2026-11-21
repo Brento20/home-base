@@ -1,5 +1,6 @@
 import library from '#lib/features/recipes/library.json';
 import { cookTitle, scaleIngredients, type Recipe } from '#lib/features/recipes/recipe.js';
+import type { PublicFields } from '#lib/features/friends/public-profile.js';
 import { addDays, todayISO, zonedToInstant } from '#lib/time.js';
 import type {
 	CookDinner,
@@ -529,3 +530,28 @@ export const sampleSentPostcards: FeedPost[] = [
 		}
 	}
 ];
+
+/** Public profile answers in sample mode, by person. */
+export const samplePublicFields: Record<string, PublicFields> = {
+	'sample-brenton': {
+		suburb: 'Marrickville',
+		knownFor: 'A mean lasagne',
+		happyTo: 'Water your plants',
+		localSpot: '',
+		askMeAbout: 'Squarespace, sourdough'
+	},
+	'sample-sam': {
+		suburb: 'Newtown',
+		knownFor: 'Fig jam',
+		happyTo: 'Lend a ladder',
+		localSpot: 'The Terrace garden',
+		askMeAbout: 'Bees'
+	},
+	'sample-alex': {
+		suburb: 'Newtown',
+		knownFor: 'Pub trivia',
+		happyTo: '',
+		localSpot: 'The Lord Nelson',
+		askMeAbout: 'Board games'
+	}
+};

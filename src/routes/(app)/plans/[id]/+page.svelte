@@ -99,21 +99,23 @@
 				<ul class="grouped">
 					{#each home.people as person (person.id)}
 						<li class="grouped-row guest">
-							<Avatar
-								person={{
-									displayName: person.name,
-									initials: person.initials,
-									accentColour: person.colour,
-									avatarUrl: person.avatarUrl
-								}}
-								size={30}
-							/>
-							<span class="grouped-label">
-								{person.isYou ? `${person.name} (you)` : person.name}
-								<span class="grouped-sub" class:going={person.response === 'going'}
-									>{status(person.response)}</span
-								>
-							</span>
+							<a class="guest-link" href={person.isYou ? '/profile' : `/people/${person.id}`}>
+								<Avatar
+									person={{
+										displayName: person.name,
+										initials: person.initials,
+										accentColour: person.colour,
+										avatarUrl: person.avatarUrl
+									}}
+									size={30}
+								/>
+								<span class="grouped-label">
+									{person.isYou ? `${person.name} (you)` : person.name}
+									<span class="grouped-sub" class:going={person.response === 'going'}
+										>{status(person.response)}</span
+									>
+								</span>
+							</a>
 							{#if person.canAdd}
 								<form method="POST" action="?/addFriend" use:enhance>
 									<input type="hidden" name="person" value={person.id} />
@@ -359,6 +361,16 @@
 
 	.guest {
 		gap: 12px;
+	}
+
+	.guest-link {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
 	}
 
 	.going {

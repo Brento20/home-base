@@ -10,17 +10,19 @@ import {
 	unblockPerson
 } from '#lib/features/friends/friends.server.js';
 import { listRecentPostcards } from '#lib/features/friends/postcards.server.js';
+import { getMyPublicProfile } from '#lib/features/friends/public-profile.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [account, friends, links, blocked, postcards] = await Promise.all([
+	const [account, friends, links, blocked, postcards, publicProfile] = await Promise.all([
 		getAccountDetails(locals),
 		listFriends(locals),
 		listFriendLinks(locals),
 		listBlocked(locals),
-		listRecentPostcards(locals, 5)
+		listRecentPostcards(locals, 5),
+		getMyPublicProfile(locals)
 	]);
-	return { account, friends, links, blocked, postcards };
+	return { account, friends, links, blocked, postcards, publicProfile };
 };
 
 export const actions: Actions = {

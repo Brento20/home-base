@@ -341,20 +341,21 @@ test('Friends and postcards: profile, friends, a friend link, a postcard and a r
 	context
 }) => {
 	const errors = watchErrors(page);
+	// Your face on the Home tab opens your profile and friends.
 	await open(page, '/home');
-	await page.getByRole('link', { name: 'You & friends' }).click();
+	await page.getByRole('link', { name: 'You: your profile and friends' }).click();
 	await expect(page).toHaveURL(/\/profile$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You');
 	await expect(page.locator('.friend', { hasText: 'Sam' })).toContainText('The Terrace');
 
-	// A line about yourself, written in Edit and shown at the top of your profile.
-	await page.getByRole('link', { name: 'Edit' }).click();
+	// Your public profile: a line about you and a few answers, shown at the top of your profile.
+	await page.locator('a[href="/profile/public"]').first().click();
 	await page.getByLabel('About you').fill(`Waters plants ${run}`);
-	await page.getByLabel('Date of birth').fill('1990-06-15'); // required; the sample has none
+	await page.getByLabel('Known for').fill(`Lasagne ${run}`);
 	await page.getByRole('button', { name: 'Save', exact: true }).click();
-	await expect(page).toHaveURL(/\/home$/);
-	await open(page, '/profile');
+	await expect(page).toHaveURL(/\/profile$/);
 	await expect(page.locator('.profile-header')).toContainText(`Waters plants ${run}`);
+	await expect(page.locator('.public-fields')).toContainText(`Lasagne ${run}`);
 
 	// A friend link: shown once, listed until it's used or cancelled.
 	await page.getByRole('button', { name: 'Make a friend link' }).click();
@@ -496,6 +497,15 @@ test('Plan invites: answer for yourself, see who is going, invite a friend, add 
 	await open(page, '/plans/sample-plan-trivia');
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Trivia night');
 	const alex = page.locator('.guest', { hasText: 'Alex' });
+	// Not a friend yet: their name opens their public profile.
+	if (await alex.getByRole('button', { name: 'Add friend' }).count()) {
+		await alex.locator('.guest-link').click();
+		await expect(page).toHaveURL(/\/people\/sample-alex$/);
+		await expect(page.locator('.public-fields')).toContainText('Pub trivia');
+		await expect(page.getByText('You’re not friends yet')).toBeVisible();
+		await page.goBack();
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Trivia night');
+	}
 	const add = alex.getByRole('button', { name: 'Add friend' });
 	if (await add.count()) {
 		await add.click();

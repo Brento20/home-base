@@ -241,22 +241,6 @@
 		</label>
 	</div>
 
-	{#if housemateColours}
-		<label class="field">
-			<span class="field-label">About you</span>
-			<textarea
-				class="field-input bio"
-				name="bio"
-				rows="2"
-				maxlength="140"
-				placeholder="Plant dad. Makes a mean lasagne."
-				aria-invalid={errors.bio ? 'true' : undefined}>{start.bio ?? ''}</textarea
-			>
-			{#if errors.bio}<span class="field-error">{errors.bio}</span>
-			{:else}<span class="field-hint">One line your friends see on your profile.</span>{/if}
-		</label>
-	{/if}
-
 	{#if showEmail}<p class="email">Signed up as {account.email}</p>{/if}
 
 	{#if showActions}
@@ -267,12 +251,6 @@
 </form>
 
 <style>
-	.bio {
-		resize: none;
-		field-sizing: content;
-		min-height: 64px;
-	}
-
 	/* The photo centred at the top, its actions underneath, as on an iPhone contact card. */
 	.photo {
 		display: flex;

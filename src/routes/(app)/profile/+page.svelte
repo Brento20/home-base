@@ -7,6 +7,8 @@
 	 */
 	import { enhance } from '$app/forms';
 	import PostcardList from '#lib/features/friends/PostcardList.svelte';
+	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
+	import { filledFields } from '#lib/features/friends/public-profile.js';
 	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -59,10 +61,23 @@
 </PageHeader>
 
 <div class="stack">
-	<ProfileHeader person={me} name={shownName} bio={account.bio} {facts} />
-	{#if !account.bio}
-		<a class="add-bio" href="/home/profile">Add a line about yourself</a>
-	{/if}
+	<ProfileHeader person={me} name={shownName} bio={data.publicProfile.bio} {facts} />
+
+	<section aria-labelledby="public-heading">
+		<div class="section-heading-row">
+			<h2 id="public-heading" class="section-heading">Public profile</h2>
+			<a class="section-heading-link" href="/profile/public">Edit</a>
+		</div>
+		{#if filledFields(data.publicProfile.fields).length}
+			<PublicFieldsCard fields={data.publicProfile.fields} label="Your public profile" />
+			<p class="group-note">Anyone on home base can see these, friends or not.</p>
+		{:else}
+			<p class="empty">
+				Add a few things people can see before they’re your friends, like what you’re known for or
+				your favourite local spot. <a href="/profile/public">Fill it in</a>
+			</p>
+		{/if}
+	</section>
 
 	<section aria-labelledby="friends-heading">
 		<div class="section-heading-row">
@@ -181,13 +196,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-l);
-	}
-
-	.add-bio {
-		margin-top: calc(var(--space-l) * -1 + 10px);
-		align-self: center;
-		font-size: var(--text-small);
-		color: var(--colour-accent);
 	}
 
 	.count {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import SoloScreen from '#lib/ui/SoloScreen.svelte';
@@ -47,6 +48,12 @@
 				ring
 			/>
 		</div>
+		{#if data.person}
+			{#if data.person.bio}<p class="bio">{data.person.bio}</p>{/if}
+			<div class="public">
+				<PublicFieldsCard fields={data.person.fields} label="About {link.name}" />
+			</div>
+		{/if}
 	{/if}
 
 	<GlassCard padding="var(--space-m)">
@@ -93,6 +100,16 @@
 		display: flex;
 		justify-content: center;
 		margin-bottom: var(--space-m);
+	}
+
+	.bio {
+		margin-bottom: var(--space-m);
+		text-align: center;
+	}
+
+	.public {
+		margin-bottom: var(--space-m);
+		text-align: left;
 	}
 
 	.actions {

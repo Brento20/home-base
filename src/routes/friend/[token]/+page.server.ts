@@ -4,6 +4,7 @@ import {
 	rememberFriendLink
 } from '#lib/features/friends/friend-cookie.server.js';
 import { acceptFriendLink, previewFriendLink } from '#lib/features/friends/friends.server.js';
+import { getPublicProfile } from '#lib/features/friends/public-profile.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -19,7 +20,11 @@ export const load: PageServerLoad = async ({ params, locals, cookies }) => {
 	if (waiting && (locals.stage === 'signed-out' || locals.stage === 'profile'))
 		rememberFriendLink(cookies, params.token);
 	else forgetFriendLink(cookies);
-	return { link, stage: locals.stage };
+	// Signed in: their public profile, so you know who you're adding.
+	const signedIn = locals.stage === 'ready' || locals.stage === 'home';
+	const person =
+		signedIn && link && !link.isYou ? await getPublicProfile(locals, link.person) : null;
+	return { link, person, stage: locals.stage };
 };
 
 export const actions: Actions = {

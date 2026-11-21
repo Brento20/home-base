@@ -31,7 +31,7 @@ export const isTabView = (pathname: string) =>
  */
 const ALSO_UNDER: Record<string, string[]> = {
 	'/': ['/feed', '/dinner'],
-	'/home': ['/profile', '/postcards']
+	'/home': ['/profile', '/postcards', '/people']
 };
 
 /** Which tab a path belongs to, or -1 for pages outside the tab bar (sign up, setup). */

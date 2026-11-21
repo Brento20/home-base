@@ -13,6 +13,8 @@ import { forgetSamplePostcardsFrom, removePhotosFrom } from './postcards.server.
  */
 
 export interface FriendLinkPreview {
+	/** Whose link it is, for their public profile. */
+	person: string;
 	name: string;
 	initials: string;
 	colour: string;
@@ -125,6 +127,7 @@ export async function previewFriendLink(
 		if (!link) return null;
 		// Sample mode has one person, so every link is your own.
 		return {
+			person: 'sample-brenton',
 			name: 'Brenton',
 			initials: 'B',
 			colour: '#e58440',
@@ -138,6 +141,7 @@ export async function previewFriendLink(
 	if (error) dbError(error);
 	const row = (
 		data as {
+			person: string;
 			name: string;
 			initials: string;
 			colour: string;
@@ -148,6 +152,7 @@ export async function previewFriendLink(
 	)?.[0];
 	return row
 		? {
+				person: row.person,
 				name: row.name,
 				initials: row.initials,
 				colour: row.colour,

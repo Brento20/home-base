@@ -45,14 +45,21 @@
 	{/snippet}
 </PageHeader>
 
-<a class="people" href="/home/settings" aria-label="Everyone in {data.household.name}">
+<!-- Your face opens your profile and friends; everyone else's opens the home's settings. -->
+<div class="people" role="group" aria-label="Everyone in {data.household.name}">
 	{#each data.household.members as person (person.id)}
-		<span class="person">
+		<a
+			class="person"
+			href={person.id === data.me.id ? '/profile' : '/home/settings'}
+			aria-label={person.id === data.me.id
+				? 'You: your profile and friends'
+				: `${person.displayName}: home settings`}
+		>
 			<Avatar {person} size={52} ring />
-			<span class="name">{person.displayName}</span>
-		</span>
+			<span class="name">{person.id === data.me.id ? 'You' : person.displayName}</span>
+		</a>
 	{/each}
-</a>
+</div>
 
 <Reveal of={screen} placeholder={[354, 282, 184]} gap={40} label="Loading home">
 	{#snippet children(home)}
@@ -209,6 +216,8 @@
 		align-items: center;
 		gap: 8px;
 		min-width: 60px;
+		color: inherit;
+		text-decoration: none;
 	}
 
 	.name {

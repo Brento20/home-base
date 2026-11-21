@@ -3,13 +3,12 @@ import { avatarUrl } from '#lib/features/household/household.server.js';
 import { sampleAccount, sampleProfiles } from '#lib/server/sample-data.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
 import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
+import { BIO_MAX } from '#lib/features/friends/public-profile.js';
 import { isAvatarColour } from './colours.js';
 
 /** Sign-up, sign-in and profile details for the signed-in person. */
 
 export const PASSWORD_MIN = 10;
-/** The line about yourself that friends see. */
-export const BIO_MAX = 140;
 const PHOTO_MAX_BYTES = 1024 * 1024;
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 

@@ -5,6 +5,7 @@
 	 * blocking them is at the foot.
 	 */
 	import PostcardList from '#lib/features/friends/PostcardList.svelte';
+	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -47,6 +48,8 @@
 		bio={friend.bio}
 		{facts}
 	/>
+
+	{#if data.fields}<PublicFieldsCard fields={data.fields} label="About {friend.name}" />{/if}
 
 	{#if data.sent}
 		<p class="sent" role="status">Postcard sent. It’s on {friend.name}’s home feed now.</p>
