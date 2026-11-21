@@ -335,3 +335,100 @@ test('Tabs keep their last screen: back to a tab shows it at once, then updates'
 	}
 	expect(errors).toEqual([]);
 });
+
+test('Friends and postcards: your profile, a friend, a friend link, a postcard', async ({
+	page,
+	context
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/home');
+	await page.getByRole('link', { name: 'You & friends' }).click();
+	await expect(page).toHaveURL(/\/profile$/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You');
+	await expect(page.locator('.grouped-row', { hasText: 'Sam' })).toContainText('The Terrace');
+
+	// A friend link: shown once, listed until it's used or cancelled.
+	await page.getByRole('button', { name: 'Make a friend link' }).click();
+	const field = page.getByLabel('Friend link', { exact: true });
+	await expect(field).toHaveValue(/\/friend\/[\w-]{32}$/);
+	const link = await field.inputValue();
+	const other = await context.newPage();
+	await open(other, new URL(link).pathname);
+	await expect(other.getByRole('heading', { level: 1 })).toHaveText('This is your friend link');
+	await page.getByRole('button', { name: 'Cancel' }).first().click();
+	await open(other, new URL(link).pathname);
+	await expect(other.getByRole('heading', { level: 1 })).toHaveText('This friend link has run out');
+
+	// A friend's page, and a postcard to their home.
+	await page.locator('.grouped-row', { hasText: 'Sam' }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sam');
+	await page.getByRole('link', { name: 'Send a postcard' }).click();
+	await expect(page.locator('select[name="to"]')).toHaveValue('sample-sam');
+	// A photo and a few lines, through the same composer as a feed post.
+	await page.locator('input[type="file"]').setInputFiles({
+		name: 'figs.png',
+		mimeType: 'image/png',
+		buffer: Buffer.from(
+			'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+			'base64'
+		)
+	});
+	await expect(page.locator('.preview img')).toBeVisible();
+	await page.getByLabel('Message').fill(`Wish you were here ${run}`);
+	await page.getByRole('button', { name: 'Send', exact: true }).click();
+	await expect(page).toHaveURL(/\/profile\/sample-sam\?sent/);
+	await expect(page.getByRole('status')).toContainText('Postcard sent');
+
+	// Sam's postcard to this home sits in the feed, and opens on its own page.
+	await open(page, '/');
+	const postcard = page.locator('.postcard').first();
+	if (await postcard.count()) {
+		await expect(postcard).toContainText('Postcard from Sam');
+		await postcard.locator('.open').click();
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Postcard');
+		await page.getByRole('button', { name: 'Take it down' }).click();
+		await page.getByRole('button', { name: 'Tap again to take it down' }).click();
+		await expect(page).toHaveURL(/\/$/);
+	}
+	expect(errors).toEqual([]);
+});
+
+test('House-sitter link: pick what to share, open it signed out, stop it', async ({
+	page,
+	browser
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/home');
+	await page.getByRole('link', { name: 'House-sitter link' }).click();
+	await page.getByLabel('Who it’s for').fill(`Sam ${run}`);
+	await page.getByLabel('A message for them').fill('Feed Pickles twice a day.');
+	await page.getByRole('checkbox', { name: /Wifi/ }).check();
+	await page.getByRole('button', { name: 'Make a sitter link' }).click();
+	const field = page.getByLabel('House-sitter link', { exact: true });
+	await expect(field).toHaveValue(/\/sitter\/[\w-]{32}$/);
+	const link = new URL(await field.inputValue()).pathname;
+	await expect(page.locator('.grouped-row', { hasText: `Sam ${run}` })).toContainText('1 note');
+
+	// A stranger's browser: no cookies, no account.
+	const sitterContext = await browser.newContext();
+	const sitter = await sitterContext.newPage();
+	await open(sitter, link);
+	await expect(sitter.getByRole('heading', { level: 1 })).toContainText('Looking after');
+	await expect(sitter.getByText('Feed Pickles twice a day.')).toBeVisible();
+	await expect(sitter.locator('.wifi, [class*="wifi"]').first()).toBeVisible();
+	// Only what was picked: no money, no other notes.
+	await expect(sitter.getByText('Plumber')).toHaveCount(0);
+	await expect(sitter.getByText(/owes|\$\d/)).toHaveCount(0);
+	await expect(sitter.locator('nav[aria-label="Main"]')).toHaveCount(0);
+
+	// Stopped, it ends at once.
+	await page
+		.locator('.grouped-row', { hasText: `Sam ${run}` })
+		.getByRole('button', { name: 'Stop' })
+		.click();
+	await expect(page.locator('.grouped-row', { hasText: `Sam ${run}` })).toHaveCount(0);
+	await open(sitter, link);
+	await expect(sitter.getByRole('heading', { level: 1 })).toHaveText('This link has ended');
+	await sitterContext.close();
+	expect(errors).toEqual([]);
+});

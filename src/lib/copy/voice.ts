@@ -160,6 +160,13 @@ export const PLACEHOLDERS = {
 		'Parcel’s on the doorstep',
 		'Movie night? Mean Girls or Clueless?'
 	],
+	postcard: [
+		'Greetings from our place!',
+		'The figs are finally ripe',
+		'Thinking of you. Dinner soon?',
+		'Look what we found at the markets',
+		'The cat says hi'
+	],
 	reply: [
 		'Count me in',
 		'Say something nice…',

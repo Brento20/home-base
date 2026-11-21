@@ -11,9 +11,11 @@ describe('stages', () => {
 		expect(stageFor(true, true, true)).toBe('ready');
 	});
 
-	it('opens invite links and the privacy page in every stage', () => {
+	it('opens invite, friend and sitter links and the privacy page in every stage', () => {
 		for (const stage of stages) {
 			expect(redirectFor(stage, '/join/[token]')).toBeNull();
+			expect(redirectFor(stage, '/friend/[token]')).toBeNull();
+			expect(redirectFor(stage, '/sitter/[token]')).toBeNull();
 			expect(redirectFor(stage, '/privacy')).toBeNull();
 		}
 	});

@@ -59,8 +59,12 @@
 				recipes, money, posts, photos and notes.
 			</li>
 			<li>
-				<strong>Invite links:</strong> only a scrambled fingerprint of each link, so a link can be checked
-				without being stored.
+				<strong>Friends and postcards:</strong> who your friends are, anyone you’ve blocked, and the postcards
+				you send. A postcard keeps your name and your home’s name as they were when you sent it.
+			</li>
+			<li>
+				<strong>Links:</strong> for invite, friend and house-sitter links, only a scrambled fingerprint
+				of each link, so a link can be checked without being stored.
 			</li>
 		</ul>
 		<p>There are no ads, no tracking and no analytics. Nothing is sold or shared for marketing.</p>
@@ -72,6 +76,16 @@
 			Everything in a home is visible to everyone in that home, and to no one else. Notes marked
 			secret are hidden behind dots on screen and locked (encrypted) in the database, so they can’t
 			be read from the database alone.
+		</p>
+		<p>
+			Friends see your name, colour, photo and your home’s name, and nothing in your home. A
+			postcard is seen by everyone in the home it’s sent to; anyone there can take it down or block
+			you.
+		</p>
+		<p>
+			A house-sitter link shows whoever has it a single page with only what the person who made it
+			picked: a message, chosen notes (secret ones too, if picked) and the chores. Never money. It
+			stops working at the end of its last day, or sooner if someone in the home stops it.
 		</p>
 		<p>
 			As the person running the service, Brenton can reach the database to keep it working and fix
@@ -124,6 +138,10 @@
 			<li>
 				<strong>Leave a home:</strong> Home settings › Leaving. If you’re the last one there, the home
 				and everything in it is deleted.
+			</li>
+			<li>
+				<strong>Friends:</strong> remove or block anyone from their page in You &amp; friends. Blocking
+				takes their postcards off your home’s feed and stops new ones.
 			</li>
 			<li>
 				<strong>Delete your account:</strong> email <a href="mailto:{CONTACT}">{CONTACT}</a> from the

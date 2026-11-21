@@ -6,7 +6,9 @@ import type {
 	AccountDetails,
 	Expense,
 	ExpenseGroup,
+	Blocked,
 	FeedPost,
+	Friend,
 	HomeNote,
 	Household,
 	Plan,
@@ -420,5 +422,41 @@ export const sampleFeedPosts: FeedPost[] = [
 		reactions: [],
 		replies: [],
 		plans: []
+	}
+];
+
+// Friends, postcards and blocks: one friend in another home, who has sent a postcard.
+
+export const sampleFriends: Friend[] = [
+	{
+		id: 'sample-sam',
+		name: 'Sam',
+		initials: 'S',
+		colour: '#8fb7a5',
+		avatarUrl: null,
+		homeName: 'The Terrace',
+		friendsSince: new Date(Date.now() - 40 * 86_400_000).toISOString()
+	}
+];
+
+export const sampleBlocked: Blocked[] = [];
+
+export const samplePostcards: FeedPost[] = [
+	{
+		id: 'sample-postcard-1',
+		authorId: null,
+		body: 'Greetings from The Terrace! The figs are finally ripe. Come grab a bag this weekend.',
+		photoUrl: null,
+		createdAt: new Date(Date.now() - 5 * 3_600_000).toISOString(),
+		reactions: [],
+		replies: [],
+		plans: [],
+		postcard: {
+			profileId: 'sample-sam',
+			name: 'Sam',
+			initials: 'S',
+			colour: '#8fb7a5',
+			home: 'The Terrace'
+		}
 	}
 ];

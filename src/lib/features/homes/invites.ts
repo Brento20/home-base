@@ -3,15 +3,13 @@
  * /join/[token], which carries the person through signing up and their profile, then joins
  * them. The database keeps only a hash of each token (20261124000000_invite_links.sql).
  */
+import { isLinkToken } from '#lib/link-token.js';
 
 /** How long a new link lasts, and how many people it lets in, unless the owner picks otherwise. */
 export const INVITE_DAYS = 7;
 export const INVITE_USE_CHOICES = [1, 5] as const;
 
-/** The database makes 32-character URL-safe tokens; allow some slack, refuse anything else. */
-const TOKEN = /^[A-Za-z0-9_-]{20,64}$/;
-
-export const isInviteToken = (value: string) => TOKEN.test(value);
+export const isInviteToken = isLinkToken;
 
 /**
  * The token from whatever was pasted: a whole link (from any host, so a link copied from the

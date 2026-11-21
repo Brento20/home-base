@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
-	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import ShareLink from '#lib/ui/ShareLink.svelte';
 	import { placesLeft } from '#lib/features/homes/invites.js';
 	import { formatDayLabel, todayISO } from '#lib/time.js';
 	import type { PageProps } from './$types';
@@ -17,11 +17,6 @@
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.homeSettings);
 	let busy = $state<'rename' | 'invite' | 'place' | null>(null);
-	let copied = $state(false);
-	let canShare = $state(false);
-	// Phones have a share sheet; most desktops don't. Checked after hydration so the server's
-	// page and the browser's agree.
-	onMount(() => (canShare = typeof navigator.share === 'function'));
 
 	// Time zones grouped by region for the picker: "Australia" › "Sydney".
 	const zoneGroups = $derived.by(() => {
@@ -41,7 +36,6 @@
 
 	const submitting = (which: 'rename' | 'invite') => () => {
 		busy = which;
-		copied = false;
 		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
 			await update({ reset: false });
 			busy = null;
@@ -53,23 +47,6 @@
 		const label = formatDayLabel(todayISO(new Date(instant)));
 		return label === 'Today' || label === 'Tomorrow' ? label.toLowerCase() : label;
 	};
-
-	async function copy(link: string) {
-		try {
-			await navigator.clipboard.writeText(link);
-			copied = true;
-		} catch {
-			// Clipboard refused (an old browser, or no permission): the link is selectable.
-		}
-	}
-
-	async function share(link: string) {
-		try {
-			await navigator.share({ title: `Join ${data.household.name} on home base`, url: link });
-		} catch {
-			// Closed the share sheet: nothing to do.
-		}
-	}
 </script>
 
 <svelte:head>
@@ -181,34 +158,11 @@
 				</form>
 
 				{#if form?.invite?.link}
-					<div class="new-link">
-						<input
-							class="field-input link"
-							readonly
-							value={form.invite.link}
-							aria-label="Invite link"
-							onfocus={(event) => event.currentTarget.select()}
-						/>
-						<div class="link-actions">
-							{#if canShare}
-								<button
-									class="button-secondary"
-									type="button"
-									onclick={() => share(form!.invite!.link!)}
-								>
-									<Icon name="share" size={17} /> Share
-								</button>
-							{/if}
-							<button
-								class="button-secondary"
-								type="button"
-								onclick={() => copy(form!.invite!.link!)}
-							>
-								{copied ? 'Copied' : 'Copy link'}
-							</button>
-						</div>
-						<p class="field-hint">You won’t see this link again, so send it now.</p>
-					</div>
+					<ShareLink
+						link={form.invite.link}
+						title="Join {data.household.name} on home base"
+						label="Invite link"
+					/>
 				{/if}
 			</GlassCard>
 
@@ -323,33 +277,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 14px;
-	}
-
-	.new-link {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-s);
-		margin-top: var(--space-m);
-		padding-top: var(--space-m);
-		border-top: 1px solid var(--colour-hairline);
-	}
-
-	.link {
-		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-		font-size: var(--text-small);
-	}
-
-	.link-actions {
-		display: flex;
-		gap: var(--space-s);
-	}
-
-	.link-actions > * {
-		flex: 1;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
 	}
 
 	.invite .grouped-label {

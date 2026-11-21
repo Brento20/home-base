@@ -25,8 +25,14 @@ export const isViewSwitch = (from: string, to: string) =>
 export const isTabView = (pathname: string) =>
 	TABS.some((tab) => tab.href === pathname) || TAB_VIEWS.some((views) => views.includes(pathname));
 
-/** Pages that belong to a tab without living under its path: the feed and dinner are Today's. */
-const ALSO_UNDER: Record<string, string[]> = { '/': ['/feed', '/dinner'] };
+/**
+ * Pages that belong to a tab without living under its path: the feed and dinner are Today's;
+ * your profile, friends and postcards are Home's.
+ */
+const ALSO_UNDER: Record<string, string[]> = {
+	'/': ['/feed', '/dinner'],
+	'/home': ['/profile', '/postcards']
+};
 
 /** Which tab a path belongs to, or -1 for pages outside the tab bar (sign up, setup). */
 export function tabIndexFor(pathname: string) {

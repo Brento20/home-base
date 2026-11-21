@@ -1,4 +1,5 @@
 import type { Cookies } from '@sveltejs/kit';
+import { sampleLinkToken } from '#lib/link-token.js';
 import { dbError, friendlyMessage } from '#lib/server/db.js';
 import { sampleHousehold } from '#lib/server/sample-data.js';
 import { INVITE_DAYS, INVITE_USE_CHOICES, isInviteToken } from './invites.js';
@@ -49,14 +50,6 @@ interface SampleInvite extends Invite {
 }
 const sampleInvites: SampleInvite[] = [];
 
-function sampleToken() {
-	const bytes = crypto.getRandomValues(new Uint8Array(24));
-	return btoa(String.fromCharCode(...bytes))
-		.replaceAll('+', '-')
-		.replaceAll('/', '_')
-		.replace(/=+$/, '');
-}
-
 const isLive = (invite: Invite & { revoked?: boolean }) =>
 	!invite.revoked && invite.uses < invite.maxUses && Date.parse(invite.expiresAt) > Date.now();
 
@@ -101,7 +94,7 @@ export async function createInvite(
 	const useLimit = (INVITE_USE_CHOICES as readonly number[]).includes(maxUses) ? maxUses : 1;
 
 	if (!locals.supabase) {
-		const token = sampleToken();
+		const token = sampleLinkToken();
 		sampleInvites.push({
 			id: crypto.randomUUID(),
 			token,

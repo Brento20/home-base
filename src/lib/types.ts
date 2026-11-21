@@ -225,5 +225,53 @@ export interface FeedPost {
 	reactions: { profileId: string; reaction: FeedReaction }[];
 	/** Oldest first. */
 	replies: FeedReply[];
-	plans: FeedPlanLink[];
+	plans: FeedPlanLink[]; /** Set when it's a postcard from a friend of someone here, not a post by the home. */
+	postcard?: PostcardFrom;
+}
+
+/** Who sent a postcard, as it was when they sent it. */
+export interface PostcardFrom {
+	/** Null once they've deleted their account. */
+	profileId: string | null;
+	name: string;
+	initials: string;
+	colour: string;
+	home: string;
+}
+
+/** A friend, as friends see each other: nothing of their home but its name. */
+export interface Friend {
+	id: string;
+	name: string;
+	initials: string;
+	colour: string;
+	avatarUrl: string | null;
+	/** Null when they're not in a home (so postcards can't reach them). */
+	homeName: string | null;
+	/** ISO instant. */
+	friendsSince: string;
+}
+
+/** A friend link you've made that nobody has used yet. */
+export interface FriendLink {
+	id: string;
+	createdAt: string;
+	expiresAt: string;
+}
+
+/** Someone you've blocked. */
+export interface Blocked {
+	id: string;
+	name: string;
+}
+
+/** A house-sitter link, as the home sees it (the token itself is only shown once). */
+export interface SitterLink {
+	id: string;
+	label: string;
+	message: string;
+	noteCount: number;
+	showChores: boolean;
+	createdAt: string;
+	expiresAt: string;
 }

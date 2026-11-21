@@ -162,8 +162,15 @@
 
 <ul class="grouped more" aria-label="Account">
 	<li>
-		<a class="grouped-row" href="/home/profile"
-			><span class="grouped-label">Edit your profile</span><span class="grouped-chevron"
+		<a class="grouped-row" href="/profile"
+			><span class="grouped-label">You &amp; friends</span><span class="grouped-chevron"
+				><Icon name="chevron" size={16} /></span
+			></a
+		>
+	</li>
+	<li>
+		<a class="grouped-row" href="/home/sitter"
+			><span class="grouped-label">House-sitter link</span><span class="grouped-chevron"
 				><Icon name="chevron" size={16} /></span
 			></a
 		>

@@ -48,15 +48,23 @@ async function toNote(row: NoteRow, householdId: string): Promise<HomeNote> {
 		isSecret: row.is_secret,
 		updatedAt: row.updated_at
 	};
-	if (!isSealed(row.body)) return note;
+	const { body, locked } = await readableBody(row.body, householdId);
+	return locked ? { ...note, body, locked } : { ...note, body };
+}
 
+/**
+ * A note's body as typed: opened with NOTES_KEY if it was sealed. `locked` when it was sealed
+ * with a key this server doesn't have. Also used by house-sitter pages (sitter.server.ts).
+ */
+export async function readableBody(stored: string, householdId: string) {
+	if (!isSealed(stored)) return { body: stored, locked: false };
 	const sealing = key();
-	const body = sealing ? await unseal(row.body, sealing, householdId) : null;
+	const body = sealing ? await unseal(stored, sealing, householdId) : null;
 	if (body === null) {
 		console.error('[notes] a sealed note wouldn’t open: NOTES_KEY is missing or has changed.');
-		return { ...note, body: '', locked: true };
+		return { body: '', locked: true };
 	}
-	return { ...note, body };
+	return { body, locked: false };
 }
 
 /** Seals secret notes saved before NOTES_KEY was set. Best effort: the next read tries again. */

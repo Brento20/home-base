@@ -1,25 +1,31 @@
 <script lang="ts">
 	/**
 	 * Numbers the home keeps (the plumber, the agent, the vet), each with Call and Text buttons,
-	 * as a grouped list. Tap the name to see or edit the note it came from.
+	 * as a grouped list. Tap the name to see or edit the note it came from (not on a house-sitter
+	 * page, which is read-only).
 	 */
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { Contact } from './house-info.js';
 
 	interface Props {
 		contacts: Contact[];
+		readonly?: boolean;
 	}
 
-	let { contacts }: Props = $props();
+	let { contacts, readonly = false }: Props = $props();
 </script>
 
 <ul class="contacts">
 	{#each contacts as contact (contact.key)}
 		<li>
-			<a class="who" href="/home/notes/{contact.noteId}">
+			<svelte:element
+				this={readonly ? 'span' : 'a'}
+				class="who"
+				href={readonly ? undefined : `/home/notes/${contact.noteId}`}
+			>
 				<span class="name">{contact.name}</span>
 				<span class="detail">{contact.detail ? `${contact.detail} · ` : ''}{contact.display}</span>
-			</a>
+			</svelte:element>
 			<a class="act" href="sms:{contact.dial}" aria-label="Text {contact.name}">
 				<Icon name="message" size={20} />
 			</a>

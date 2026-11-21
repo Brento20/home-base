@@ -11,9 +11,11 @@
 
 	interface Props {
 		wifi: WifiDetails;
+		/** On a house-sitter page: no link to edit the note. */
+		readonly?: boolean;
 	}
 
-	let { wifi }: Props = $props();
+	let { wifi, readonly = false }: Props = $props();
 
 	let open = $state(false);
 	let qr = $state('');
@@ -89,7 +91,7 @@
 			{/if}
 		</dl>
 
-		<a class="edit" href="/home/notes/{wifi.noteId}">Edit Wi-Fi details</a>
+		{#if !readonly}<a class="edit" href="/home/notes/{wifi.noteId}">Edit Wi-Fi details</a>{/if}
 	</div>
 </Sheet>
 

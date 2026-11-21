@@ -5,11 +5,13 @@
 	 * keeps just those fresh); scrolling near the end fetches older ones from /feed/older, a few at
 	 * a time, and adds them below. Older posts already shown are fetched again in one go whenever
 	 * the page's data changes (a reaction, a reply, the refresh), so they never go stale.
+	 * Postcards from friends come mixed in by time (listFeed) and show as PostcardCard.
 	 */
 	import { untrack } from 'svelte';
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
 	import type { FeedPost, Profile } from '#lib/types.js';
+	import PostcardCard from '#lib/features/friends/PostcardCard.svelte';
 	import PostCard from './PostCard.svelte';
 
 	interface Props {
@@ -111,7 +113,13 @@
 	{:else}
 		<ol class="posts">
 			{#each shown as post (post.id)}
-				<li in:arrive={{ y: -12 }} out:leave animate:glide><PostCard {post} {people} {me} /></li>
+				<li in:arrive={{ y: -12 }} out:leave animate:glide>
+					{#if post.postcard}
+						<PostcardCard post={{ ...post, postcard: post.postcard }} />
+					{:else}
+						<PostCard {post} {people} {me} />
+					{/if}
+				</li>
 			{/each}
 		</ol>
 

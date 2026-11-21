@@ -2,10 +2,11 @@
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/**
-	 * Writing a feed post: a message, a photo, or both. The photo is shrunk in the browser before
-	 * it's sent (and loses its location data on the way).
+	 * Writing a feed post or a postcard: a message, a photo, or both. The photo is shrunk in the
+	 * browser before it's sent (and loses its location data on the way). A postcard adds its
+	 * "To" field above (`fields`) and a note above the buttons (`footer`).
 	 */
-	import { untrack } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { shrinkPhoto } from '#lib/ui/photo.js';
@@ -15,9 +16,27 @@
 		errors?: FieldErrors<'body' | 'photo'>;
 		body?: string;
 		maxLength: number;
+		/** What the message box suggests, a different one each time it's empty. */
+		placeholders?: readonly string[];
+		/** The send button: "Post" by default. */
+		submitLabel?: string;
+		busyLabel?: string;
+		/** Extra fields above the message. */
+		fields?: Snippet;
+		/** A note or message above the buttons. */
+		footer?: Snippet;
 	}
 
-	let { errors = {}, body: startBody = '', maxLength }: Props = $props();
+	let {
+		errors = {},
+		body: startBody = '',
+		maxLength,
+		placeholders = PLACEHOLDERS.post,
+		submitLabel = 'Post',
+		busyLabel = 'Posting…',
+		fields,
+		footer
+	}: Props = $props();
 
 	// Starts from what was sent if the post bounced back with an error.
 	let body = $state(untrack(() => startBody));
@@ -71,6 +90,8 @@
 		};
 	}}
 >
+	{@render fields?.()}
+
 	<label class="field">
 		<span class="visually-hidden">Message</span>
 		<textarea
@@ -78,8 +99,8 @@
 			name="body"
 			rows="5"
 			maxlength={maxLength}
-			placeholder={PLACEHOLDERS.post[0]}
-			use:placeholderReel={PLACEHOLDERS.post}
+			placeholder={placeholders[0]}
+			use:placeholderReel={placeholders}
 			bind:value={body}
 			aria-invalid={errors.body ? 'true' : undefined}></textarea>
 		{#if nearLimit}<span class="limit">{maxLength - body.length} left</span>{/if}
@@ -98,6 +119,8 @@
 		<span class="field-error">{photoProblem ?? errors.photo}</span>
 	{/if}
 
+	{@render footer?.()}
+
 	<div class="actions">
 		<label class="button-secondary add-photo">
 			<Icon name="photo" size={20} />
@@ -111,7 +134,7 @@
 			/>
 		</label>
 		<button class="button-primary post" disabled={empty || saving || reading}>
-			{saving ? 'Posting…' : 'Post'}
+			{saving ? busyLabel : submitLabel}
 		</button>
 	</div>
 </form>
@@ -178,6 +201,7 @@
 	.add-photo {
 		position: relative;
 		display: inline-flex;
+		white-space: nowrap;
 		flex: 1;
 		align-items: center;
 		justify-content: center;

@@ -3,6 +3,8 @@ import { dbError } from '#lib/server/db.js';
 import { getHouseholdId, myId } from '#lib/features/household/household.server.js';
 import { sampleFeedPosts, samplePlans } from '#lib/server/sample-data.js';
 import type { FeedPost, FeedReaction, FieldErrors } from '#lib/types.js';
+import { listPostcards } from '#lib/features/friends/postcards.server.js';
+import { photoExtension, photoProblem, toBase64 } from './photo-rules.js';
 import { isReaction } from './reactions.js';
 
 /**
@@ -13,8 +15,6 @@ import { isReaction } from './reactions.js';
 
 export const POST_BODY_MAX = 1000;
 export const REPLY_BODY_MAX = 1000;
-const PHOTO_MAX_BYTES = 3 * 1024 * 1024;
-const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 /**
  * Today loads only the newest few posts with the page; older ones come a few at a time from
@@ -70,21 +70,32 @@ const toPost = (row: PostRow): FeedPost => ({
 /** The signed-in person's id (sample mode: the first sample person). */
 
 /**
- * The newest `limit` posts (or the `limit` before the `before` time), and whether there are
- * older ones still.
+ * The newest `limit` items (or the `limit` before the `before` time), and whether there are
+ * older ones still. Postcards from friends (src/lib/features/friends/postcards.server.ts) are
+ * mixed in by time, so the feed pages through both as one list.
  */
 export async function listFeed(
 	locals: App.Locals,
 	limit = FEED_FIRST_PAGE,
 	before?: string
 ): Promise<{ posts: FeedPost[]; hasMore: boolean }> {
+	const [own, postcards] = await Promise.all([
+		listPosts(locals, limit, before),
+		listPostcards(locals, limit, before)
+	]);
+	// Each list brought one extra, so the first `limit` of both together are the right ones.
+	const merged = [...own, ...postcards].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+	return { posts: merged.slice(0, limit), hasMore: merged.length > limit };
+}
+
+/** The home's own posts: the newest `limit`, plus one more to tell if there are older ones. */
+async function listPosts(locals: App.Locals, limit: number, before?: string): Promise<FeedPost[]> {
 	const { supabase } = locals;
-	if (!supabase) {
-		const sorted = [...sampleFeedPosts]
+	if (!supabase)
+		return [...sampleFeedPosts]
 			.filter((post) => !before || post.createdAt < before)
-			.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-		return { posts: sorted.slice(0, limit), hasMore: sorted.length > limit };
-	}
+			.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+			.slice(0, limit + 1);
 
 	let query = supabase
 		.from('feed_posts')
@@ -96,8 +107,7 @@ export async function listFeed(
 		.limit(limit + 1);
 
 	if (readError) dbError(readError);
-	const rows = (data ?? []) as unknown as PostRow[];
-	return { posts: rows.slice(0, limit).map(toPost), hasMore: rows.length > limit };
+	return ((data ?? []) as unknown as PostRow[]).map(toPost);
 }
 
 export async function getPost(locals: App.Locals, id: string): Promise<FeedPost> {
@@ -130,19 +140,11 @@ export function parsePostForm(form: FormData) {
 	const errors: FieldErrors<PostField> = {};
 
 	if (body.length > POST_BODY_MAX) errors.body = `Keep it under ${POST_BODY_MAX} characters.`;
-	if (photo && !PHOTO_TYPES.includes(photo.type)) errors.photo = 'That photo type isn’t supported.';
-	else if (photo && photo.size > PHOTO_MAX_BYTES) errors.photo = 'That photo is too big.';
+	const badPhoto = photoProblem(photo);
+	if (badPhoto) errors.photo = badPhoto;
 	if (!body && !photo) errors.body = 'Write something or add a photo.';
 
 	return { body, photo, errors, valid: Object.keys(errors).length === 0 };
-}
-
-function toBase64(bytes: Uint8Array) {
-	let binary = '';
-	for (let i = 0; i < bytes.length; i += 0x8000) {
-		binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-	}
-	return btoa(binary);
 }
 
 /** Posts a message and/or photo as the signed-in person, and returns the new post's id. */
@@ -172,9 +174,7 @@ export async function createPost(
 	const householdId = await getHouseholdId(locals);
 	let photoPath: string | null = null;
 	if (photo) {
-		const extension =
-			photo.type === 'image/png' ? 'png' : photo.type === 'image/webp' ? 'webp' : 'jpg';
-		const path = `${householdId}/${id}.${extension}`;
+		const path = `${householdId}/${id}.${photoExtension(photo.type)}`;
 		const { error: uploadError } = await supabase.storage
 			.from('feed-photos')
 			.upload(path, photo, { contentType: photo.type, upsert: false });

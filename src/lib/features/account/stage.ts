@@ -27,11 +27,14 @@ export function redirectFor(stage: Stage, routeId: string | null): string | null
 	// Sign up, sign in and the landing page are only for people who are signed out.
 	if (routeId.startsWith('/(public)')) return stage === 'signed-out' ? null : stageHome[stage];
 
-	// Email links, invite links, the privacy page and signing out work in any stage. An invite link says what to
-	// do next for the stage you're in (src/routes/join/[token]).
+	// Email links, invite, friend and house-sitter links, the privacy page and signing out work in
+	// any stage. Invite and friend links say what to do next for the stage you're in
+	// (src/routes/join/[token], src/routes/friend/[token]); a sitter page needs no account at all.
 	if (
 		routeId.startsWith('/auth/') ||
 		routeId.startsWith('/join/') ||
+		routeId.startsWith('/friend/') ||
+		routeId.startsWith('/sitter/') ||
 		routeId === '/privacy' ||
 		routeId === '/logout'
 	)
