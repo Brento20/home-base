@@ -38,7 +38,7 @@
 		</span>
 		<span class="people" aria-label="{members.length} people">
 			{#each members.slice(0, 4) as person, index (person.id)}
-				<span class="stacked" style:z-index={4 - index}><Avatar {person} size={26} /></span>
+				<span class="stacked" style:z-index={4 - index}><Avatar {person} size={30} ring /></span>
 			{/each}
 		</span>
 		<Icon name="chevron" size={18} />
@@ -103,11 +103,12 @@
 		position: relative;
 		display: flex;
 		border-radius: 50%;
-		box-shadow: 0 0 0 2px var(--colour-ground);
+		/* Cuts each ring clear of the face it overlaps. */
+		box-shadow: 0 0 0 4.5px var(--colour-ground);
 	}
 
 	.stacked:not(:first-child) {
-		margin-left: -8px;
+		margin-left: -4px;
 	}
 
 	.body > :global(.icon) {

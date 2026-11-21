@@ -4,6 +4,7 @@
 	import '#lib/styles/base.css';
 	import '#lib/styles/forms.css';
 	import '#lib/styles/ai.css';
+	import '#lib/styles/grouped.css';
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { markHydrated } from '#lib/copy/pick.js';

@@ -3,6 +3,7 @@
 	 * Compare mode: each category's spending in two date ranges, side by side, with how much it
 	 * went up or down. Range A is grey and range B is blue, named in the legend above.
 	 */
+	import { reveal } from '#lib/ui/reveal.js';
 	import { formatMoney } from './money.js';
 	import { describeChange, type CategoryChange } from './report.js';
 
@@ -25,8 +26,8 @@
 	<span><span class="key b"></span>{bLabel}</span>
 </div>
 
-<ul class="rows">
-	{#each categories as category (category.key)}
+<ul class="rows" use:reveal>
+	{#each categories as category, index (category.key)}
 		{@const isSelected = selected === category.key}
 		<li class:dim={selected !== null && !isSelected}>
 			<a
@@ -48,11 +49,13 @@
 				</span>
 				<span class="pair">
 					<span class="track"
-						><span class="fill a" style:width="{width(category.aCents)}%"></span></span
+						><span class="fill a" style:width="{width(category.aCents)}%" style:--i={index}
+						></span></span
 					>
 					<span class="amount">{formatMoney(category.aCents)}</span>
 					<span class="track"
-						><span class="fill b" style:width="{width(category.bCents)}%"></span></span
+						><span class="fill b" style:width="{width(category.bCents)}%" style:--i={index}
+						></span></span
 					>
 					<span class="amount">{formatMoney(category.bCents)}</span>
 				</span>
@@ -172,5 +175,22 @@
 		font-variant-numeric: tabular-nums;
 		color: var(--colour-text-muted);
 		text-align: right;
+	}
+
+	/* The bars grow from the left when the list comes into view. */
+	.fill {
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 800ms var(--spring-soft) calc(var(--i) * 60ms);
+	}
+
+	.rows:global(.shown) .fill {
+		transform: scaleX(1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fill {
+			transition: none;
+		}
 	}
 </style>

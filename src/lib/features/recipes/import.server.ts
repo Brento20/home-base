@@ -10,7 +10,14 @@
  * `sourceNote` records which fields were estimated, for the recipe's "About these numbers".
  */
 import { askForJson, imageBlock, textBlock } from '#lib/server/ai.js';
-import { BLANK_RECIPE_FORM, PROTEIN_OPTIONS, type RecipeFormValues } from './recipe.js';
+import {
+	BLANK_RECIPE_FORM,
+	ingredientLine,
+	parseIngredientLine,
+	PROTEIN_OPTIONS,
+	type Ingredient,
+	type RecipeFormValues
+} from './recipe.js';
 import {
 	clampServes,
 	fetchPage,
@@ -27,6 +34,28 @@ import {
 
 // Claude ----------------------------------------------------------------------------------------
 
+/** One ingredient, field by field, so amounts can't run into names ("80 -100g" → "-100g"). */
+interface AiIngredient {
+	/** 0 when there's no amount ("to taste"). The low end of a range. */
+	amount: number;
+	/** The high end of a range ("80–100 g" is 100); 0 when it's one amount. */
+	amountMax: number;
+	unit: (typeof AI_UNITS)[number];
+	name: string;
+	prep: string;
+}
+
+interface AiNutrition {
+	energyKj: number;
+	proteinG: number;
+	carbsG: number;
+	fatG: number;
+	sugarsG: number;
+	fibreG: number;
+}
+
+const AI_UNITS = ['g', 'kg', 'ml', 'L', 'tsp', 'tbsp', 'cup', 'none'] as const;
+
 interface AiRecipe {
 	isRecipe: boolean;
 	title: string;
@@ -38,20 +67,41 @@ interface AiRecipe {
 	vegetarian: boolean;
 	vegan: boolean;
 	proteins: string[];
-	ingredients: string[];
+	ingredients: AiIngredient[];
 	steps: string[];
 	notes: string;
-	energyKj: number;
-	proteinG: number;
-	carbsG: number;
-	fatG: number;
-	sugarsG: number;
-	fibreG: number;
+	/** Per serve. */
+	nutrition: AiNutrition;
 	/** Which fields were estimated rather than taken from the recipe. */
 	estimated: Estimate[];
 }
 
 const number = { type: 'number' };
+const NUTRITION_SCHEMA = {
+	type: 'object',
+	additionalProperties: false,
+	required: ['energyKj', 'proteinG', 'carbsG', 'fatG', 'sugarsG', 'fibreG'],
+	properties: {
+		energyKj: number,
+		proteinG: number,
+		carbsG: number,
+		fatG: number,
+		sugarsG: number,
+		fibreG: number
+	}
+};
+const INGREDIENT_SCHEMA = {
+	type: 'object',
+	additionalProperties: false,
+	required: ['amount', 'amountMax', 'unit', 'name', 'prep'],
+	properties: {
+		amount: number,
+		amountMax: number,
+		unit: { type: 'string', enum: [...AI_UNITS] },
+		name: { type: 'string' },
+		prep: { type: 'string' }
+	}
+};
 const RECIPE_SCHEMA = {
 	type: 'object',
 	additionalProperties: false,
@@ -69,12 +119,7 @@ const RECIPE_SCHEMA = {
 		'ingredients',
 		'steps',
 		'notes',
-		'energyKj',
-		'proteinG',
-		'carbsG',
-		'fatG',
-		'sugarsG',
-		'fibreG',
+		'nutrition',
 		'estimated'
 	],
 	properties: {
@@ -88,15 +133,10 @@ const RECIPE_SCHEMA = {
 		vegetarian: { type: 'boolean' },
 		vegan: { type: 'boolean' },
 		proteins: { type: 'array', items: { type: 'string', enum: [...PROTEIN_OPTIONS] } },
-		ingredients: { type: 'array', items: { type: 'string' } },
+		ingredients: { type: 'array', items: INGREDIENT_SCHEMA },
 		steps: { type: 'array', items: { type: 'string' } },
 		notes: { type: 'string' },
-		energyKj: number,
-		proteinG: number,
-		carbsG: number,
-		fatG: number,
-		sugarsG: number,
-		fibreG: number,
+		nutrition: NUTRITION_SCHEMA,
 		estimated: { type: 'array', items: { type: 'string', enum: [...ESTIMATES] } }
 	}
 };
@@ -131,12 +171,14 @@ vegetarian, vegan: from the ingredients. No meat, poultry, seafood, gelatine, or
 
 proteins: the main proteins in the dish, from the list. Butter, a splash of milk or a sprinkle of cheese isn't "dairy", and fish sauce isn't "fish".
 
-ingredients: every ingredient, one per line, in the recipe's order, for the serves above, written as "amount unit name, prep note":
-- "1.25 kg chicken wings, cut into drumettes and wingettes", "50 g unsalted butter", "2 garlic cloves, crushed", "1.5 tsp brown sugar, firmly packed", "Salt and pepper, to taste".
-- Units: only g, kg, ml, L, tsp, tbsp or cup; things you count have no unit ("2 eggs", "1 brown onion, diced"). Decimals, not fractions.
-- Metric only: where both are given, keep the metric and drop the imperial; convert lb, oz, fl oz and °F.
-- The name is the ingredient a shopper looks for ("coriander", "cooking salt"); size, colour or type can come first ("large eggs", "dried thyme"). Everything else (cutting, packing, substitutes, "or parsley", "for garnish", "optional") goes after the comma, briefly.
-- No brackets, brand names, "Note 1" or "see notes" pointers, links or HTML.
+ingredients: every ingredient, in the recipe's order, for the serves above. Each one is separate fields; never put an amount or unit in the name:
+- amount: the number, as a decimal (1.5, not 1 ½; 0.25, not ¼). 0 if there's no amount ("salt, to taste", "oil, for frying").
+- amountMax: for a range, the high end, with amount as the low end: "80–100 g noodles" is amount 80, amountMax 100, unit "g"; "2–3 garlic cloves" is 2 and 3. 0 when it's one amount.
+- unit: g, kg, ml, L, tsp, tbsp or cup; "none" for things you count ("2 eggs", "1 brown onion") and for no amount. Metric only: where both are given keep the metric; convert lb, oz and fl oz (1 oz = 28 g, 1 lb = 450 g, 1 fl oz = 30 ml). A stick of butter is 113 g.
+- "2 × 400 g tins diced tomatoes" is amount 2, unit "none", name "400 g tins diced tomatoes".
+- name: what a shopper looks for, in sentence case ("Coriander", "Unsalted butter", "Large eggs", "Dried rice noodles"). Size, colour or type can come first.
+- prep: everything else, briefly (cutting, packing, substitutes, "or parsley", "for garnish", "optional", "to taste"); "" if none.
+- No brackets, brand names, "Note 1" or "see notes" pointers, links or HTML anywhere.
 - If the ingredients come in groups (a spice mix, a sauce), keep them in order; the steps say which group is used when.
 
 steps: the full method, one step per line, no numbering.
@@ -148,27 +190,105 @@ steps: the full method, one step per line, no numbering.
 
 notes: one to three short, practical tips from the recipe or its notes, in your own words: what matters most (like "Don't crowd the tray or the wings won't brown"), a key swap or a make-ahead tip. Under 300 characters. "" if there's nothing useful.
 
-energyKj, proteinG, carbsG, fatG, sugarsG, fibreG: per serve. Copy them if the recipe states nutrition (Calories × 4.184 is kJ). If it doesn't, estimate them from the ingredients and amounts divided by serves, using typical Australian food composition values (like FSANZ's AUSNUT data): energy to the nearest 10 kJ, grams to one decimal. Count what's eaten, not what's discarded (bones, marinade left behind, deep-frying oil mostly).
+nutrition: per serve, always filled in, never 0 for a real dish.
+- If the recipe states nutrition, copy it (Calories × 4.184 is kJ; a stated per-recipe figure is divided by serves).
+- Otherwise estimate it: work out each ingredient's contribution from its amount (the middle of a range) using typical Australian food composition values (like FSANZ's AUSNUT data), add them up and divide by serves. Count what's eaten, not what's discarded (bones, marinade left behind, most deep-frying oil).
+- energyKj to the nearest 10; grams to one decimal. Check the energy roughly matches the macros (protein and carbs 17 kJ per gram, fat 37, fibre 8).
 
 estimated: list every field you estimated or judged rather than read from the recipe: "nutrition", "prepTime", "cookTime", "restTime", "cuisine", "proteins". Leave a field out if the recipe states it (a stated rest of none counts as stated). An empty list means everything came straight from the recipe.
 
 Never invent ingredients or steps that aren't in the recipe.`;
 
-function valuesFromAi(recipe: AiRecipe | null, from: string): RecipeFormValues | null {
+/**
+ * An AI ingredient back into the cookbook's own line, checked by reading it the way the form
+ * will on save: a line that doesn't come back as the same ingredient is dropped.
+ */
+function ingredientFromAi(item: AiIngredient): Ingredient | null {
+	const name = item.name.replace(/[()]/g, '').replace(/\s+/g, ' ').trim();
+	if (!name) return null;
+	const amount = Number.isFinite(item.amount) && item.amount > 0 ? item.amount : null;
+	const big = item.unit === 'kg' || item.unit === 'L' ? 1000 : 1;
+	const unit =
+		amount === null
+			? null
+			: item.unit === 'kg'
+				? 'g'
+				: item.unit === 'L'
+					? 'ml'
+					: item.unit === 'none'
+						? 'each'
+						: item.unit;
+	const max = amount !== null && item.amountMax > amount ? item.amountMax * big : null;
+	const ingredient: Ingredient = {
+		name: name.charAt(0).toUpperCase() + name.slice(1),
+		quantity: amount === null ? null : amount * big,
+		quantityMax: max,
+		unit,
+		prepNote: item.prep.replace(/[()]/g, '').trim() || null
+	};
+	// Round-trip through the form's own reader, so what's saved is exactly what was filled.
+	return parseIngredientLine(ingredientLine(ingredient));
+}
+
+/**
+ * Nutrition per serve, tidied: nothing negative, energy in a believable range, and energy
+ * worked out from the macros when it's missing or (for an estimate) doesn't add up.
+ */
+function tidyNutrition(raw: AiNutrition | null | undefined, estimated: boolean) {
+	if (!raw) return null;
+	const grams = (value: number) =>
+		Number.isFinite(value) && value > 0 ? Math.round(value * 10) / 10 : 0;
+	const proteinG = grams(raw.proteinG);
+	const carbsG = grams(raw.carbsG);
+	const fatG = grams(raw.fatG);
+	const fibreG = grams(raw.fibreG);
+	const sugarsG = Math.min(grams(raw.sugarsG), carbsG || Infinity);
+	const fromMacros = Math.round((proteinG * 17 + carbsG * 17 + fatG * 37 + fibreG * 8) / 10) * 10;
+	let energyKj = Number.isFinite(raw.energyKj) && raw.energyKj > 0 ? Math.round(raw.energyKj) : 0;
+	if (!energyKj || (estimated && fromMacros && Math.abs(energyKj - fromMacros) / fromMacros > 0.3))
+		energyKj = fromMacros;
+	// Under 100 kJ or over 10,000 kJ a serve isn't a main meal: a misreading.
+	if (energyKj < 100 || energyKj > 10_000) return null;
+	return { energyKj, proteinG, carbsG, fatG, sugarsG, fibreG };
+}
+
+function nutritionFields(nutrition: ReturnType<typeof tidyNutrition>) {
+	const amount = (value: number) => (value > 0 ? String(value) : '0');
+	return nutrition
+		? {
+				energyKj: String(nutrition.energyKj),
+				proteinG: amount(nutrition.proteinG),
+				carbsG: amount(nutrition.carbsG),
+				fatG: amount(nutrition.fatG),
+				sugarsG: amount(nutrition.sugarsG),
+				fibreG: amount(nutrition.fibreG)
+			}
+		: { energyKj: '', proteinG: '', carbsG: '', fatG: '', sugarsG: '', fibreG: '' };
+}
+
+/** A filled form and which of its fields were estimated (for "About these numbers"). */
+interface Read {
+	values: RecipeFormValues;
+	estimated: Estimate[];
+}
+
+function valuesFromAi(recipe: AiRecipe | null): Read | null {
 	if (!recipe?.isRecipe) return null;
-	const ingredients = recipe.ingredients.map((line) => line.trim()).filter(Boolean);
+	const ingredients = recipe.ingredients
+		.map(ingredientFromAi)
+		.filter((ingredient): ingredient is Ingredient => ingredient !== null);
 	const steps = recipe.steps.map((line) => line.trim()).filter(Boolean);
 	if (!recipe.title.trim() || ingredients.length === 0 || steps.length === 0) return null;
 
-	const amount = (value: number) => (value > 0 ? String(Math.round(value * 10) / 10) : '');
 	// A day at most: anything longer is a misreading.
 	const minutes = (value: number) => (value > 0 ? String(Math.min(1440, Math.round(value))) : '');
-	const hasNutrition = recipe.energyKj > 0 && recipe.proteinG > 0;
+	const estimatedNutrition = recipe.estimated.includes('nutrition');
+	const nutrition = tidyNutrition(recipe.nutrition, estimatedNutrition);
 	const proteins = recipe.proteins.filter((protein) =>
 		(PROTEIN_OPTIONS as readonly string[]).includes(protein)
 	);
 
-	return {
+	const values: RecipeFormValues = {
 		...BLANK_RECIPE_FORM,
 		title: recipe.title.trim().slice(0, 120),
 		baseServings: clampServes(recipe.serves),
@@ -179,35 +299,57 @@ function valuesFromAi(recipe: AiRecipe | null, from: string): RecipeFormValues |
 		isVegetarian: recipe.vegetarian || recipe.vegan,
 		isVegan: recipe.vegan,
 		proteins: [...new Set(proteins)],
-		ingredients: ingredients.slice(0, 60).join('\n'),
+		ingredients: ingredients.slice(0, 60).map(ingredientLine).join('\n'),
 		steps: steps.slice(0, 40).join('\n'),
 		notes: recipe.notes.trim().slice(0, 1000),
-		energyKj: hasNutrition ? String(Math.round(recipe.energyKj)) : '',
-		proteinG: hasNutrition ? amount(recipe.proteinG) : '',
-		carbsG: hasNutrition ? amount(recipe.carbsG) : '',
-		fatG: hasNutrition ? amount(recipe.fatG) : '',
-		sugarsG: hasNutrition ? amount(recipe.sugarsG) : '',
-		fibreG: hasNutrition ? amount(recipe.fibreG) : '',
-		sourceNote: sourceNote(
-			from,
-			recipe.estimated.filter((field) => field !== 'nutrition' || hasNutrition)
-		)
+		...nutritionFields(nutrition)
 	};
+	return {
+		values,
+		estimated: recipe.estimated.filter((field) => field !== 'nutrition' || nutrition)
+	};
+}
+
+const NUTRITION_SYSTEM = `You estimate nutrition per serve for a home recipe, from its ingredients and the number of serves. Work out each ingredient's contribution from its amount (the middle of a range) using typical Australian food composition values (like FSANZ's AUSNUT data), add them up and divide by serves. Count what's eaten, not what's discarded (bones, marinade left behind, most deep-frying oil). Energy to the nearest 10 kJ; grams to one decimal. Check the energy roughly matches the macros (protein and carbs 17 kJ per gram, fat 37, fibre 8). Never answer 0 for a real dish.`;
+
+/**
+ * The last step of every import: nutrition filled in if it's still missing (a short second ask
+ * from the ingredient lines alone, so it's there even when the page had none or the first ask
+ * failed), then the "About these numbers" note saying where it all came from.
+ */
+async function finish(read: Read, from: string): Promise<RecipeFormValues> {
+	let { values, estimated } = read;
+	if (!values.energyKj && values.ingredients.trim()) {
+		const answer = await askForJson<AiNutrition>({
+			system: NUTRITION_SYSTEM,
+			content: `Serves ${values.baseServings}.\nIngredients:\n${values.ingredients}`,
+			schema: NUTRITION_SCHEMA,
+			maxTokens: 400,
+			timeoutMs: 20_000
+		});
+		const nutrition = tidyNutrition(answer, true);
+		if (nutrition) {
+			values = { ...values, ...nutritionFields(nutrition) };
+			estimated = [...new Set([...estimated, 'nutrition' as const])];
+		}
+	}
+	return { ...values, sourceNote: sourceNote(from, estimated) };
 }
 
 const askAboutText = async (text: string) =>
 	valuesFromAi(
 		await askForJson<AiRecipe>({
+			model: 'sharp',
 			system: SYSTEM,
 			content: `Here's the recipe:\n\n${text.slice(0, TEXT_MAX_CHARS)}`,
 			schema: RECIPE_SCHEMA,
-			maxTokens: 4000
-		}),
-		'Read from pasted text'
+			maxTokens: 6000,
+			timeoutMs: 60_000
+		})
 	);
 
 /** A recipe page: the tidied structured data (if any) plus the card's text, read together. */
-async function askAboutPage(draft: RecipeFormValues | null, text: string, from: string) {
+async function askAboutPage(draft: RecipeFormValues | null, text: string) {
 	const structured = draft
 		? `STRUCTURED RECIPE DATA (tidied):\n${JSON.stringify(
 				{
@@ -233,13 +375,13 @@ async function askAboutPage(draft: RecipeFormValues | null, text: string, from: 
 		: '';
 	return valuesFromAi(
 		await askForJson<AiRecipe>({
+			model: 'sharp',
 			system: SYSTEM,
 			content: `${structured}PAGE TEXT:\n${text}`,
 			schema: RECIPE_SCHEMA,
-			maxTokens: 4000,
-			timeoutMs: 40_000
-		}),
-		from
+			maxTokens: 6000,
+			timeoutMs: 60_000
+		})
 	);
 }
 
@@ -254,18 +396,19 @@ export async function importRecipe(
 	const photo = await imageBlock(form.get('photo'));
 
 	if (photo) {
-		const values = valuesFromAi(
+		const read = valuesFromAi(
 			await askForJson<AiRecipe>({
 				model: 'sharp',
 				system: SYSTEM,
 				content: [photo, textBlock(text || 'Read the recipe in this photo.')],
 				schema: RECIPE_SCHEMA,
-				maxTokens: 4000,
-				timeoutMs: 45_000
-			}),
-			'Read from a photo of the recipe'
+				maxTokens: 6000,
+				timeoutMs: 60_000
+			})
 		);
-		return values ? { values, source: 'photo' } : null;
+		return read
+			? { values: await finish(read, 'Read from a photo of the recipe'), source: 'photo' }
+			: null;
 	}
 
 	const link = linkIn(text);
@@ -276,13 +419,13 @@ export async function importRecipe(
 		// the recipe card to tidy the wording and estimate what it lacks (often times, nutrition).
 		const from = `Imported from ${link.hostname.replace(/^www\./, '')}`;
 		const data = findRecipeData(html);
-		const parsed = data ? valuesFromRecipeData(data) : null;
-		const draft = parsed && { ...parsed, sourceNote: sourceNote(from, []) };
-		const values = (await askAboutPage(draft, pageText(html), from)) ?? draft;
-		return values ? { values, source: 'link' } : null;
+		const draft = data ? valuesFromRecipeData(data) : null;
+		const read =
+			(await askAboutPage(draft, pageText(html))) ?? (draft && { values: draft, estimated: [] });
+		return read ? { values: await finish(read, from), source: 'link' } : null;
 	}
 
 	if (text.length < 20) return null;
-	const values = await askAboutText(text);
-	return values ? { values, source: 'text' } : null;
+	const read = await askAboutText(text);
+	return read ? { values: await finish(read, 'Read from pasted text'), source: 'text' } : null;
 }

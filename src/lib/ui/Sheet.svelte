@@ -76,7 +76,7 @@
 	}
 
 	.sheet::backdrop {
-		background: rgb(4 3 3 / 0.55);
+		background: var(--surface-scrim);
 		animation: dim-in 260ms var(--ease-out);
 	}
 
@@ -86,10 +86,10 @@
 		overscroll-behavior: contain;
 		padding: 18px var(--page-gutter) calc(env(safe-area-inset-bottom) + 22px);
 		border-radius: 30px 30px 0 0;
-		background: linear-gradient(180deg, rgb(34 27 23), rgb(20 16 13));
+		background: var(--surface-sheet);
 		box-shadow:
-			inset 0 1px 0 rgb(255 255 255 / 0.12),
-			0 -20px 60px -20px rgb(0 0 0 / 0.8);
+			inset 0 1px 0 var(--edge-light),
+			0 -20px 60px -20px var(--shadow-colour);
 		animation: sheet-in 380ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
@@ -123,7 +123,7 @@
 		margin-right: -10px;
 		border: 0;
 		border-radius: 50%;
-		background: rgb(255 255 255 / 0.06);
+		background: var(--colour-fill);
 		color: var(--colour-text-muted);
 	}
 

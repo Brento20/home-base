@@ -18,7 +18,7 @@
 	<a class="tile dinner" class:on={tonight} href="/dinner">
 		<GlassSurface radius={24} squish />
 		<span class="tile-body">
-			<span class="icon"><Icon name="dinner" size={24} /></span>
+			<span class="icon"><Icon name="dinner" size={22} /></span>
 			<span>
 				<span class="label">Plan dinner</span>
 				<span class="state">{tonight ? `Tonight: ${tonight}` : 'What’s cooking?'}</span>
@@ -29,7 +29,7 @@
 	<a class="tile compose" href="/feed/new">
 		<GlassSurface radius={24} squish />
 		<span class="tile-body">
-			<span class="icon"><Icon name="compose" size={24} /></span>
+			<span class="icon"><Icon name="compose" size={22} /></span>
 			<span>
 				<span class="label">Post update</span>
 				<span class="state">Share with home</span>
@@ -50,7 +50,7 @@
 		display: block;
 		color: inherit;
 		text-decoration: none;
-		height: 108px;
+		height: 64px;
 		padding: 0;
 		border: 0;
 		border-radius: var(--radius-tile);
@@ -65,35 +65,46 @@
 		position: relative;
 		z-index: 1;
 		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
+		align-items: center;
+		gap: 12px;
 		height: 100%;
-		padding: 16px 18px;
+		padding: 0 14px;
 		border-radius: inherit;
 		box-shadow: inset 0 0 0 1px var(--colour-hairline);
 		transition: background-color var(--duration-settle) var(--ease-out);
 	}
 
 	.tile:global([data-pressed]) .tile-body {
-		background-color: rgb(255 255 255 / 0.04);
+		background-color: var(--colour-press);
 	}
 
 	.on {
-		box-shadow: 0 14px 40px -14px rgb(240 140 60 / 0.6);
+		box-shadow: 0 14px 40px -14px color-mix(in srgb, var(--colour-accent) 55%, transparent);
 	}
 
 	.on .tile-body {
-		background: linear-gradient(160deg, rgb(246 170 104 / 0.3), rgb(246 170 104 / 0.1));
-		box-shadow: inset 0 0 0 1px rgb(255 190 140 / 0.32);
+		background: linear-gradient(
+			160deg,
+			color-mix(in srgb, var(--colour-accent) 30%, transparent),
+			color-mix(in srgb, var(--colour-accent) 10%, transparent)
+		);
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--colour-accent) 34%, transparent);
 	}
 
+	/* Icon on the left, words beside it: the compact shape of an iOS Control Centre tile. */
 	.icon {
+		display: grid;
+		flex: none;
 		color: var(--colour-text-muted);
+	}
+
+	.tile-body > span:last-child {
+		min-width: 0;
 	}
 
 	.dinner .icon,
 	.compose .icon {
-		color: #f6b37a;
+		color: var(--colour-accent);
 	}
 
 	.label {

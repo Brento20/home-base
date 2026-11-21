@@ -5,7 +5,7 @@
 	 * calendar or use the arrows to change month.
 	 */
 	import { fly } from 'svelte/transition';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { formatDayLabel, formatLongDate, formatTimeOfDay } from '#lib/time.js';
@@ -17,17 +17,40 @@
 		month: string;
 		plans: Plan[];
 		dinners: Task[];
+		/** The month's plans and dinners are on their way. */
+		loading?: boolean;
+		/** They couldn't be fetched. */
+		failed?: boolean;
 		people: Profile[];
 		today: string;
 		now: string;
 	}
 
-	let { month, plans, dinners, people, today, now }: Props = $props();
+	let {
+		month: loadedMonth,
+		plans,
+		dinners,
+		loading = false,
+		failed = false,
+		people,
+		today,
+		now
+	}: Props = $props();
+
+	// The month you asked for shows the moment you ask (a swipe, an arrow, Today), before the
+	// page has finished moving there; its plans and dinners fade in when they arrive. Entries
+	// always belong to the loaded month, so while another is showing they're held back.
+	let asked = $state<string | null>(null);
+	const month = $derived(asked ?? loadedMonth);
+	const waiting = $derived(loading || month !== loadedMonth);
+	afterNavigate(() => (asked = null));
 
 	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 	const weeks = $derived(monthGrid(month));
-	const byDate = $derived(entriesByDate(plans, dinners));
+	const byDate = $derived(
+		waiting ? (new Map() as ReturnType<typeof entriesByDate>) : entriesByDate(plans, dinners)
+	);
 	const shownDates = $derived(new Set(weeks.flat().map((day) => day.date)));
 
 	// The day you tapped, or today when it's on screen, or the 1st.
@@ -83,8 +106,21 @@
 		typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	function changeMonth(step: 1 | -1) {
+		goToMonth(shiftMonth(month, step), step);
+	}
+
+	/** Shows a month straight away, then moves the page there (replacing, so Back leaves). */
+	function goToMonth(target: string, step: 1 | -1) {
 		direction = step;
-		goto(monthHref(shiftMonth(month, step)), { replace: true, reset: false });
+		asked = target === loadedMonth ? null : target;
+		goto(monthHref(target), { replace: true, reset: false });
+	}
+
+	/** The arrows and Today are real links (new tab, no script); a tap goes the quick way. */
+	function follow(event: MouseEvent, target: string, step: 1 | -1) {
+		if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+		event.preventDefault();
+		goToMonth(target, step);
 	}
 
 	// A sideways swipe on the calendar changes month (an up-and-down one still scrolls).
@@ -116,7 +152,8 @@
 					href={monthHref(monthOf(today))}
 					data-sveltekit-replacestate
 					data-sveltekit-reset="false"
-					onclick={() => (direction = monthOf(today) > month ? 1 : -1)}>Today</a
+					onclick={(event) => follow(event, monthOf(today), monthOf(today) > month ? 1 : -1)}
+					>Today</a
 				>
 			{/if}
 			<a
@@ -125,7 +162,7 @@
 				aria-label="Previous month"
 				data-sveltekit-replacestate
 				data-sveltekit-reset="false"
-				onclick={() => (direction = -1)}
+				onclick={(event) => follow(event, shiftMonth(month, -1), -1)}
 			>
 				<Icon name="back" size={20} />
 			</a>
@@ -135,7 +172,7 @@
 				aria-label="Next month"
 				data-sveltekit-replacestate
 				data-sveltekit-reset="false"
-				onclick={() => (direction = 1)}
+				onclick={(event) => follow(event, shiftMonth(month, 1), 1)}
 			>
 				<Icon name="chevron" size={20} />
 			</a>
@@ -147,6 +184,7 @@
 		class="grid-card"
 		role="group"
 		aria-label="{monthLabel(month, today)} calendar"
+		aria-busy={waiting}
 		data-gesture-ignore
 		ontouchstart={onTouchStart}
 		ontouchend={onTouchEnd}
@@ -159,7 +197,9 @@
 				in:fly={{ x: reduceMotion ? 0 : direction * 36, duration: reduceMotion ? 0 : 260 }}
 			>
 				<div class="weekdays" aria-hidden="true">
-					{#each WEEKDAYS as name (name)}<span>{name.slice(0, 1)}</span>{/each}
+					{#each WEEKDAYS as name, index (name)}<span class:weekend={index >= 5}
+							>{name.slice(0, 1)}</span
+						>{/each}
 				</div>
 				{#each weeks as week (week[0].date)}
 					<div class="week">
@@ -220,6 +260,10 @@
 					{/if}
 				{/each}
 			</ul>
+		{:else if waiting}
+			<p class="nothing" aria-busy="true">Looking…</p>
+		{:else if failed}
+			<p class="nothing">Couldn’t load this month. Pull down to try again.</p>
 		{:else}
 			<p class="nothing">
 				Nothing on.
@@ -300,11 +344,26 @@
 		grid-template-columns: repeat(7, 1fr);
 	}
 
+	/*
+	 * The day letters read as a header, not as dates (as in the iPhone's Calendar): small, bold,
+	 * spaced initials in the secondary colour, on their own band above a hairline. Weekends
+	 * are a step quieter.
+	 */
+	.weekdays {
+		margin-bottom: 6px;
+		padding-bottom: 8px;
+		box-shadow: inset 0 -1px 0 var(--colour-hairline);
+	}
+
 	.weekdays span {
-		padding-bottom: 6px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
+		font-size: 0.6875rem;
+		font-weight: var(--weight-strong);
+		letter-spacing: 0.06em;
 		text-align: center;
+		color: var(--colour-text-muted);
+	}
+
+	.weekdays .weekend {
 		color: var(--colour-text-faint);
 	}
 
@@ -329,7 +388,7 @@
 		width: 32px;
 		height: 32px;
 		border-radius: 50%;
-		font-size: var(--text-small);
+		font-size: var(--text-body);
 		font-variant-numeric: tabular-nums;
 		transition: background var(--duration-quick) var(--ease-out);
 	}
@@ -368,6 +427,21 @@
 		height: 5px;
 		border-radius: 50%;
 		background: var(--colour-accent);
+		/* Dots arrive after their month (they stream in): fade them in rather than pop. */
+		animation: dot-in 220ms ease-out both;
+	}
+
+	@keyframes dot-in {
+		from {
+			opacity: 0;
+			scale: 0.4;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dot {
+			animation: none;
+		}
 	}
 
 	.dot.dinner {
@@ -429,7 +503,7 @@
 	}
 
 	.dinner-card:global([data-pressed]) .body {
-		background-color: rgb(255 255 255 / 0.04);
+		background-color: var(--colour-press);
 	}
 
 	.when {

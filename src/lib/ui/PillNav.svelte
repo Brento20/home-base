@@ -73,11 +73,10 @@
 		left: var(--inset);
 		width: calc((100% - 2 * var(--inset)) / var(--count));
 		border-radius: var(--radius-pill);
-		background: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.06));
+		background: var(--pill-on);
 		box-shadow:
-			inset 0 1px 0 rgb(255 255 255 / 0.22),
-			inset 0 0 0 1px rgb(255 255 255 / 0.08),
-			0 6px 16px -8px rgb(0 0 0 / 0.6);
+			var(--pill-on-edge),
+			0 6px 16px -8px var(--shadow-colour);
 		transform: translateX(calc(var(--at) * 100%));
 		transition: transform 440ms var(--spring-soft);
 	}

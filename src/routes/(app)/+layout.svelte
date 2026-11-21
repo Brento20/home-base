@@ -1,15 +1,30 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
 	import AppGestures from '#lib/ui/AppGestures.svelte';
 	import TabBar from '#lib/ui/TabBar.svelte';
 	import { drift } from '#lib/ui/backdrop-drift.js';
 	import { startLiveRefresh } from '#lib/ui/live-refresh.js';
+	import { setHomeSettings } from '#lib/home.js';
 	import type { LayoutProps } from './$types';
 
-	let { children }: LayoutProps = $props();
+	let { data, children }: LayoutProps = $props();
 
-	// Picks up what other phones changed: on return to the app, and every 20 seconds.
-	onMount(() => startLiveRefresh());
+	// Dates and money on this phone follow the home's time zone and currency, set before any
+	// page below renders (so hydration matches the server), and again if they're changed.
+	untrack(() => setHomeSettings(data.home));
+	$effect.pre(() => setHomeSettings(data.home));
+
+	// Picks up what other phones changed: everything on return to the app, and Today every minute.
+	// Navigations tell the refresher the page is fresh, so it doesn't reload it straight away.
+	let markFresh: (() => void) | null = null;
+	afterNavigate(() => markFresh?.());
+	onMount(() =>
+		startLiveRefresh(60_000, (done) => {
+			markFresh = done;
+			return () => (markFresh = null);
+		})
+	);
 </script>
 
 <!--

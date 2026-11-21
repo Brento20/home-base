@@ -14,11 +14,18 @@ declare global {
 			stage: import('#lib/features/account/stage.js').Stage;
 			/** The home the signed-in person belongs to, once they've built or joined one. */
 			householdId: string | null;
+			/** That home's time zone and currency (src/lib/home.ts); the defaults before one. */
+			home: import('#lib/home.js').HomeSettings;
 		}
 		// interface Error {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env?: {
+				/** Cloudflare's rate limiter for AI calls (wrangler.jsonc › ratelimits). */
+				AI_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
+			};
+		}
 	}
 }
 

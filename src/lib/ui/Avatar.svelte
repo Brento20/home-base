@@ -10,9 +10,15 @@
 		 * instead of an initial, which would be too small to read.
 		 */
 		dot?: boolean;
+		/**
+		 * A thin ring in their colour, a little out from the edge (as Fitness rings a friend), so
+		 * you can tell whose it is at a glance, photo or not. It sits outside `size`: leave about
+		 * 4px around it.
+		 */
+		ring?: boolean;
 	}
 
-	let { person, size = 32, dot = false }: Props = $props();
+	let { person, size = 32, dot = false, ring = false }: Props = $props();
 	let broken = $state(false);
 	const hasPhoto = $derived(Boolean(person.avatarUrl) && !broken);
 </script>
@@ -21,6 +27,7 @@
 <span
 	class="avatar"
 	class:dot={dot && !hasPhoto}
+	class:ring={ring && !(dot && !hasPhoto)}
 	style:--size="{size}px"
 	style:--person-colour={person.accentColour}
 	aria-hidden="true"
@@ -42,10 +49,22 @@
 		overflow: hidden;
 		border-radius: 50%;
 		background: var(--person-colour);
-		color: #14100d;
+		/* A pale person colour still has an edge on a light page. */
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		color: var(--colour-on-ring);
 		font-size: calc(var(--size) * 0.4);
 		font-weight: var(--weight-strong);
 		line-height: 1;
+	}
+
+	/*
+	 * An outline, not a shadow, so the gap between face and ring is see-through on any
+	 * background. Mixed a touch towards the text colour, so a pale colour (Silver) still shows
+	 * on a light page and a deep one on a dark page.
+	 */
+	.ring {
+		outline: 1.5px solid color-mix(in oklab, var(--person-colour) 80%, var(--colour-text));
+		outline-offset: 2px;
 	}
 
 	.dot {

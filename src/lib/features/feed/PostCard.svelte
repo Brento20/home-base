@@ -41,7 +41,7 @@
 	<GlassSurface radius={26} />
 	<div class="body">
 		<header class="byline">
-			<Avatar person={author} size={34} />
+			<Avatar person={author} size={38} ring />
 			<p class="who">
 				<span id="post-{post.id}-by" class="name">{nameFor(post.authorId)}</span>
 				<time class="when" datetime={post.createdAt}
@@ -123,7 +123,7 @@
 	}
 
 	.post:not(.full) .body:has(.open:global([data-pressed])) {
-		background-color: rgb(255 255 255 / 0.03);
+		background-color: var(--colour-press);
 	}
 
 	.byline {
@@ -178,7 +178,7 @@
 		display: block;
 		width: 100%;
 		border-radius: 18px;
-		background: rgb(255 255 255 / 0.04);
+		background: var(--colour-press);
 		box-shadow: inset 0 0 0 1px var(--colour-hairline);
 	}
 

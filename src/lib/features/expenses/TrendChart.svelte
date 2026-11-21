@@ -1,8 +1,11 @@
 <script lang="ts">
 	/**
-	 * Spending over time as thin columns, one per day, week or month. Hover or tap a column to read
-	 * its amount above the chart; a hidden table gives screen readers the same numbers.
+	 * Spending over time as thin columns, one per day, week or month, with a dashed line at the
+	 * average (as in Apple's Health). Hover or tap a column to read its amount above the chart;
+	 * the columns rise from the baseline when the chart comes into view. A hidden table gives
+	 * screen readers the same numbers.
 	 */
+	import { reveal } from '#lib/ui/reveal.js';
 	import { formatMoney, formatMoneyShort } from './money.js';
 	import type { SeriesPoint } from './report.js';
 
@@ -12,9 +15,11 @@
 		colour: string;
 		/** What the chart shows, e.g. "Spending" or "Groceries". */
 		title: string;
+		/** Columns after this date haven't happened yet, so they're left out of the average. */
+		today?: string;
 	}
 
-	let { series, bucket, colour, title }: Props = $props();
+	let { series, bucket, colour, title, today }: Props = $props();
 
 	const W = 340;
 	const H = 150;
@@ -33,6 +38,12 @@
 		const magnitude = 10 ** Math.floor(Math.log10(max));
 		const step = [1, 2, 2.5, 5, 10].find((s) => s * magnitude >= max) ?? 10;
 		return step * magnitude;
+	});
+
+	// The average per column, over the columns that have happened.
+	const average = $derived.by(() => {
+		const past = today ? series.filter((point) => point.start <= today) : series;
+		return past.length ? past.reduce((sum, point) => sum + point.cents, 0) / past.length : 0;
 	});
 
 	const slot = $derived(plotW / Math.max(series.length, 1));
@@ -66,7 +77,7 @@
 
 <figure class="trend">
 	<p class="readout" aria-live="polite">{readout}</p>
-	<svg viewBox="0 0 {W} {H}" role="img" aria-label="{title} by {unit}">
+	<svg viewBox="0 0 {W} {H}" role="img" aria-label="{title} by {unit}" use:reveal>
 		<g class="grid">
 			{#each [top / 2, top] as tick (tick)}
 				<line x1={PAD_LEFT} x2={W} y1={y(tick)} y2={y(tick)} />
@@ -78,11 +89,20 @@
 		{#each series as point, index (point.start)}
 			{@const x = PAD_LEFT + index * slot + (slot - barW) / 2}
 			<path
+				class="column"
 				d={column(x, point.cents)}
 				fill={colour}
 				opacity={active === null || active === index ? 1 : 0.45}
+				style:--i={index}
 			/>
 		{/each}
+
+		{#if average > 0}
+			<g class="average">
+				<line x1={PAD_LEFT} x2={W} y1={y(average)} y2={y(average)} />
+				<text x={W} y={y(average) - 4} text-anchor="end">avg {formatMoneyShort(average)}</text>
+			</g>
+		{/if}
 
 		{#each labelIndexes as index (index)}
 			<text
@@ -159,8 +179,44 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	path {
-		transition: opacity var(--duration-quick) var(--ease-out);
+	/* The columns rise from the baseline, left to right, when the chart comes into view. */
+	.column {
+		transform: scaleY(0);
+		transform-box: fill-box;
+		transform-origin: bottom;
+		transition:
+			transform 700ms var(--spring-soft) calc(var(--i) * 14ms),
+			opacity var(--duration-quick) var(--ease-out);
+	}
+
+	svg:global(.shown) .column {
+		transform: scaleY(1);
+	}
+
+	.average line {
+		stroke: var(--colour-text-muted);
+		stroke-width: 1;
+		stroke-dasharray: 3 3;
+	}
+
+	.average text {
+		fill: var(--colour-text-muted);
+	}
+
+	.average {
+		opacity: 0;
+		transition: opacity 400ms var(--ease-out) 600ms;
+	}
+
+	svg:global(.shown) .average {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.column,
+		.average {
+			transition: none;
+		}
 	}
 
 	.hit {

@@ -36,7 +36,9 @@
 			<Icon name="chevron" size={18} />
 		</a>
 
-		{#if note.body}
+		{#if note.locked}
+			<p class="text locked">Locked, and can’t be opened right now.</p>
+		{:else if note.body}
 			{#if note.isSecret && !revealed}
 				<p class="text hidden" aria-label="Hidden">••••••••••</p>
 			{:else}
@@ -58,6 +60,11 @@
 </article>
 
 <style>
+	.locked {
+		color: var(--colour-text-muted);
+		font-size: var(--text-small);
+	}
+
 	.note {
 		position: relative;
 		border-radius: var(--radius-tile);

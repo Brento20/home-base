@@ -4,7 +4,8 @@ import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleProfiles, sampleTasks } from '#lib/server/sample-data.js';
 import { addDays, isValidDateISO, todayISO } from '#lib/time.js';
 import { nextDueDate, repeatFromForm } from './repeat.js';
-import type { FieldErrors, Profile, Task } from '#lib/types.js';
+import type { DinnerSnapshot } from '#lib/features/recipes/recipe.js';
+import type { CookDinner, FieldErrors, Profile, Task } from '#lib/types.js';
 
 /**
  * Tasks are household chores: a name, who, when, and optionally a repeat (weekly, every two
@@ -36,11 +37,20 @@ interface TaskRow {
 	due_time: string | null;
 	recipe_id: string | null;
 	servings: number | null;
-	recipe: Task['recipe'];
+	/** Only the dish's name, from TASK_COLUMNS... */
+	recipe_title?: string | null;
+	/** ...or the whole recipe as scheduled, from DINNER_COLUMNS. */
+	recipe?: DinnerSnapshot | null;
 }
 
+/**
+ * A task as lists, Today and the calendar show it: for a dinner, just the dish's name, not the
+ * recipe snapshot (ingredients, method, nutrition), which only the cook view needs.
+ */
 export const TASK_COLUMNS =
-	'id, title, notes, assignee_id, due_on, repeat, completed_at, completed_by, created_by, due_time, recipe_id, servings, recipe';
+	'id, title, notes, assignee_id, due_on, repeat, completed_at, completed_by, created_by, due_time, recipe_id, servings, recipe_title:recipe->>title';
+/** A dinner with its whole recipe snapshot, for the cook view (getDinner). */
+export const DINNER_COLUMNS = `${TASK_COLUMNS}, recipe`;
 const COLUMNS = TASK_COLUMNS;
 
 export const toTask = (row: TaskRow): Task => ({
@@ -57,7 +67,15 @@ export const toTask = (row: TaskRow): Task => ({
 	recipeId: row.recipe_id,
 	servings: row.servings,
 	recipe: row.recipe
+		? { title: row.recipe.title }
+		: row.recipe_title != null
+			? { title: row.recipe_title }
+			: null
 });
+
+/** A dinner row read with DINNER_COLUMNS, recipe and all. */
+export const toCookDinner = (row: TaskRow): CookDinner | null =>
+	row.recipe ? { ...toTask(row), recipe: row.recipe } : null;
 
 /** Soonest due first, undated last. */
 const byDue = (a: Task, b: Task) => (a.dueOn ?? '9999').localeCompare(b.dueOn ?? '9999');
@@ -125,9 +143,24 @@ export async function listOpenTasks(locals: App.Locals): Promise<Task[]> {
 export async function listTasksComingUp(locals: App.Locals, days = 7): Promise<Task[]> {
 	const today = todayISO();
 	const until = addDays(today, days - 1);
-	return (await listOpenTasks(locals)).filter(
-		(task) => task.dueOn !== null && task.dueOn <= until && (!task.recipeId || task.dueOn >= today)
-	);
+	const due = (task: Task) =>
+		task.dueOn !== null && task.dueOn <= until && (!task.recipeId || task.dueOn >= today);
+
+	const { supabase } = locals;
+	if (!supabase) return (await listOpenTasks(locals)).filter(due);
+
+	// Only what's due by the end of the week, not every open task in the home: a long list of
+	// undated or far-off chores shouldn't make Today slower.
+	const { data, error: readError } = await supabase
+		.from('tasks')
+		.select(COLUMNS)
+		.eq('household_id', await getHouseholdId(locals))
+		.is('completed_at', null)
+		.lte('due_on', until)
+		.order('due_on')
+		.order('created_at');
+	if (readError) dbError(readError);
+	return (data ?? []).map(toTask).filter(due);
 }
 
 /** Finished tasks, most recent first. */

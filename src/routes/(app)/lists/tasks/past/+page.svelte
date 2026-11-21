@@ -106,8 +106,8 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		background: var(--ring-colour);
-		color: #14100d;
+		background: var(--ring-ink);
+		color: var(--colour-on-ring);
 		opacity: 0.7;
 	}
 
@@ -121,7 +121,7 @@
 	.title {
 		color: var(--colour-text-muted);
 		text-decoration: line-through;
-		text-decoration-color: rgb(245 237 230 / 0.3);
+		text-decoration-color: var(--colour-strike);
 		overflow-wrap: anywhere;
 	}
 

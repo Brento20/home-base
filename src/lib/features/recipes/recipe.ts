@@ -11,8 +11,10 @@ export type Unit = 'g' | 'ml' | 'tsp' | 'tbsp' | 'cup' | 'each';
 
 export interface Ingredient {
 	name: string;
-	/** Null for "to taste" and the like. */
+	/** Null for "to taste" and the like. The low end of a range ("80–100 g" is 80). */
 	quantity: number | null;
+	/** The high end of a range ("80–100 g" is 100); missing or null when it's one amount. */
+	quantityMax?: number | null;
 	/** Null when there's no quantity; 'each' for things you count (2 eggs). */
 	unit: Unit | null;
 	prepNote: string | null;
@@ -101,7 +103,8 @@ export function scaleIngredients(
 	const factor = servings / recipe.baseServings;
 	return recipe.ingredients.map((ingredient) => ({
 		...ingredient,
-		quantity: ingredient.quantity === null ? null : ingredient.quantity * factor
+		quantity: ingredient.quantity === null ? null : ingredient.quantity * factor,
+		quantityMax: ingredient.quantityMax ? ingredient.quantityMax * factor : null
 	}));
 }
 
@@ -139,9 +142,27 @@ function formatMetric(value: number, unit: 'g' | 'ml') {
 const trim = (value: number, places: number) =>
 	Number(value.toFixed(places)).toLocaleString('en-AU', { maximumFractionDigits: places });
 
-/** "150 g", "1½ tsp", "2" (for 'each'), or null for "to taste". */
-export function formatQuantity(quantity: number | null, unit: Unit | null) {
+/**
+ * "150 g", "1½ tsp", "2" (for 'each'), a range like "80–100 g" or "2–3 tbsp", or null for
+ * "to taste".
+ */
+export function formatQuantity(
+	quantity: number | null,
+	unit: Unit | null,
+	max?: number | null
+): string | null {
 	if (quantity === null || quantity <= 0) return null;
+	if (max && max > quantity) {
+		const low = formatQuantity(quantity, unit);
+		const high = formatQuantity(max, unit);
+		if (low && high && low !== high) {
+			// "80 g" and "100 g" → "80–100 g": the unit once, at the end. 1 kg–1.5 kg stays whole.
+			const [lowNumber, lowUnit] = splitUnit(low);
+			const [, highUnit] = splitUnit(high);
+			return lowUnit === highUnit ? `${lowNumber}–${high}` : `${low}–${high}`;
+		}
+		return low;
+	}
 	switch (unit) {
 		case 'g':
 		case 'ml':
@@ -156,9 +177,20 @@ export function formatQuantity(quantity: number | null, unit: Unit | null) {
 	}
 }
 
+/** "80–100 g" → ["80–100", "g"]; "2" → ["2", ""]. cup and cups count as the same unit. */
+function splitUnit(amount: string): [string, string] {
+	const space = amount.indexOf(' ');
+	if (space < 0) return [amount, ''];
+	return [amount.slice(0, space), amount.slice(space + 1).replace(/^cups$/, 'cup')];
+}
+
+/** The ingredient's amount as it reads, ranges included. */
+const amountOf = (ingredient: Ingredient) =>
+	formatQuantity(ingredient.quantity, ingredient.unit, ingredient.quantityMax);
+
 /** How an ingredient reads in a recipe: the amount, then the name, then how to prep it. */
 export function describeIngredient(ingredient: Ingredient) {
-	const amount = formatQuantity(ingredient.quantity, ingredient.unit);
+	const amount = amountOf(ingredient);
 	return {
 		amount: amount ?? (ingredient.prepNote?.startsWith('to taste') ? 'To taste' : ''),
 		name: ingredient.name,
@@ -169,7 +201,7 @@ export function describeIngredient(ingredient: Ingredient) {
 
 /** A shopping list line: "Chicken thigh · 600 g", or just "Salt". Fits a list item (120). */
 export function shoppingLine(ingredient: Ingredient) {
-	const amount = formatQuantity(ingredient.quantity, ingredient.unit);
+	const amount = amountOf(ingredient);
 	return (amount ? `${ingredient.name} · ${amount}` : ingredient.name).slice(0, 120);
 }
 
@@ -311,39 +343,77 @@ export function filterOptions(recipes: RecipeSummary[]) {
 	};
 }
 
+/** One amount: 2, 1.5, 1,5, ½, 1/2, 1 ½ or 1½. */
+const AMOUNT = String.raw`(?:\d+\/\d+|\d+(?:[.,]\d+)?(?:\s*(?:\d+\/\d+|[¼½¾⅓⅔]))?|[¼½¾⅓⅔])`;
+const INGREDIENT_LINE = new RegExp(
+	String.raw`^(${AMOUNT})` +
+		// A range: "80-100", "80 - 100", "80–100", "2 to 3", "1 or 2".
+		String.raw`(?:\s*(?:-|–|—|to|or)\s*(${AMOUNT}))?` +
+		String.raw`\s*(kg|g|grams?|ml|millilitres?|l|litres?|tsp|teaspoons?|tbsp|tablespoons?|cups?)?\b\.?` +
+		// "2 x 400 g tins": two of the thing that follows.
+		String.raw`(\s*[x×]\s*(?=\d))?` +
+		String.raw`\s*(.*)$`,
+	'i'
+);
+
+const UNIT_WORDS: Record<string, Unit | 'kg' | 'l'> = {
+	g: 'g',
+	gram: 'g',
+	grams: 'g',
+	kg: 'kg',
+	ml: 'ml',
+	millilitre: 'ml',
+	millilitres: 'ml',
+	l: 'l',
+	litre: 'l',
+	litres: 'l',
+	tsp: 'tsp',
+	teaspoon: 'tsp',
+	teaspoons: 'tsp',
+	tbsp: 'tbsp',
+	tablespoon: 'tbsp',
+	tablespoons: 'tbsp',
+	cup: 'cup',
+	cups: 'cup'
+};
+
 /**
  * Reads "200 g chicken thigh, sliced" into an ingredient: an optional amount (2, 1.5, ½, 1/2,
- * 1 ½), an optional unit (g, kg, ml, L, tsp, tbsp, cup), the name, and anything after the
- * first comma as the prep note. kg and L become g and ml.
+ * 1 ½) or range ("80–100 g", "2 to 3"), an optional unit (g, kg, ml, L, tsp, tbsp, cup, or the
+ * words), the name, and anything after the first comma as the prep note. kg and L become g and
+ * ml. "2 x 400 g tins tomatoes" is two "400 g tins tomatoes".
  */
 export function parseIngredientLine(line: string): Ingredient | null {
-	const text = line.trim().replace(/^[-•*]\s*/, '');
+	// A bullet, or a stray dash from a broken range ("-100g"): amounts are never negative.
+	const text = line.trim().replace(/^[-–•*]\s*/, '');
 	if (!text) return null;
-	const match = text.match(
-		/^(\d+\/\d+|\d+(?:[.,]\d+)?(?:\s*(?:\d+\/\d+|[¼½¾⅓⅔]))?|[¼½¾⅓⅔]|)\s*(kg|g|ml|l|tsp|tbsp|cups?)?\b\.?\s*(.*)$/i
-	);
+	const match = text.match(INGREDIENT_LINE);
 	let quantity: number | null = null;
+	let quantityMax: number | null = null;
 	let unit: Unit | null = null;
 	let rest = text;
-	if (match && match[1].trim()) {
+	if (match) {
 		quantity = parseAmount(match[1]);
-		const rawUnit = match[2]?.toLowerCase();
-		rest = match[3];
-		if (rawUnit === 'kg') [quantity, unit] = [quantity * 1000, 'g'];
-		else if (rawUnit === 'l') [quantity, unit] = [quantity * 1000, 'ml'];
-		else if (rawUnit === 'cups' || rawUnit === 'cup') unit = 'cup';
-		else if (rawUnit) unit = rawUnit as Unit;
-		else unit = 'each';
+		quantityMax = match[2] ? parseAmount(match[2]) : null;
+		const rawUnit = match[3] ? UNIT_WORDS[match[3].toLowerCase()] : undefined;
+		rest = match[5];
+		const scale = rawUnit === 'kg' || rawUnit === 'l' ? 1000 : 1;
+		quantity *= scale;
+		if (quantityMax !== null) quantityMax *= scale;
+		unit =
+			rawUnit === 'kg' ? 'g' : rawUnit === 'l' ? 'ml' : rawUnit && !match[4] ? rawUnit : 'each';
 		rest = rest.replace(/^of\s+/i, '');
 	}
 	const comma = rest.indexOf(',');
 	const name = (comma >= 0 ? rest.slice(0, comma) : rest).trim();
 	const prepNote = comma >= 0 ? rest.slice(comma + 1).trim() || null : null;
 	if (!name) return null;
+	const hasAmount = quantity !== null && quantity > 0;
 	return {
 		name: name.charAt(0).toUpperCase() + name.slice(1),
-		quantity: quantity && quantity > 0 ? quantity : null,
-		unit: quantity && quantity > 0 ? unit : null,
+		quantity: hasAmount ? quantity : null,
+		quantityMax: hasAmount && quantityMax !== null && quantityMax > quantity! ? quantityMax : null,
+		unit: hasAmount ? unit : null,
 		prepNote
 	};
 }
@@ -351,6 +421,8 @@ export function parseIngredientLine(line: string): Ingredient | null {
 const GLYPHS: Record<string, number> = { '¼': 0.25, '½': 0.5, '¾': 0.75, '⅓': 1 / 3, '⅔': 2 / 3 };
 
 function parseAmount(text: string) {
+	// "1,250" is twelve hundred and fifty; "1,5" is one and a half.
+	if (/^\d{1,3}(,\d{3})+$/.test(text.trim())) return Number(text.replace(/,/g, ''));
 	let total = 0;
 	for (const part of text.trim().split(/\s+|(?=[¼½¾⅓⅔])/)) {
 		if (!part) continue;
@@ -363,14 +435,21 @@ function parseAmount(text: string) {
 	return total;
 }
 
-/** An ingredient back as a line of text, for editing a home recipe. */
+/** An ingredient back as a line of text, for editing a home recipe: "80-100 g noodles". */
 export function ingredientLine(ingredient: Ingredient) {
-	const amount =
-		ingredient.quantity === null
-			? ''
-			: ingredient.unit === 'each' || ingredient.unit === null
-				? trim(ingredient.quantity, 2)
-				: `${trim(ingredient.quantity, 2)} ${ingredient.unit}`;
+	let amount = '';
+	if (ingredient.quantity !== null) {
+		// Plain numbers, no thousands comma: "1,250" would read back as 1.25.
+		const plain = (value: number) => String(Number(value.toFixed(2)));
+		const number = ingredient.quantityMax
+			? `${plain(ingredient.quantity)}-${plain(ingredient.quantityMax)}`
+			: plain(ingredient.quantity);
+		const counted = ingredient.unit === 'each' || ingredient.unit === null;
+		// "2 × 400 g tins tomatoes", so the 400 isn't read as part of the amount.
+		amount = counted
+			? `${number}${/^\d/.test(ingredient.name) ? ' ×' : ''}`
+			: `${number} ${ingredient.unit}`;
+	}
 	return (
 		[amount, ingredient.name].filter(Boolean).join(' ') +
 		(ingredient.prepNote ? `, ${ingredient.prepNote}` : '')

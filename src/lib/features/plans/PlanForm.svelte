@@ -205,7 +205,7 @@
 		width: 50px;
 		height: 30px;
 		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.12);
+		background: var(--colour-fill-strong);
 		transition: background-color var(--duration-quick) var(--ease-out);
 	}
 

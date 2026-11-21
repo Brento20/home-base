@@ -34,6 +34,15 @@ export default ts.config(
 		}
 	},
 	{
-		ignores: ['.svelte-kit/', '.wrangler/', '_to_delete/', 'build/', 'node_modules/', 'static/']
+		ignores: [
+			'.svelte-kit/',
+			'.wrangler/',
+			'_to_delete/',
+			'build/',
+			'node_modules/',
+			'static/',
+			'test-results/',
+			'playwright-report/'
+		]
 	}
 );

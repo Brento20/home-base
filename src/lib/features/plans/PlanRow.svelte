@@ -60,7 +60,7 @@
 
 	/* A touch brighter under the finger, alongside the glass squish. */
 	.plan-card:global([data-pressed]) .body {
-		background-color: rgb(255 255 255 / 0.04);
+		background-color: var(--colour-press);
 	}
 
 	.time {

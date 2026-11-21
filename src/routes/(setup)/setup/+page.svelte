@@ -21,7 +21,7 @@
 			<span class="body">
 				<span class="text">
 					<span class="title">Build a home</span>
-					<span class="detail">Name it and set a password to share.</span>
+					<span class="detail">Name it, then invite people with a link.</span>
 				</span>
 				<Icon name="chevron" size={20} />
 			</span>
@@ -31,7 +31,7 @@
 			<span class="body">
 				<span class="text">
 					<span class="title">Join a home</span>
-					<span class="detail">Use the name and password someone gave you.</span>
+					<span class="detail">Open the invite link someone sent you.</span>
 				</span>
 				<Icon name="chevron" size={20} />
 			</span>

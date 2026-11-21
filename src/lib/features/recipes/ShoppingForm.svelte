@@ -143,7 +143,7 @@
 	.item:has(input:not(:checked)) .amount {
 		color: var(--colour-text-faint);
 		text-decoration: line-through;
-		text-decoration-color: rgb(255 255 255 / 0.25);
+		text-decoration-color: var(--colour-fill-stronger);
 	}
 
 	.item:has(input:focus-visible) {

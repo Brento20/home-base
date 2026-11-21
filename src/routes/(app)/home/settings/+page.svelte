@@ -1,27 +1,75 @@
 <script lang="ts">
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
+	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import PasswordField from '#lib/ui/PasswordField.svelte';
+	import { placesLeft } from '#lib/features/homes/invites.js';
+	import { formatDayLabel, todayISO } from '#lib/time.js';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.homeSettings);
-	let busy = $state<'rename' | 'password' | null>(null);
+	let busy = $state<'rename' | 'invite' | 'place' | null>(null);
+	let copied = $state(false);
+	let canShare = $state(false);
+	// Phones have a share sheet; most desktops don't. Checked after hydration so the server's
+	// page and the browser's agree.
+	onMount(() => (canShare = typeof navigator.share === 'function'));
 
-	const submitting = (which: 'rename' | 'password') => () => {
+	// Time zones grouped by region for the picker: "Australia" › "Sydney".
+	const zoneGroups = $derived.by(() => {
+		const groups: Record<string, { value: string; label: string }[]> = {};
+		for (const zone of data.timeZones) {
+			const [region, ...rest] = zone.split('/');
+			const label = rest.length ? rest.join(' / ').replaceAll('_', ' ') : region;
+			(groups[region] ??= []).push({ value: zone, label });
+		}
+		return Object.entries(groups);
+	});
+	const zoneName = (zone: string) => zone.split('/').pop()!.replaceAll('_', ' ');
+	const currencyName = (code: string) =>
+		data.currencies.find((currency) => currency.code === code)?.name ?? code;
+
+	const alone = $derived(data.household.members.length === 1);
+
+	const submitting = (which: 'rename' | 'invite') => () => {
 		busy = which;
+		copied = false;
 		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: which === 'password' });
+			await update({ reset: false });
 			busy = null;
 		};
 	};
+
+	// "Expires tomorrow", "Expires Saturday", "Expires Sat 29 Nov".
+	const expires = (instant: string) => {
+		const label = formatDayLabel(todayISO(new Date(instant)));
+		return label === 'Today' || label === 'Tomorrow' ? label.toLowerCase() : label;
+	};
+
+	async function copy(link: string) {
+		try {
+			await navigator.clipboard.writeText(link);
+			copied = true;
+		} catch {
+			// Clipboard refused (an old browser, or no permission): the link is selectable.
+		}
+	}
+
+	async function share(link: string) {
+		try {
+			await navigator.share({ title: `Join ${data.household.name} on home base`, url: link });
+		} catch {
+			// Closed the share sheet: nothing to do.
+		}
+	}
 </script>
 
 <svelte:head>
@@ -47,19 +95,143 @@
 	</ul>
 </section>
 
+<section aria-labelledby="place-heading">
+	<h2 id="place-heading" class="section-label">Where home is</h2>
+	{#if data.isOwner}
+		<GlassCard>
+			<form
+				method="POST"
+				action="?/place"
+				class="form-stack"
+				use:enhance={() => {
+					busy = 'place';
+					return async ({ result, update }) => {
+						// Every date and amount on screen was drawn the old way: start fresh.
+						if (result.type === 'success') location.reload();
+						else {
+							await update({ reset: false });
+							busy = null;
+						}
+					};
+				}}
+			>
+				<label class="field">
+					<span class="field-label">Time zone</span>
+					<select class="field-input" name="timeZone" value={data.home.timeZone}>
+						{#each zoneGroups as [region, zones] (region)}
+							<optgroup label={region.replaceAll('_', ' ')}>
+								{#each zones as zone (zone.value)}
+									<option value={zone.value}>{zone.label}</option>
+								{/each}
+							</optgroup>
+						{/each}
+					</select>
+					<span class="field-hint"
+						>Sets what “today” means for due dates, points and the colours.</span
+					>
+				</label>
+				<label class="field">
+					<span class="field-label">Money</span>
+					<select class="field-input" name="currency" value={data.home.currency}>
+						{#each data.currencies as currency (currency.code)}
+							<option value={currency.code}>{currency.name} ({currency.code})</option>
+						{/each}
+					</select>
+					<span class="field-hint"
+						>Amounts already saved keep their numbers; only the sign changes.</span
+					>
+				</label>
+				{#if form?.place?.message}<p class="field-error" role="alert">{form.place.message}</p>{/if}
+				<button class="button-secondary" disabled={busy === 'place'}>
+					{busy === 'place' ? 'Saving…' : 'Save'}
+				</button>
+			</form>
+		</GlassCard>
+	{:else}
+		<p class="explain">
+			{zoneName(data.home.timeZone)} time, in {currencyName(data.home.currency)}s ({data.home
+				.currency}). An owner can change this.
+		</p>
+	{/if}
+</section>
+
 {#if data.isOwner}
 	<section aria-labelledby="invite-heading">
 		<h2 id="invite-heading" class="section-label">Inviting people</h2>
 		<p class="explain">
-			{#if data.hasPassword}
-				Share the home name, <strong>{data.household.name}</strong>, and its password. They join
-				from the welcome screen after signing up.
-			{:else}
-				Set a password so people can join. Until then nobody else can.
-			{/if}
+			Send someone a link. It lasts a week and only lets in the people it was made for.
 		</p>
 
 		<div class="stack">
+			<GlassCard>
+				<form method="POST" action="?/invite" class="form-stack" use:enhance={submitting('invite')}>
+					<label class="field">
+						<span class="field-label">Who it’s for</span>
+						<select class="field-input" name="uses">
+							<option value="1">One person</option>
+							<option value="5">Up to 5 people</option>
+						</select>
+					</label>
+					{#if form?.invite?.message}<p class="field-error" role="alert">
+							{form.invite.message}
+						</p>{/if}
+					<button class="button-primary" disabled={busy === 'invite'}>
+						{busy === 'invite' ? 'Making a link…' : 'Create invite link'}
+					</button>
+				</form>
+
+				{#if form?.invite?.link}
+					<div class="new-link">
+						<input
+							class="field-input link"
+							readonly
+							value={form.invite.link}
+							aria-label="Invite link"
+							onfocus={(event) => event.currentTarget.select()}
+						/>
+						<div class="link-actions">
+							{#if canShare}
+								<button
+									class="button-secondary"
+									type="button"
+									onclick={() => share(form!.invite!.link!)}
+								>
+									<Icon name="share" size={17} /> Share
+								</button>
+							{/if}
+							<button
+								class="button-secondary"
+								type="button"
+								onclick={() => copy(form!.invite!.link!)}
+							>
+								{copied ? 'Copied' : 'Copy link'}
+							</button>
+						</div>
+						<p class="field-hint">You won’t see this link again, so send it now.</p>
+					</div>
+				{/if}
+			</GlassCard>
+
+			{#if data.invites.length}
+				<div>
+					<h3 class="group-title">Links that still work</h3>
+					<ul class="grouped">
+						{#each data.invites as invite (invite.id)}
+							<li class="grouped-row invite">
+								<span class="grouped-label">
+									{placesLeft(invite.uses, invite.maxUses)}
+									<span class="invite-detail">Expires {expires(invite.expiresAt)}</span>
+								</span>
+								<form method="POST" action="?/revoke" use:enhance>
+									<input type="hidden" name="id" value={invite.id} />
+									<button class="button-quiet danger">Revoke</button>
+								</form>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+
 			<GlassCard>
 				<form method="POST" action="?/rename" class="form-stack" use:enhance={submitting('rename')}>
 					<label class="field">
@@ -75,47 +247,42 @@
 						/>
 						{#if form?.rename?.message}<span class="field-error">{form.rename.message}</span>
 						{:else if form?.rename && 'saved' in form.rename}<span class="field-hint">Saved.</span
-							>{/if}
+							>{:else}<span class="field-hint">Shown on invite links.</span>{/if}
 					</label>
 					<button class="button-secondary" disabled={busy === 'rename'}>
 						{busy === 'rename' ? 'Saving…' : 'Rename home'}
 					</button>
 				</form>
 			</GlassCard>
-
-			<GlassCard>
-				<form
-					method="POST"
-					action="?/password"
-					class="form-stack"
-					use:enhance={submitting('password')}
-				>
-					<PasswordField
-						label={data.hasPassword ? 'New home password' : 'Home password'}
-						autocomplete="new-password"
-						minlength={8}
-						error={form?.password?.message ?? undefined}
-						hint={form?.password && 'saved' in form.password
-							? 'Saved. Share it with whoever you’re inviting.'
-							: 'At least 8 characters. Changing it doesn’t remove anyone.'}
-					/>
-					<button class="button-secondary" disabled={busy === 'password'}>
-						{busy === 'password' ? 'Saving…' : 'Save password'}
-					</button>
-				</form>
-			</GlassCard>
 		</div>
 	</section>
 {:else}
-	<p class="explain">
-		To invite someone, ask an owner for the home password, then share it with the home name,
-		<strong>{data.household.name}</strong>.
-	</p>
+	<p class="explain">To invite someone, ask an owner to send them an invite link.</p>
 {/if}
+
+<section class="leave" aria-labelledby="leave-heading">
+	<h2 id="leave-heading" class="section-label">Leaving</h2>
+	<p class="explain">
+		{#if alone}
+			You’re the only one here, so leaving deletes {data.household.name} and everything in it, for good.
+		{:else}
+			You’ll lose access to everything here. Come back any time with a new invite link.
+			{#if data.isOwner && data.household.ownerIds.length === 1}Whoever’s been here longest becomes
+				the owner.{/if}
+		{/if}
+	</p>
+	{#if form?.leave?.message}<p class="field-error" role="alert">{form.leave.message}</p>{/if}
+	<ConfirmDelete
+		action="?/leave"
+		label={alone ? `Leave and delete ${data.household.name}` : `Leave ${data.household.name}`}
+		confirmLabel={alone ? 'Tap again to delete it all' : 'Tap again to leave'}
+	/>
+</section>
 
 <style>
 	section + section,
-	section + .explain {
+	section + .explain,
+	.explain + .leave {
 		margin-top: var(--space-xl);
 	}
 
@@ -156,14 +323,51 @@
 		color: var(--colour-text-muted);
 	}
 
-	.explain strong {
-		font-weight: var(--weight-medium);
-		color: var(--colour-text);
-	}
-
 	.stack {
 		display: flex;
 		flex-direction: column;
 		gap: 14px;
+	}
+
+	.new-link {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-s);
+		margin-top: var(--space-m);
+		padding-top: var(--space-m);
+		border-top: 1px solid var(--colour-hairline);
+	}
+
+	.link {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: var(--text-small);
+	}
+
+	.link-actions {
+		display: flex;
+		gap: var(--space-s);
+	}
+
+	.link-actions > * {
+		flex: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+	}
+
+	.invite .grouped-label {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.invite-detail {
+		font-size: var(--text-caption);
+		color: var(--colour-text-muted);
+	}
+
+	.danger {
+		color: var(--colour-danger, #d4453b);
 	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
 	import { groupPlansByDay } from '#lib/features/plans/describe.js';
@@ -7,7 +8,7 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import RoundButton from '#lib/ui/RoundButton.svelte';
 	import SegmentedNav from '#lib/ui/SegmentedNav.svelte';
-	import type { Plan } from '#lib/types.js';
+	import type { Plan, Task } from '#lib/types.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -15,7 +16,80 @@
 	// Said a little differently each visit (src/lib/copy/voice.ts).
 	const emptyLine = pick(EMPTY.plans);
 
-	const groups = $derived(groupPlansByDay(data.plans, data.today));
+	// The list shows the first page of plans; "Show later plans" adds more from /plans/later.
+	// When the page's plans refresh, the later ones already showing refresh too, in one request.
+	let later = $state<Plan[]>([]);
+	let laterHasMore = $state<boolean | null>(null);
+	let loadingLater = $state(false);
+	let laterFailed = $state(false);
+	const listed = $derived.by(() => {
+		if (data.view !== 'list') return [];
+		const ids = new Set(data.plans.map((plan) => plan.id));
+		return [...data.plans, ...later.filter((plan) => !ids.has(plan.id))];
+	});
+	const moreLater = $derived(data.view === 'list' && (laterHasMore ?? data.hasMore));
+
+	async function fetchLater(offset: number, limit: number) {
+		const response = await fetch(`/plans/later?offset=${offset}&limit=${limit}`, {
+			headers: { accept: 'application/json' }
+		});
+		if (!response.ok) throw new Error(String(response.status));
+		return (await response.json()) as { plans: Plan[]; hasMore: boolean };
+	}
+
+	async function showLater() {
+		if (data.view !== 'list' || loadingLater) return;
+		loadingLater = true;
+		laterFailed = false;
+		try {
+			const page = await fetchLater(data.plans.length + later.length, data.plans.length);
+			later = [...later, ...page.plans];
+			laterHasMore = page.hasMore;
+		} catch {
+			laterFailed = true;
+		} finally {
+			loadingLater = false;
+		}
+	}
+
+	$effect(() => {
+		if (data.view !== 'list') return;
+		const first = data.plans.length;
+		const count = untrack(() => later.length);
+		if (count === 0) return;
+		let current = true;
+		fetchLater(first, count)
+			.then((page) => {
+				if (!current) return;
+				later = page.plans;
+				laterHasMore = page.hasMore;
+			})
+			.catch(() => {});
+		return () => (current = false);
+	});
+
+	const groups = $derived(data.view === 'list' ? groupPlansByDay(listed, data.today) : []);
+
+	// A month's plans and dinners stream in after its grid. Keep the ones showing until the new
+	// ones arrive (a refresh of the same month never blanks it), labelled with their month so
+	// another month's dots never show on this one.
+	type Entries = { month: string; plans: Plan[]; dinners: Task[] };
+	let entries = $state<Entries | null>(null);
+	let entriesFailed = $state(false);
+	$effect(() => {
+		if (data.view !== 'calendar') return;
+		const { month } = data;
+		let current = true;
+		entriesFailed = false;
+		data.entries.then(
+			(loaded) => current && (entries = { month, ...loaded }),
+			() => current && (entriesFailed = true)
+		);
+		return () => (current = false);
+	});
+	const monthEntries = $derived(
+		data.view === 'calendar' && entries?.month === data.month ? entries : null
+	);
 
 	const isOver = (plan: Plan) =>
 		!plan.allDay && new Date(plan.endsAt ?? plan.startsAt).getTime() < new Date(data.now).getTime();
@@ -45,8 +119,10 @@
 {#if data.view === 'calendar'}
 	<PlanCalendar
 		month={data.month}
-		plans={data.plans}
-		dinners={data.dinners}
+		plans={monthEntries?.plans ?? []}
+		dinners={monthEntries?.dinners ?? []}
+		loading={!monthEntries && !entriesFailed}
+		failed={!monthEntries && entriesFailed}
 		people={data.household.members}
 		today={data.today}
 		now={data.now}
@@ -68,10 +144,27 @@
 			</ul>
 		</section>
 	{/each}
+	{#if moreLater}
+		<div class="later">
+			<button type="button" class="button-secondary" onclick={showLater} disabled={loadingLater}>
+				{loadingLater
+					? 'Loading later plans…'
+					: laterFailed
+						? 'Couldn’t load. Try again'
+						: 'Show later plans'}
+			</button>
+		</div>
+	{/if}
 	<p class="footer"><a class="button-quiet" href="/plans/import">Import from Apple Calendar</a></p>
 {/if}
 
 <style>
+	.later {
+		display: flex;
+		justify-content: center;
+		margin-top: var(--space-l);
+	}
+
 	.views {
 		margin-bottom: var(--space-l);
 	}

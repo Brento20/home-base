@@ -21,6 +21,11 @@ export const variables = defineEnvVars({
 			'Claude API key from platform.claude.com › API keys. Optional: without it, the AI helpers hide and every form works by hand.',
 		schema: optional
 	},
+	NOTES_KEY: {
+		description:
+			'Locks secret notes in the database: 32 random bytes, base64 (openssl rand -base64 32). Optional: without it secret notes are stored as typed. Lose it and locked notes can’t be read.',
+		schema: optional
+	},
 	ANTHROPIC_BASE_URL: {
 		description: 'Only for tests: points the AI helpers at a stand-in server.',
 		schema: optional

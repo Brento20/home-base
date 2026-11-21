@@ -25,8 +25,11 @@
 			.map((item) => (item.id in pending ? { ...item, checked: pending[item.id] } : item))
 			.sort((a, b) => Number(a.checked) - Number(b.checked))
 	);
-	const remaining = $derived(items.filter((item) => !item.checked).length);
-	const allTicked = $derived(items.length > 0 && remaining === 0);
+	const toGet = $derived(items.filter((item) => !item.checked));
+	const ticked = $derived(items.filter((item) => item.checked));
+	const remaining = $derived(toGet.length);
+	// The Shopping list never moves to Past lists, so it has nothing to announce.
+	const allTicked = $derived(!list.pinned && items.length > 0 && remaining === 0);
 
 	function setPending(id: string, checked: boolean | null) {
 		if (checked === null) delete pending[id];
@@ -78,20 +81,49 @@
 	<p class="summary">Nothing on this list yet.</p>
 {:else}
 	<p class="summary" aria-live="polite">
-		{remaining === 0 ? 'All ticked' : `${remaining} of ${items.length} to get`}
+		{remaining === 0 ? 'All got' : `${remaining} to get`}
 	</p>
 {/if}
 
-<ul class="items">
-	{#each items as item (item.id)}
-		<ListItemRow
-			{item}
-			{editing}
-			ringColour={ringColourFor(item.createdBy)}
-			onoptimistic={setPending}
-		/>
-	{/each}
-</ul>
+{#if toGet.length}
+	<ul class="items">
+		{#each toGet as item (item.id)}
+			<ListItemRow
+				{item}
+				{editing}
+				ringColour={ringColourFor(item.createdBy)}
+				onoptimistic={setPending}
+			/>
+		{/each}
+	</ul>
+{/if}
+
+<!-- Ticked things gather at the foot, as in Reminders, with Clear to take them away. -->
+{#if ticked.length}
+	<div class="ticked-head">
+		<p class="summary">{ticked.length} ticked</p>
+		<form
+			method="POST"
+			action="?/clearTicked"
+			use:enhance={() => {
+				ticked.forEach((item) => setPending(item.id, null));
+				return async ({ update }) => update();
+			}}
+		>
+			<button class="clear">Clear</button>
+		</form>
+	</div>
+	<ul class="items done">
+		{#each ticked as item (item.id)}
+			<ListItemRow
+				{item}
+				{editing}
+				ringColour={ringColourFor(item.createdBy)}
+				onoptimistic={setPending}
+			/>
+		{/each}
+	</ul>
+{/if}
 
 <style>
 	.complete {
@@ -194,5 +226,37 @@
 	.items {
 		margin: 0;
 		padding: 0;
+	}
+
+	/* A hairline between rows that starts at the text, past the circle (as in Reminders). */
+	.items > :global(li + li) {
+		background: linear-gradient(var(--colour-hairline), var(--colour-hairline)) no-repeat
+			calc(24px + var(--space-m)) 0 / calc(100% - 24px - var(--space-m)) 1px;
+	}
+
+	.ticked-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: var(--space-l);
+	}
+
+	.ticked-head .summary {
+		margin: 0;
+	}
+
+	.ticked-head form {
+		margin: 0;
+	}
+
+	.clear {
+		min-height: var(--tap-target);
+		padding: 0 4px;
+		border: 0;
+		background: none;
+		font: inherit;
+		font-size: var(--text-small);
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
 	}
 </style>

@@ -25,3 +25,14 @@ vite.config.ts.timestamp-*
 
 # Files waiting for you to delete
 _to_delete
+
+# Python
+__pycache__/
+
+# Tests
+test-results/
+playwright-report/
+
+# Supabase CLI working files
+supabase/.temp/
+supabase/.branches/

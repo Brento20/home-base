@@ -2,6 +2,8 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
+	import Icon from '#lib/ui/Icon.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import PasswordField from '#lib/ui/PasswordField.svelte';
 	import SoloScreen from '#lib/ui/SoloScreen.svelte';
@@ -12,6 +14,9 @@
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.newPassword);
 	let submitting = $state(false);
+
+	// From Edit your profile, back goes there; from a reset email, back to Today.
+	const fromProfile = $derived(page.url.searchParams.get('from') === 'profile');
 </script>
 
 <svelte:head>
@@ -19,6 +24,11 @@
 </svelte:head>
 
 <SoloScreen title={heading}>
+	{#snippet top()}
+		<a class="button-quiet back" href={fromProfile ? '/home/profile' : '/'}
+			><Icon name="back" size={18} /> {fromProfile ? 'Profile' : 'Today'}</a
+		>
+	{/snippet}
 	<GlassCard>
 		<form
 			method="POST"

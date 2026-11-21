@@ -27,8 +27,15 @@ export function redirectFor(stage: Stage, routeId: string | null): string | null
 	// Sign up, sign in and the landing page are only for people who are signed out.
 	if (routeId.startsWith('/(public)')) return stage === 'signed-out' ? null : stageHome[stage];
 
-	// Email links and signing out work in any stage.
-	if (routeId.startsWith('/auth/') || routeId === '/logout') return null;
+	// Email links, invite links, the privacy page and signing out work in any stage. An invite link says what to
+	// do next for the stage you're in (src/routes/join/[token]).
+	if (
+		routeId.startsWith('/auth/') ||
+		routeId.startsWith('/join/') ||
+		routeId === '/privacy' ||
+		routeId === '/logout'
+	)
+		return null;
 
 	if (stage === 'signed-out') return stageHome[stage];
 

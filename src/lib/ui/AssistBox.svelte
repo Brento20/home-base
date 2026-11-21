@@ -237,12 +237,18 @@
 		padding: 12px 16px;
 		border: 0;
 		border-radius: var(--radius-field);
-		background: rgb(255 255 255 / 0.04);
+		background: var(--colour-press);
 		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
 		font-size: var(--text-body);
 		line-height: 1.4;
 		resize: vertical;
 		outline: none;
+	}
+
+	/* On light, the same white well as every other field, so it doesn't read as disabled. */
+	:global([data-mode='light']) .box textarea,
+	:global([data-mode='light']) .box input {
+		background: var(--colour-well);
 	}
 
 	.box input {

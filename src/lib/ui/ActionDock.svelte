@@ -68,10 +68,10 @@
 		gap: 4px;
 		padding: 5px;
 		border-radius: var(--radius-pill);
-		background: rgb(20 15 13 / 0.68);
+		background: var(--surface-bar);
 		box-shadow:
 			var(--glass-inner-light),
-			0 14px 32px -14px rgb(0 0 0 / 0.7);
+			0 14px 32px -14px var(--shadow-colour);
 	}
 
 	.action-bar::after {
@@ -111,6 +111,6 @@
 	}
 
 	.action-bar :global(.button-secondary.act[data-pressed]) {
-		background: rgb(255 255 255 / 0.06);
+		background: var(--colour-fill);
 	}
 </style>

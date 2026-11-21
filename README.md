@@ -22,7 +22,7 @@ Preview other palettes with `?daypart=morning`, `?daypart=day` or `?daypart=even
 | ------------------------------------------ | --------------------------------------------------------------------- |
 | `src/hooks.server.ts`                      | Signs each request in and sends people to the step they're up to      |
 | `src/routes/(public)/`                     | Signed out: landing page (/welcome), sign up, sign in, reset password |
-| `src/routes/(setup)/`                      | Profile, then Welcome home: build or join a home                      |
+| `src/routes/(setup)/`                      | Profile, then Welcome home: build a home or open an invite link       |
 | `src/routes/(app)/`                        | The app itself: Today, Plans, Lists, Money, Home, plus the tab bar    |
 | `src/routes/auth/`, `account/`, `avatars/` | Email links, setting a new password, serving profile photos           |
 | `src/lib/features/<feature>/`              | Each feature's components and its `*.server.ts` data functions        |
@@ -51,8 +51,8 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 - **Lists › Tasks**: household chores with who, when, and how often they repeat (once, weekly, every 2 weeks, monthly, or Custom: every N days, weeks, months or years, like the air con filter every 3 months). Ticking one off moves it to Past tasks; a repeating chore gets its next occurrence straight away. Monthly chores keep their day (a chore on the 31st falls on the last day of shorter months). Undo from Past tasks.
 - **Points**: one for every task you tick off, shown beside your avatars on Today (this week) with a scoreboard at /points. Undo takes the point back.
 - **Money**: Splitwise-style shared expenses. A home can have several groups (Our Place, Car), each with members from the home. Add an expense by saying who paid, the total, and how it's divided (equally, exact amounts or percent). Between two people the balance is one sentence ("You owe Brenton $2.50"); bigger groups show who owes whom with debts simplified, and Settle up records a repayment. **Reports** open on the current month: browse months or pick dates, see spending by category and over time, tap a category for the expenses behind it, and Compare any two ranges. Reports count each expense's full amount; repayments only move balances.
-- **Sign up and homes**: a landing page at /welcome, sign up with email and password, confirm by email, then a profile (name, nickname, pronouns, date of birth, photo). Then "Welcome home": build a home (name + password to share) or join one. Five wrong join attempts in 15 minutes locks you out for a while.
-- **Home**: everyone in your home, notes anyone can add (wifi, bins, the spare key), with "Hide until tapped" and Copy. Home settings lets an owner rename the home and set its password.
+- **Sign up and homes**: a landing page at /welcome, sign up with email and password, confirm by email, then a profile (name, nickname, pronouns, date of birth, photo). Then "Welcome home": build a home (just a name) or join one from an invite link. An invite link opened before signing up is remembered through sign-up and profile, then joins you.
+- **Home**: everyone in your home, notes anyone can add (wifi, bins, the spare key), with "Hide until tapped" and Copy; secret notes are encrypted in the database when `NOTES_KEY` is set. Home settings lets an owner rename the home, make and revoke invite links, and set the time zone and currency; anyone can leave. Help & privacy has feedback, the privacy page, a data download and account deletion.
 - **Installed app**: add it to the Home Screen and it opens full screen with its own launch screen. Pages you've opened are saved, so they still open with no signal (an "Offline" pill says so); pages never opened show a friendly offline screen. When a new version is deployed, a "New version ready" notice appears and refreshes only when tapped. Signing out deletes every saved page.
 - **AI helpers** (optional, they need a Claude API key): **recipe import** on Add a recipe (paste a link or the recipe, or snap a cookbook page; a link reads the site's own recipe data, tidied, and Claude fills in what it leaves out: times, cuisine, protein and nutrition are estimated when the recipe doesn't give them, and the recipe's "About these numbers" says which), **quick add** in plain words (✨ in the Tasks field: "bins out every Tuesday, Chris"; and "Say it how you'd text it" on New plan), **receipt scan** on Add expense, and **the week in a line** under Today's date. Every helper only fills in the normal form for you to check and save: the button glows while it works, the fields it filled glow briefly (a Siri-style spectrum ring), and Undo puts the form back. If one can't manage, it says "Oops! I can't work out a thing today! Enter it manually 👉👈" and the form is right there; with no key, the helpers don't show at all.
 - Everyone's phones stay in step by refreshing when the app comes back to the foreground and every 20 seconds.
@@ -66,8 +66,8 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 2. Run the files in `supabase/migrations/` in order (SQL editor, or `supabase db push` with the CLI).
 3. `cp .env.example .env` and fill in `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
 4. Restart `npm run dev`. Signed out, you land on /welcome.
-5. Sign up, fill in your profile and build a home. Share its name and password with whoever you
-   live with; they sign up and choose Join a home.
+5. Sign up, fill in your profile and build a home. In Home settings, create an invite link and
+   send it to whoever you live with; they open it, sign up and join.
 6. For real email, add custom SMTP under **Authentication › Emails**: the built-in sender only
    manages a few emails an hour.
 
@@ -76,7 +76,7 @@ variables are declared in `src/env.ts` and imported from `$app/env/private`.
 1. Deploy to Cloudflare Workers (below). Add the live address to Supabase's Redirect URLs and
    make it the Site URL.
 2. On each iPhone, open the site in Safari › Share › **Add to Home Screen**.
-3. Sign up on one phone and build a home; sign up on another and join it.
+3. Sign up on one phone and build a home; send an invite link to the other and join from it.
 4. Add **Limes** on one phone and check it off on the other. Done.
 
 ## Hosting: Cloudflare Workers
@@ -96,6 +96,10 @@ holds the deploy settings.
 - **AI helpers**: add `ANTHROPIC_API_KEY` the same way, as a Secret (create the key at
   platform.claude.com › API keys). Without it the helpers hide. Locally, put it in `.dev.vars`.
   Quick jobs use Claude Haiku and photos use Claude Sonnet (`src/lib/server/ai.ts`).
+- **Secret notes**: make a key on your Mac with `openssl rand -base64 32`, save it in your
+  password manager first, then run `npx wrangler secret put NOTES_KEY` and paste it when asked.
+  Notes marked secret are then encrypted before they're saved, and older ones the first time
+  they're read. Without the key, encrypted notes can't be read, so don't lose it or change it.
 - **Your own domain**: Workers › home-base › Settings › Domains & Routes › Add › Custom domain
   (the domain's DNS has to be on Cloudflare). Then update Supabase's Site URL and Redirect URLs.
 - **Deploy on every push** (optional): connect the GitHub repo under Workers › home-base ›

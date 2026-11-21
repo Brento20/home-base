@@ -4,9 +4,13 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '$app/env/private';
 
 export const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
 
-/** One client per request, reading and writing the auth session through SvelteKit cookies. */
-export function createSupabaseServerClient(event: RequestEvent) {
+/**
+ * One client per request, reading and writing the auth session through SvelteKit cookies.
+ * `fetch` lets the request time its database calls (src/lib/server/timing.ts).
+ */
+export function createSupabaseServerClient(event: RequestEvent, timedFetch?: typeof fetch) {
 	return createServerClient(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+		global: timedFetch ? { fetch: timedFetch } : undefined,
 		cookies: {
 			getAll: () => event.cookies.getAll(),
 			setAll: (cookiesToSet, headers) => {

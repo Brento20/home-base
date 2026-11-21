@@ -282,7 +282,7 @@
 
 	.armed .glyph,
 	.done .glyph {
-		color: #f6b37a;
+		color: var(--colour-accent);
 	}
 
 	/* The tick stands upright (the arrow's wind-up turn doesn't apply to it) and pops in. */
@@ -348,14 +348,14 @@
 	}
 
 	.ready .bead {
-		color: #f6b37a;
+		color: var(--colour-accent);
 	}
 
 	.hint-label {
 		font-size: var(--text-caption);
 		font-weight: var(--weight-medium);
 		color: var(--colour-text-muted);
-		text-shadow: 0 1px 8px rgb(0 0 0 / 0.6);
+		text-shadow: 0 1px 8px var(--shadow-colour);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

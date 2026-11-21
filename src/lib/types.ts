@@ -23,24 +23,31 @@ export interface AccountDetails {
 	/** 'YYYY-MM-DD', or empty. */
 	dateOfBirth: string;
 	avatarUrl: string | null;
+	/** Their colour (#e58440): avatar, rings, points. From AVATAR_COLOURS. */
+	accentColour: string;
 }
 
 export type ProfileField =
-	'firstName' | 'lastName' | 'nickname' | 'pronouns' | 'dateOfBirth' | 'photo';
+	'firstName' | 'lastName' | 'nickname' | 'pronouns' | 'dateOfBirth' | 'photo' | 'accentColour';
 
 export type ProfileValues = Pick<
 	AccountDetails,
 	'firstName' | 'lastName' | 'nickname' | 'pronouns' | 'dateOfBirth'
->;
+> & {
+	/** Missing when the form has no colour picker (signing up: a colour is given on joining). */
+	accentColour?: string;
+};
 
 /** Something everyone in the home might need: the wifi, bin nights, the spare key. */
 export interface HomeNote {
 	id: string;
 	title: string;
 	body: string;
-	/** Hidden behind dots until tapped. Still readable by everyone in the home. */
+	/** Hidden behind dots until tapped, and sealed in the database. Readable by everyone home. */
 	isSecret: boolean;
 	updatedAt: string;
+	/** Sealed with a key this server doesn't have (NOTES_KEY missing or changed). */
+	locked?: boolean;
 }
 
 export interface Household {
@@ -62,6 +69,8 @@ export interface ListItem {
 export interface ShoppingList {
 	id: string;
 	name: string;
+	/** The home's always-there Shopping list (one per home): never finishes, can't be deleted. */
+	pinned: boolean;
 	/** Set once every item is ticked; the list then lives in Past lists. */
 	completedAt: string | null;
 	items: ListItem[];
@@ -70,8 +79,11 @@ export interface ShoppingList {
 export interface ListSummary {
 	id: string;
 	name: string;
+	pinned: boolean;
 	total: number;
 	remaining: number;
+	/** A few still-to-get names, newest first. */
+	upNext: string[];
 	completedAt: string | null;
 }
 
@@ -89,11 +101,19 @@ export interface Task {
 	createdBy: string | null;
 	/** 'HH:MM' household time, for dinners scheduled at a time. */
 	dueTime: string | null;
-	/** Set for dinners: the recipe it came from and the recipe as scheduled. */
+	/**
+	 * Set for dinners: the recipe it came from, and the dish's name. Lists and the calendar only
+	 * need the name, so that's all they fetch; the cook view gets the whole recipe (CookDinner).
+	 */
 	recipeId: string | null;
 	servings: number | null;
-	recipe: import('#lib/features/recipes/recipe.js').DinnerSnapshot | null;
+	recipe: { title: string } | null;
 }
+
+/** A dinner with the recipe as it was scheduled (ingredients, method), for the cook view. */
+export type CookDinner = Omit<Task, 'recipe'> & {
+	recipe: import('#lib/features/recipes/recipe.js').DinnerSnapshot;
+};
 
 export interface Plan {
 	id: string;

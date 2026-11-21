@@ -1,26 +1,50 @@
-import { HOUSEHOLD_LOCALE } from '#lib/config.js';
+import { homeSettings, LOCALE } from '#lib/home.js';
 
 /**
- * Money is whole cents everywhere (integers), and only turned into dollars for display.
- * Every amount is Australian dollars.
+ * Money is whole cents everywhere (integers), and only turned into dollars (or pounds, or
+ * euros) for display, in the home's currency (src/lib/home.ts; Australian dollars by default).
  */
 
-const dollars = new Intl.NumberFormat(HOUSEHOLD_LOCALE, { style: 'currency', currency: 'AUD' });
-const wholeDollars = new Intl.NumberFormat(HOUSEHOLD_LOCALE, {
-	style: 'currency',
-	currency: 'AUD',
-	maximumFractionDigits: 0
-});
+// One formatter per currency and style, made when first needed: a server serves many homes.
+const formatters = new Map<string, Intl.NumberFormat>();
+function formatter(whole: boolean) {
+	const { currency } = homeSettings();
+	const key = `${currency}:${whole}`;
+	let found = formatters.get(key);
+	if (!found) {
+		found = new Intl.NumberFormat(LOCALE, {
+			style: 'currency',
+			currency,
+			// "£12", not "GBP 12": within a home's own app the plain sign is clear.
+			currencyDisplay: 'narrowSymbol',
+			...(whole ? { maximumFractionDigits: 0, minimumFractionDigits: 0 } : {})
+		});
+		formatters.set(key, found);
+	}
+	return found;
+}
 
-/** $1,234.50 */
-export const formatMoney = (cents: number) => dollars.format(cents / 100);
+/** $1,234.50 (£1,234.50, €1,234.50…) */
+export const formatMoney = (cents: number) => formatter(false).format(cents / 100);
 
 /** $1,235, for chart labels where cents are noise. */
-export const formatMoneyShort = (cents: number) => wholeDollars.format(cents / 100);
+export const formatMoneyShort = (cents: number) => formatter(true).format(cents / 100);
 
-/** Reads what someone typed ("120", "$1,234.5", "12.05") as cents, or null if it isn't money. */
+/** The home's currency sign on its own, for beside an amount field: "$", "£", "€". */
+export function currencySymbol() {
+	return (
+		formatter(false)
+			.formatToParts(0)
+			.find((part) => part.type === 'currency')?.value ?? '$'
+	);
+}
+
+/**
+ * Reads what someone typed ("120", "$1,234.5", "£12.05", "NZ$40") as cents, or null if it isn't
+ * money. Currency signs, letters, spaces and thousands commas are ignored.
+ */
 export function parseMoney(value: string): number | null {
-	const cleaned = value.replace(/[$,\s]/g, '');
+	const cleaned = value.replace(/[^\d.]/g, '');
 	if (!/^\d+(\.\d{0,2})?$/.test(cleaned)) return null;
 	const [whole, fraction = ''] = cleaned.split('.');
 	return Number(whole) * 100 + Number(fraction.padEnd(2, '0'));

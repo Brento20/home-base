@@ -33,7 +33,7 @@
 	padding: 12px 14px;
 	border: 1px solid var(--colour-hairline-strong);
 	border-radius: 14px;
-	background: rgb(0 0 0 / 0.28);
+	background: var(--colour-well);
 	font-size: var(--text-body);
 	line-height: 1.35;
 	color: var(--colour-text);
@@ -200,7 +200,7 @@ legend.field-label {
 
 .button-edit[data-pressed] {
 	transform: scale(0.96);
-	background-color: rgb(255 255 255 / 0.06);
+	background-color: var(--colour-fill);
 	transition-duration: var(--duration-press);
 	transition-timing-function: var(--ease-out);
 }
@@ -225,7 +225,7 @@ legend.field-label {
 	padding: 0 24px;
 	border: 1px solid var(--colour-hairline-strong);
 	border-radius: var(--radius-pill);
-	background: rgb(255 255 255 / 0.04);
+	background: var(--colour-press);
 	color: var(--colour-text);
 	font-weight: var(--weight-medium);
 	text-decoration: none;
@@ -288,7 +288,7 @@ legend.field-label {
 
 .button-secondary[data-pressed],
 .choice-pill[data-pressed] {
-	background-color: rgb(255 255 255 / 0.08);
+	background-color: var(--colour-fill);
 }
 
 .button-quiet[data-pressed] {
@@ -409,9 +409,9 @@ legend.field-label {
 	gap: 6px;
 	min-height: 40px;
 	padding: 0 16px 0 12px;
-	border: 1px solid rgb(255 255 255 / 0.14);
+	border: 1px solid var(--colour-fill-strong);
 	border-radius: var(--radius-pill);
-	background: rgb(255 255 255 / 0.05);
+	background: var(--colour-fill);
 	color: var(--colour-text-muted);
 	font-size: var(--text-small);
 	cursor: pointer;
@@ -421,7 +421,7 @@ legend.field-label {
 }
 
 .extra-chip[data-pressed] {
-	background: rgb(255 255 255 / 0.1);
+	background: var(--colour-fill-strong);
 	transform: scale(0.95);
 	transition-duration: var(--duration-press);
 	transition-timing-function: var(--ease-out);

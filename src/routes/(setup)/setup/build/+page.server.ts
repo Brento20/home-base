@@ -4,12 +4,10 @@ import type { Actions } from './$types';
 
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
-		const { name, password, errors, valid } = parseHomeForm(await request.formData(), {
-			checkStrength: true
-		});
+		const { name, errors, valid } = parseHomeForm(await request.formData());
 		if (!valid) return fail(400, { name, errors, message: null });
 
-		const { message } = await createHome(locals, name, password);
+		const { message } = await createHome(locals, name);
 		if (message) return fail(400, { name, errors: {}, message });
 
 		redirect(303, '/');

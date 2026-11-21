@@ -102,7 +102,7 @@
 	}
 
 	.trigger:global([data-pressed]) {
-		background: rgb(255 255 255 / 0.06);
+		background: var(--colour-fill);
 	}
 
 	.menu {
@@ -112,7 +112,7 @@
 		min-width: 200px;
 		padding: 6px;
 		border-radius: 18px;
-		background: rgb(28 22 19 / 0.96);
+		background: var(--surface-raised);
 		box-shadow:
 			inset 0 0 0 1px var(--colour-hairline-strong),
 			var(--shadow-lift);
@@ -151,7 +151,7 @@
 	}
 
 	.item:global([data-pressed]) {
-		background: rgb(255 255 255 / 0.06);
+		background: var(--colour-fill);
 	}
 
 	.item :global(svg) {
@@ -160,7 +160,7 @@
 
 	.danger,
 	.danger :global(svg) {
-		color: #f19a8f;
+		color: var(--colour-danger);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

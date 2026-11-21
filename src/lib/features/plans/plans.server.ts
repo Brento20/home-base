@@ -122,15 +122,36 @@ export function parsePlanForm(form: FormData) {
 	return { input, errors, values, valid };
 }
 
+/** How many plans the Plans list shows before "Show later plans". */
+export const PLANS_PAGE = 30;
+export const PLANS_PAGE_MAX = 100;
+
+/**
+ * A page of the Plans list: `limit` plans from the start of today, after skipping `offset`,
+ * and whether there are later ones still.
+ */
+export async function listUpcomingPlansPage(
+	locals: App.Locals,
+	offset = 0,
+	limit = PLANS_PAGE
+): Promise<{ plans: Plan[]; hasMore: boolean }> {
+	const plans = await listUpcomingPlans(locals, limit + 1, offset);
+	return { plans: plans.slice(0, limit), hasMore: plans.length > limit };
+}
+
 /** Everything from the start of today, soonest first. */
-export async function listUpcomingPlans(locals: App.Locals, limit = 100): Promise<Plan[]> {
+export async function listUpcomingPlans(
+	locals: App.Locals,
+	limit = 100,
+	offset = 0
+): Promise<Plan[]> {
 	const startOfToday = zonedToInstant(todayISO()).toISOString();
 	const { supabase } = locals;
 	if (!supabase) {
 		return samplePlans
 			.filter((plan) => plan.startsAt >= startOfToday)
 			.sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-			.slice(0, limit);
+			.slice(offset, offset + limit);
 	}
 
 	const householdId = await getHouseholdId(locals);
@@ -140,7 +161,8 @@ export async function listUpcomingPlans(locals: App.Locals, limit = 100): Promis
 		.eq('household_id', householdId)
 		.gte('starts_at', startOfToday)
 		.order('starts_at')
-		.limit(limit);
+		.order('id') // a steady order for plans at the same time, so pages never overlap
+		.range(offset, offset + limit - 1);
 
 	if (readError) dbError(readError);
 	return (data ?? []).map(toPlan);

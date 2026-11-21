@@ -6,6 +6,8 @@
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import { resizePhoto } from '#lib/ui/photo.js';
+	import Icon from '#lib/ui/Icon.svelte';
+	import { AVATAR_COLOURS } from './colours.js';
 	import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
 
 	interface Props {
@@ -15,19 +17,42 @@
 		errors?: FieldErrors<ProfileField>;
 		submitLabel: string;
 		today: string;
+		/** For a Save button elsewhere on the page (`form="…"`). */
+		id?: string;
+		/** False when the page puts its own Save button at the bottom (bind `saving` to it). */
+		showActions?: boolean;
+		/** The "Signed up as" line; the edit page shows it under Account instead. */
+		showEmail?: boolean;
+		saving?: boolean;
+		/**
+		 * Shows "Your colour", with each housemate's name under the colour they wear
+		 * (colour → nickname). Off while signing up: a colour is given on joining a home.
+		 */
+		housemateColours?: Record<string, string> | null;
 	}
 
-	let { account, values, errors = {}, submitLabel, today }: Props = $props();
+	let {
+		account,
+		values,
+		errors = {},
+		submitLabel,
+		today,
+		id,
+		showActions = true,
+		showEmail = true,
+		saving = $bindable(false),
+		housemateColours = null
+	}: Props = $props();
 
 	const start = $derived(values ?? account);
-
-	let saving = $state(false);
 	let photo = $state<File | null>(null);
 	let preview = $state<string | null>(null);
 	let removePhoto = $state(false);
 	let photoProblem = $state<string | null>(null);
 	// Follows the form's starting value, and the field can change it (for the preview initial).
 	let nickname = $derived(start.nickname);
+	// Follows the saved colour, and the picker changes it (for the preview).
+	let colour = $derived(start.accentColour ?? account.accentColour);
 	let fileInput = $state<HTMLInputElement>();
 
 	const shownAvatar = $derived(removePhoto ? null : (preview ?? account.avatarUrl));
@@ -57,6 +82,7 @@
 </script>
 
 <form
+	{id}
 	novalidate
 	method="POST"
 	enctype="multipart/form-data"
@@ -77,7 +103,7 @@
 			person={{
 				displayName: nickname,
 				initials: initial,
-				accentColour: 'var(--colour-accent)',
+				accentColour: housemateColours ? colour : 'var(--colour-accent)',
 				avatarUrl: shownAvatar
 			}}
 			size={88}
@@ -147,6 +173,36 @@
 		{:else}<span class="field-hint">What everyone in your home sees.</span>{/if}
 	</label>
 
+	{#if housemateColours}
+		<fieldset class="field colours">
+			<legend class="field-label">Your colour</legend>
+			<div class="swatches">
+				{#each AVATAR_COLOURS as option (option.hex)}
+					{@const wornBy = housemateColours[option.hex]}
+					<label class="swatch" class:on={colour === option.hex}>
+						<input
+							type="radio"
+							name="accentColour"
+							value={option.hex}
+							checked={colour === option.hex}
+							onchange={() => (colour = option.hex)}
+							aria-label="{option.name}{wornBy ? `, ${wornBy}'s colour` : ''}"
+						/>
+						<span class="swatch-colour" style:--swatch={option.hex}
+							>{#if colour === option.hex}<Icon name="check" size={16} />{/if}</span
+						>
+						<span class="swatch-name">{wornBy ?? option.name}</span>
+					</label>
+				{/each}
+			</div>
+			{#if errors.accentColour}<span class="field-error">{errors.accentColour}</span>
+			{:else}<span class="field-hint"
+					>Your avatar, your rings on tasks and lists, and your score. Under a colour is who already
+					wears it.</span
+				>{/if}
+		</fieldset>
+	{/if}
+
 	<div class="field-row">
 		<label class="field">
 			<span class="field-label">Pronouns</span>
@@ -184,23 +240,27 @@
 		</label>
 	</div>
 
-	<p class="email">Signed up as {account.email}</p>
+	{#if showEmail}<p class="email">Signed up as {account.email}</p>{/if}
 
-	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
-	</div>
+	{#if showActions}
+		<div class="form-actions">
+			<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
+		</div>
+	{/if}
 </form>
 
 <style>
+	/* The photo centred at the top, its actions underneath, as on an iPhone contact card. */
 	.photo {
 		display: flex;
-		flex-wrap: wrap;
+		flex-direction: column;
 		align-items: center;
-		gap: var(--space-m);
+		gap: var(--space-s);
+		margin-bottom: var(--space-s);
 	}
 
 	.photo .field-error {
-		flex-basis: 100%;
+		text-align: center;
 	}
 
 	.photo-actions {
@@ -227,6 +287,71 @@
 	.photo-pick:has(input:focus-visible) {
 		outline: 2px solid var(--colour-accent);
 		outline-offset: 2px;
+	}
+
+	/* Your colour: five across, so ten fit any phone in two rows. */
+	.colours {
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	.swatches {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 12px 4px;
+		margin-top: 4px;
+	}
+
+	.swatch {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		cursor: pointer;
+	}
+
+	.swatch input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.swatch-colour {
+		display: grid;
+		place-items: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--swatch);
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		color: var(--colour-on-ring);
+	}
+
+	.swatch.on .swatch-colour {
+		box-shadow:
+			0 0 0 2px var(--colour-ground),
+			0 0 0 4px var(--swatch);
+	}
+
+	.swatch:has(input:focus-visible) .swatch-colour {
+		outline: 2px solid var(--colour-accent);
+		outline-offset: 5px;
+	}
+
+	.swatch-name {
+		max-width: 100%;
+		overflow: hidden;
+		font-size: var(--text-caption);
+		color: var(--colour-text-muted);
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.swatch.on .swatch-name {
+		color: var(--colour-text);
+		font-weight: var(--weight-medium);
 	}
 
 	.email {

@@ -95,7 +95,7 @@
 	}
 
 	.diet {
-		color: #b9dca4;
+		color: var(--colour-veg);
 	}
 
 	.recipe-row > :global(svg) {

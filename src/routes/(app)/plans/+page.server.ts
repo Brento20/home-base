@@ -1,5 +1,9 @@
 import { gridRange, monthFromParam } from '#lib/features/plans/calendar.js';
-import { listPlansBetween, listUpcomingPlans } from '#lib/features/plans/plans.server.js';
+import {
+	listPlansBetween,
+	listUpcomingPlansPage,
+	PLANS_PAGE
+} from '#lib/features/plans/plans.server.js';
 import { listDinnersBetween } from '#lib/features/recipes/dinners.server.js';
 import { todayISO } from '#lib/time.js';
 import type { PageServerLoad } from './$types';
@@ -24,25 +28,30 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 			: 'list';
 
 	if (view === 'list') {
+		// The first page; "Show later plans" fetches more from /plans/later.
+		const { plans, hasMore } = await listUpcomingPlansPage(locals, 0, PLANS_PAGE);
 		return {
 			view: 'list' as const,
-			plans: await listUpcomingPlans(locals),
+			plans,
+			hasMore,
 			today,
 			now: new Date().toISOString()
 		};
 	}
 
+	// The month's grid needs no data, so its entries aren't waited for: a swipe to another
+	// month shows that month straight away, and its plans and dinners follow.
 	const month = monthFromParam(url.searchParams.get('month'), today);
 	const { from, until } = gridRange(month);
-	const [plans, dinners] = await Promise.all([
+	const entries = Promise.all([
 		listPlansBetween(locals, from, until),
 		listDinnersBetween(locals, from, until)
-	]);
+	]).then(([plans, dinners]) => ({ plans, dinners }));
+	entries.catch(() => {}); // a failure shows in the page; don't let it go unhandled here
 	return {
 		view: 'calendar' as const,
 		month,
-		plans,
-		dinners,
+		entries,
 		today,
 		now: new Date().toISOString()
 	};

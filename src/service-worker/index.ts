@@ -111,17 +111,23 @@ async function fromNetworkFirst(request: Request, isPageData: boolean, event: Fe
 	// Page data URLs carry a changing ?x-sveltekit-invalidated= query, so match on the path.
 	const saved = () => cache.match(request, { ignoreSearch: isPageData, ignoreVary: true });
 
-	const network = fetch(request).then(async (response) => {
+	// The response goes to the page the moment it starts arriving; the saved copy is written
+	// alongside. (Waiting for cache.put would hold the page until the whole body had downloaded,
+	// which stopped streamed data, like Today's feed, from showing anything early.)
+	const network = fetch(request).then((response) => {
 		// Only keep complete, signed-in pages: not redirects (to sign in) or errors.
 		if (response.ok && !response.redirected && response.type === 'basic') {
-			await cache.put(request, response.clone());
-			// Moving between tabs fetches a page's data rather than the page. Offline, SvelteKit
-			// can't fall back from a missing data file, so save it alongside every saved page.
-			if (!isPageData) event.waitUntil(saveDataFor(new URL(request.url), cache));
+			event.waitUntil(
+				cache.put(request, response.clone()).then(() => {
+					// Moving between tabs fetches a page's data rather than the page. Offline,
+					// SvelteKit can't fall back from a missing data file, so save it alongside.
+					if (!isPageData) return saveDataFor(new URL(request.url), cache);
+				})
+			);
 		}
 		// Landing on the signed-out page means the session has gone: forget saved pages.
 		if (response.redirected && new URL(response.url).pathname === '/welcome') {
-			await caches.delete(PAGES);
+			event.waitUntil(caches.delete(PAGES));
 		}
 		return response;
 	});

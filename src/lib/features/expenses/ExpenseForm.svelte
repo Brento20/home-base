@@ -14,7 +14,7 @@
 	import { CATEGORIES } from './categories.js';
 	import { nameOf } from './describe.js';
 	import type { ExpenseField, ExpenseFormValues } from './form.js';
-	import { formatMoney, parseMoney } from './money.js';
+	import { currencySymbol, formatMoney, parseMoney } from './money.js';
 	import { computeShares, readSplitInput, SPLIT_METHODS, type SplitMethod } from './split.js';
 
 	interface Props {
@@ -127,7 +127,7 @@
 	<label class="field">
 		<span class="field-label">Total paid</span>
 		<span class="money-input total">
-			<span class="currency" aria-hidden="true">$</span>
+			<span class="currency" aria-hidden="true">{currencySymbol()}</span>
 			<input
 				id="expense-amount"
 				class="field-input"
@@ -335,7 +335,7 @@
 		padding: 0 10px;
 		border: 1px solid var(--colour-hairline-strong);
 		border-radius: 12px;
-		background: rgb(0 0 0 / 0.28);
+		background: var(--colour-well);
 	}
 
 	.mini:focus-within {

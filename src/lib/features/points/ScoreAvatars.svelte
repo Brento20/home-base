@@ -19,7 +19,7 @@
 <a class="score-avatars" href="/points" aria-label={label}>
 	{#each people as person (person.id)}
 		<span class="person">
-			<Avatar {person} />
+			<Avatar {person} size={36} ring />
 			<span class="points">{weekOf(person.id)}</span>
 		</span>
 	{/each}
@@ -29,7 +29,7 @@
 	.score-avatars {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 14px;
 		min-height: var(--tap-target);
 		margin-right: -4px;
 		padding: 0 4px;
@@ -40,7 +40,7 @@
 	.person {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
 	}
 
 	.points {

@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import {
 	addListItem,
+	clearTickedItems,
 	deleteList,
 	deleteListItem,
 	getList,
@@ -22,7 +23,8 @@ export const actions: Actions = {
 		if (!name) return fail(400, { message: 'Type something to add.' });
 		if (name.length > ITEM_NAME_MAX)
 			return fail(400, { message: `Keep it under ${ITEM_NAME_MAX} characters.` });
-		await addListItem(locals, params.id, name);
+		const added = await addListItem(locals, params.id, name);
+		if (!added) return { message: `${name} is already on the list.`, already: true };
 	},
 
 	setChecked: async ({ request, locals }) => {
@@ -55,6 +57,11 @@ export const actions: Actions = {
 		if (!valid) return fail(400, { renameErrors: errors, name });
 		await renameList(locals, params.id, name);
 		return { renamed: true };
+	},
+
+	/** Takes the ticked items away (Reminders' Clear). */
+	clearTicked: async ({ locals, params }) => {
+		await clearTickedItems(locals, params.id);
 	},
 
 	delete: async ({ locals, params }) => {

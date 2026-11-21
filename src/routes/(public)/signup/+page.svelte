@@ -83,11 +83,20 @@
 
 		{#snippet footer()}
 			Already have an account? <a href="/login">Sign in</a>
+			<p class="privacy-note">
+				Signing up means you’re happy with how home base <a href="/privacy">handles your data</a>.
+			</p>
 		{/snippet}
 	</SoloScreen>
 {/if}
 
 <style>
+	.privacy-note {
+		margin-top: var(--space-s);
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
+	}
+
 	.aside {
 		color: var(--colour-text-muted);
 	}

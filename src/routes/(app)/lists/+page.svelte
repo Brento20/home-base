@@ -1,86 +1,127 @@
 <script lang="ts">
-	import { pick } from '#lib/copy/pick.js';
-	import { EMPTY } from '#lib/copy/voice.js';
-	import { PLACEHOLDERS } from '#lib/copy/voice.js';
-	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
+	/**
+	 * Lists, laid out like Reminders (the heading and Lists | Tasks switch are in +layout.svelte): the Shopping list up top as a widget you can add to straight
+	 * away, then your other lists as one grouped panel (a coloured circle each, what's left on the
+	 * right), with New list as the panel's last row, and Past lists on its own below.
+	 */
 	import { enhance } from '$app/forms';
-	import ListCard from '#lib/features/lists/ListCard.svelte';
-	import ListsNav from '#lib/features/lists/ListsNav.svelte';
-	import GlassSurface from '#lib/ui/GlassSurface.svelte';
+	import ShoppingCard from '#lib/features/lists/ShoppingCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
-	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
-	// Said a little differently each visit (src/lib/copy/voice.ts).
-	const emptyLine = pick(EMPTY.lists);
+	const shopping = $derived(data.lists.find((list) => list.pinned));
+	const others = $derived(data.lists.filter((list) => !list.pinned));
+
+	// A list keeps its colour: picked from its id, not its place, so adding one repaints nothing.
+	const COLOURS = 8;
+	function colourOf(id: string) {
+		let hash = 0;
+		for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+		return `var(--chart-${(hash % COLOURS) + 1})`;
+	}
 </script>
 
 <svelte:head>
 	<title>Lists · home base</title>
 </svelte:head>
 
-<PageHeader title="Lists" />
-<ListsNav />
-
-<form class="new-list" method="POST" action="?/create" use:enhance>
-	<GlassSurface radius={18} />
-	<label class="visually-hidden" for="new-list-name">New list name</label>
-	<input
-		id="new-list-name"
-		name="name"
-		placeholder={PLACEHOLDERS.listName[0]}
-		use:placeholderReel={PLACEHOLDERS.listName}
-		autocomplete="off"
-		enterkeyhint="go"
-		maxlength="60"
-		value={form?.name ?? ''}
-		required
-	/>
-	<button class="add-button" aria-label="Create list"><Icon name="plus" size={20} /></button>
-</form>
-{#if form?.errors?.name}<p class="field-error">{form.errors.name}</p>{/if}
-
-{#if data.lists.length === 0}
-	<p class="empty">{emptyLine}</p>
-{:else}
-	<ul class="cards">
-		{#each data.lists as list (list.id)}
-			<ListCard {list} today={data.today} />
-		{/each}
-	</ul>
+{#if shopping}
+	<ShoppingCard list={shopping} />
 {/if}
 
-<p class="past-link"><a class="button-quiet" href="/lists/past">Past lists</a></p>
+<section class="group" aria-labelledby="my-lists">
+	<h2 class="group-title" id="my-lists">My lists</h2>
+	<ul class="grouped">
+		{#each others as list (list.id)}
+			<li>
+				<a class="grouped-row" href="/lists/{list.id}">
+					<span class="grouped-icon" style:--icon-colour={colourOf(list.id)}
+						><Icon name="lists" size={16} /></span
+					>
+					<span class="grouped-label">
+						{list.name}
+						{#if list.upNext.length}
+							<span class="grouped-sub preview">{list.upNext.join(', ')}</span>
+						{/if}
+					</span>
+					<span class="grouped-value" aria-label="{list.remaining} left">{list.remaining}</span>
+					<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
+				</a>
+			</li>
+		{/each}
+		<li>
+			<form class="grouped-row new-list" method="POST" action="?/create" use:enhance>
+				<span class="grouped-icon new-icon"><Icon name="plus" size={16} /></span>
+				<label class="visually-hidden" for="new-list-name">New list name</label>
+				<input
+					id="new-list-name"
+					name="name"
+					placeholder="New list"
+					autocomplete="off"
+					autocapitalize="sentences"
+					enterkeyhint="go"
+					maxlength="60"
+					value={form?.name ?? ''}
+					required
+				/>
+				<button class="create">Add</button>
+			</form>
+		</li>
+	</ul>
+	{#if form?.errors?.name}
+		<p class="field-error group-error">{form.errors.name}</p>
+	{:else}
+		<p class="group-note">
+			{others.length
+				? 'A list moves to Past lists once everything on it is ticked.'
+				: 'For anything that isn’t the weekly shop: a hardware run, a packing list.'}
+		</p>
+	{/if}
+</section>
+
+<ul class="grouped past">
+	<li>
+		<a class="grouped-row" href="/lists/past">
+			<span class="grouped-icon" style:--icon-colour="var(--colour-fill-stronger)"
+				><Icon name="archive" size={16} /></span
+			>
+			<span class="grouped-label">Past lists</span>
+			<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
+		</a>
+	</li>
+</ul>
 
 <style>
-	.new-list {
-		position: relative;
-		display: flex;
-		align-items: center;
-		gap: var(--space-s);
-		height: 56px;
-		padding: 0 6px 0 18px;
-		border-radius: var(--radius-field);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+	.group {
+		margin-top: var(--space-xl);
 	}
 
-	.new-list:focus-within {
-		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
-			0 0 0 3px var(--colour-accent-soft);
+	.preview {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* New list: the panel's last row, an inline field with a plain Add, as in Reminders. */
+	.new-list {
+		margin: 0;
+	}
+
+	.new-icon {
+		background: var(--colour-fill-strong);
+		color: var(--colour-accent);
 	}
 
 	.new-list input {
-		position: relative;
-		z-index: 1;
 		flex: 1;
 		min-width: 0;
-		height: 100%;
+		min-height: 40px;
 		border: 0;
 		background: none;
 		font-size: var(--text-body);
+		color: var(--colour-text);
 		outline: none;
 	}
 
@@ -88,47 +129,34 @@
 		color: var(--colour-text-faint);
 	}
 
-	.add-button {
-		position: relative;
-		z-index: 1;
-		display: grid;
-		place-items: center;
-		width: var(--tap-target);
-		height: var(--tap-target);
+	.create {
+		min-height: 40px;
+		padding: 0 6px;
 		border: 0;
-		border-radius: 50%;
-		background: var(--colour-accent);
-		color: var(--colour-on-accent);
-		transition:
-			transform var(--duration-release) var(--spring-gentle),
-			background-color var(--duration-quick) var(--ease-out);
+		background: none;
+		font: inherit;
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity var(--duration-quick) var(--ease-out);
 	}
 
-	.add-button:global([data-pressed]) {
-		transform: scale(0.9);
-		background: var(--colour-accent-pressed);
-		transition-duration: var(--duration-press);
-		transition-timing-function: var(--ease-out);
+	/* Add appears once there's a name to add. */
+	.new-list:has(input:not(:placeholder-shown)) .create {
+		opacity: 1;
+		pointer-events: auto;
 	}
 
-	.field-error {
-		margin-top: var(--space-s);
+	.group-error {
+		margin: 8px 16px 0;
 	}
 
-	.cards {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		margin: 28px 0 0;
-		padding: 0;
-	}
-
-	.empty {
-		margin-top: 28px;
-		color: var(--colour-text-muted);
-	}
-
-	.past-link {
+	.past {
 		margin-top: var(--space-l);
+	}
+
+	.past .grouped-icon {
+		color: var(--colour-text-muted);
 	}
 </style>

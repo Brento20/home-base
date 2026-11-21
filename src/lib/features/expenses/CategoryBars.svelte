@@ -3,6 +3,7 @@
 	 * Spending by category as labelled horizontal bars, biggest first. Each row is a link: tap one
 	 * to see the expenses behind it, tap it again to go back to every category.
 	 */
+	import { reveal } from '#lib/ui/reveal.js';
 	import { formatMoney } from './money.js';
 	import type { CategoryTotal } from './report.js';
 
@@ -20,8 +21,8 @@
 		share > 0 && share < 0.01 ? '<1%' : `${Math.round(share * 100)}%`;
 </script>
 
-<ul class="bars">
-	{#each categories as category (category.key)}
+<ul class="bars" use:reveal>
+	{#each categories as category, index (category.key)}
 		{@const isSelected = selected === category.key}
 		<li class:dim={selected !== null && !isSelected}>
 			<a
@@ -42,6 +43,7 @@
 						class="fill"
 						style:width="{Math.max(1.5, (category.cents / max) * 100)}%"
 						style:background={category.colour}
+						style:--i={index}
 					></span>
 				</span>
 			</a>
@@ -111,9 +113,23 @@
 		background: var(--colour-hairline);
 	}
 
+	/* Each bar grows from the left, one after another, when the list comes into view. */
 	.fill {
 		display: block;
 		height: 100%;
 		border-radius: 4px;
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 800ms var(--spring-soft) calc(var(--i) * 60ms);
+	}
+
+	.bars:global(.shown) .fill {
+		transform: scaleX(1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fill {
+			transition: none;
+		}
 	}
 </style>

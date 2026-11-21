@@ -52,7 +52,7 @@
 		position: relative;
 		width: min(100%, 420px);
 		border-radius: var(--radius-pill);
-		background: rgb(20 15 13 / 0.68);
+		background: var(--surface-bar);
 		-webkit-backdrop-filter: blur(20px) saturate(150%);
 		backdrop-filter: blur(20px) saturate(150%);
 		/* Its own layer for good, so iOS doesn't re-rasterise it (and drop the blur) mid-scroll. */
@@ -60,7 +60,7 @@
 		will-change: transform;
 		box-shadow:
 			var(--glass-inner-light),
-			0 14px 32px -14px rgb(0 0 0 / 0.7);
+			0 14px 32px -14px var(--shadow-colour);
 		pointer-events: auto;
 	}
 

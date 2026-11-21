@@ -239,7 +239,7 @@
 	}
 
 	.green {
-		color: #b9dca4;
+		color: var(--colour-veg);
 	}
 
 	.kind span + span::before {
@@ -320,10 +320,10 @@
 		min-height: 46px;
 		padding: 0 8px 0 16px;
 		border-radius: var(--radius-pill);
-		background: rgb(36 30 26 / 0.98);
+		background: var(--surface-raised);
 		box-shadow:
-			inset 0 0 0 1px rgb(255 255 255 / 0.1),
-			0 10px 28px -12px rgb(0 0 0 / 0.7);
+			inset 0 0 0 1px var(--colour-hairline-strong),
+			0 10px 28px -12px var(--shadow-colour);
 		font-size: var(--text-small);
 		animation: notice-in 360ms cubic-bezier(0.22, 1, 0.36, 1);
 	}

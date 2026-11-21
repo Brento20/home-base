@@ -21,6 +21,7 @@
 			<a class="button-secondary button-block" href="/login">Sign in</a>
 		</div>
 	</GlassCard>
+	<p class="fine"><a href="/privacy">Privacy</a></p>
 </main>
 
 <style>
@@ -34,6 +35,13 @@
 		margin: 0 auto;
 		padding: calc(env(safe-area-inset-top) + 18vh) var(--page-gutter)
 			calc(env(safe-area-inset-bottom) + 28px);
+	}
+
+	.fine {
+		margin-top: calc(var(--space-2xl) * -1 + var(--space-m));
+		text-align: center;
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
 	}
 
 	.wordmark {

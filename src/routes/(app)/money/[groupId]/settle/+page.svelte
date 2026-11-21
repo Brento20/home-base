@@ -4,7 +4,7 @@
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { describeDebt } from '#lib/features/expenses/describe.js';
-	import { centsToInput } from '#lib/features/expenses/money.js';
+	import { centsToInput, currencySymbol } from '#lib/features/expenses/money.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -105,7 +105,7 @@
 		<label class="field">
 			<span class="field-label">Amount</span>
 			<span class="money-input">
-				<span class="currency" aria-hidden="true">$</span>
+				<span class="currency" aria-hidden="true">{currencySymbol()}</span>
 				<input
 					class="field-input"
 					name="amount"

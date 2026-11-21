@@ -1,4 +1,4 @@
-import { HOUSEHOLD_LOCALE } from '#lib/config.js';
+import { LOCALE } from '#lib/home.js';
 import { addDays, isValidDateISO, zonedParts } from '#lib/time.js';
 import type { Plan, Task } from '#lib/types.js';
 
@@ -26,12 +26,12 @@ export function shiftMonth(month: string, count: number) {
 	return `${Math.floor(total / 12)}-${String((total % 12) + 1).padStart(2, '0')}`;
 }
 
-const monthYear = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, {
+const monthYear = new Intl.DateTimeFormat(LOCALE, {
 	month: 'long',
 	year: 'numeric',
 	timeZone: 'UTC'
 });
-const monthOnly = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, { month: 'long', timeZone: 'UTC' });
+const monthOnly = new Intl.DateTimeFormat(LOCALE, { month: 'long', timeZone: 'UTC' });
 
 /** "November", or "January 2027" when it isn't this year. */
 export function monthLabel(month: string, today: string) {

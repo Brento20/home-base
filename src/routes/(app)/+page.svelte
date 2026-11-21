@@ -3,6 +3,7 @@
 	import ScoreAvatars from '#lib/features/points/ScoreAvatars.svelte';
 	import HomeShortcuts from '#lib/features/today/HomeShortcuts.svelte';
 	import ComingUp from '#lib/features/today/ComingUp.svelte';
+	import GettingStarted from '#lib/features/today/GettingStarted.svelte';
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { formatTodayHeading } from '#lib/time.js';
@@ -17,6 +18,24 @@
 			(item) => item.kind === 'task' && item.task.recipe && item.task.dueOn === data.today
 		)
 	);
+
+	// The feed streams in after the rest of the screen. Keep showing the last posts while a
+	// refresh's arrive, so the feed never blanks out every minute.
+	type FeedPage = Awaited<typeof data.feed>;
+	let feed = $state<FeedPage | null>(null);
+	let feedFailed = $state(false);
+	$effect(() => {
+		let current = true;
+		data.feed.then(
+			(page) => {
+				if (!current) return;
+				feed = page;
+				feedFailed = false;
+			},
+			() => current && (feedFailed = true)
+		);
+		return () => (current = false);
+	});
 </script>
 
 <svelte:head>
@@ -35,13 +54,15 @@
 </header>
 
 <div class="stack">
+	{#if data.start}<GettingStarted steps={data.start} />{/if}
 	<ComingUp items={data.comingUp} people={data.household.members} today={data.today} />
 	<ListsGlance lists={data.lists} />
 	<HomeShortcuts tonight={tonight?.kind === 'task' ? (tonight.task.recipe?.title ?? null) : null} />
 	<FeedSection
-		posts={data.feed.posts}
-		hasMore={data.feed.hasMore}
-		pageSize={data.feed.pageSize}
+		posts={feed?.posts ?? null}
+		unavailable={feedFailed}
+		hasMore={feed?.hasMore ?? false}
+		pageSize={feed?.pageSize ?? 5}
 		people={data.household.members}
 		me={data.me.id}
 	/>
@@ -84,7 +105,7 @@
 	.stack {
 		display: flex;
 		flex-direction: column;
-		gap: 30px;
-		margin-top: 28px;
+		gap: 24px;
+		margin-top: 24px;
 	}
 </style>

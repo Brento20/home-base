@@ -1,21 +1,18 @@
 <script lang="ts">
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
-	/** Home name and password, shared by Build a home and Join a home. */
+	/** Naming a new home (Build a home). People join by invite link, not by name. */
 	import { enhance } from '$app/forms';
-	import PasswordField from '#lib/ui/PasswordField.svelte';
 	import type { FieldErrors } from '#lib/types.js';
 
 	interface Props {
-		mode: 'build' | 'join';
 		name?: string;
-		errors?: FieldErrors<'name' | 'password'>;
+		errors?: FieldErrors<'name'>;
 		message?: string | null;
 	}
 
-	let { mode, name = '', errors = {}, message = null }: Props = $props();
+	let { name = '', errors = {}, message = null }: Props = $props();
 	let submitting = $state(false);
-	const building = $derived(mode === 'build');
 </script>
 
 <form
@@ -39,28 +36,17 @@
 			minlength="3"
 			maxlength="30"
 			autocomplete="off"
-			placeholder={building ? PLACEHOLDERS.homeName[0] : ''}
-			use:placeholderReel={building ? PLACEHOLDERS.homeName : []}
+			placeholder={PLACEHOLDERS.homeName[0]}
+			use:placeholderReel={PLACEHOLDERS.homeName}
 			required
 			aria-invalid={errors.name ? 'true' : undefined}
 		/>
 		{#if errors.name}<span class="field-error">{errors.name}</span>{/if}
 	</label>
 
-	<PasswordField
-		label="Home password"
-		autocomplete={building ? 'new-password' : 'off'}
-		minlength={building ? 8 : undefined}
-		error={errors.password}
-		hint={building
-			? 'At least 8 characters. Not your account password: you’ll share this one.'
-			: undefined}
-	/>
-
 	{#if message}<p class="form-message" role="alert">{message}</p>{/if}
 
 	<button class="button-primary" disabled={submitting}>
-		{#if building}{submitting ? 'Building…' : 'Build home'}
-		{:else}{submitting ? 'Joining…' : 'Join home'}{/if}
+		{submitting ? 'Building…' : 'Build home'}
 	</button>
 </form>

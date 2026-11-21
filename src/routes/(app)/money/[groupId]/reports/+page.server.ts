@@ -1,24 +1,20 @@
 import { isCategory } from '#lib/features/expenses/categories.js';
 import { listReportExpenses } from '#lib/features/expenses/expenses.server.js';
 import {
+	biggestExpenses,
 	buildReport,
 	compareReports,
 	isWholeMonth,
 	monthRange,
+	paceOf,
+	paidByTotals,
 	parseRange,
-	shiftMonth,
+	previousRange,
 	type DateRange,
 	type ReportExpense
 } from '#lib/features/expenses/report.js';
-import { addDays, daysBetween, todayISO } from '#lib/time.js';
+import { todayISO } from '#lib/time.js';
 import type { PageServerLoad } from './$types';
-
-/** The range just before another, the same length (a whole month steps back a whole month). */
-function previousRange(range: DateRange): DateRange {
-	if (isWholeMonth(range)) return shiftMonth(range, -1);
-	const days = daysBetween(range.from, range.to) + 1;
-	return { from: addDays(range.from, -days), to: addDays(range.from, -1) };
-}
 
 const byNewest = (a: ReportExpense, b: ReportExpense) => b.spentOn.localeCompare(a.spentOn);
 
@@ -48,26 +44,39 @@ export const load: PageServerLoad = async ({ locals, parent, url }) => {
 				.filter((e) => e.category === category)
 				.sort(byNewest);
 
+		// The running totals side by side, following the picked category if there is one.
+		const paceSource = category ? expenses.filter((e) => e.category === category) : expenses;
 		return {
 			mode: 'compare' as const,
 			category,
 			comparison: compareReports(buildReport(expenses, a), buildReport(expenses, b)),
+			pace: { a: paceOf(paceSource, a, today), b: paceOf(paceSource, b, today) },
 			drill: category ? { a: inRange(a), b: inRange(b) } : null
 		};
 	}
 
 	const range = parseRange(params.get('from'), params.get('to')) ?? monthRange(today);
-	const expenses = await listReportExpenses(locals, group.id, range.from, range.to);
+	// One read covers this range and the one before, for "vs last month" and the pace line.
+	const before = previousRange(range);
+	const all = await listReportExpenses(locals, group.id, before.from, range.to);
+	const expenses = all.filter((e) => e.spentOn >= range.from);
 	const report = buildReport(expenses, range);
+	const previous = buildReport(all, before);
 	const picked = category ? expenses.filter((e) => e.category === category).sort(byNewest) : null;
+	// Charts over time follow the picked category, so you can see how one kind of spending moves.
+	const focus = category ? all.filter((e) => e.category === category) : all;
 
 	return {
 		mode: 'overview' as const,
 		category,
 		report,
-		// Over time follows the picked category, so you can see how one kind of spending moves.
+		previous: { range: before, totalCents: previous.totalCents },
 		trend: picked ? buildReport(picked, range).series : report.series,
+		pace: { now: paceOf(focus, range, today), before: paceOf(focus, before) },
+		paidBy: paidByTotals(expenses, range),
+		biggest: biggestExpenses(expenses, range),
 		drill: picked,
-		isCurrentMonth: range.from === monthRange(today).from && isWholeMonth(range)
+		isCurrentMonth: range.from === monthRange(today).from && isWholeMonth(range),
+		today
 	};
 };

@@ -1,5 +1,6 @@
 import { afterNavigate, onNavigate, preloadCode } from '$app/navigation';
-import { TABS, tabIndexFor } from './tabs.js';
+import { match } from '$app/paths';
+import { TABS, isViewSwitch, tabIndexFor } from './tabs.js';
 
 /**
  * Smooth slides between screens, with the View Transitions API (motion in base.css).
@@ -26,13 +27,16 @@ import { TABS, tabIndexFor } from './tabs.js';
  * reveal below), so a screen settles in rather than appearing all at once.
  *
  * Browsers without view transitions swap screens instantly (the reveal still plays).
- * Query-only changes (a report's month) don't animate. Call once, from the root layout.
+ * Query-only changes (a report's month) and switching a tab's views (Lists | Tasks) don't
+ * animate. Call once, from the root layout.
  */
 export function usePageTransitions() {
 	onNavigate((navigation) => {
 		const { from, to } = navigation;
 		if (!document.startViewTransition || !from || !to) return;
 		if (from.url.pathname === to.url.pathname) return;
+		// Lists | Tasks: the content swaps under a heading and switch that stay put.
+		if (isViewSwitch(from.url.pathname, to.url.pathname)) return;
 
 		const root = document.documentElement;
 		root.dataset.nav = directionFor(from.url.pathname, to.url.pathname);
@@ -58,6 +62,7 @@ export function usePageTransitions() {
 		// Not on first load: the server-rendered page is already showing, and hiding it to fade
 		// it back in would flash.
 		if (type === 'enter' || !from || !to || from.url.pathname === to.url.pathname) return;
+		if (isViewSwitch(from.url.pathname, to.url.pathname)) return;
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		reveal();
 	});
@@ -78,7 +83,7 @@ function reveal() {
 	const page = document.querySelector<HTMLElement>('[data-page]');
 	if (!page) return;
 	const sections = [...page.children].flatMap((child) =>
-		child.matches('.stack, .form-stack') ? [...child.children] : [child]
+		child.matches('.stack, .form-stack, [data-view-content]') ? [...child.children] : [child]
 	);
 	let step = 0;
 	for (const section of sections) {
@@ -100,10 +105,18 @@ function reveal() {
 	}
 }
 
-/** Loads every tab's code in a quiet moment after the app opens, so the first visit is quick. */
+/**
+ * Loads every tab's code in a quiet moment after the app opens, so the first visit is quick.
+ * preloadCode takes route IDs, not paths (a path is quietly skipped), so each tab's path is
+ * matched to its route first.
+ */
 export function preloadTabs() {
-	type Path = Parameters<typeof preloadCode>[0];
-	const load = () => TABS.forEach((tab) => preloadCode(tab.href as Path).catch(() => {}));
+	const load = () =>
+		TABS.forEach((tab) =>
+			match(tab.href)
+				.then((route) => route && preloadCode(route.id))
+				.catch(() => {})
+		);
 	if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 3000 });
 	else setTimeout(load, 1500);
 }

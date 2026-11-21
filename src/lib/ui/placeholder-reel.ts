@@ -68,7 +68,6 @@ export function placeholderReel(field: Field, lines: readonly string[]) {
 	let queue = [first, ...shuffled(lines.filter((line) => line !== first))];
 	let index = 0;
 
-	if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
 	const reel = document.createElement('span');
 	reel.className = 'placeholder-reel';
 	if (field instanceof HTMLTextAreaElement) reel.classList.add('multiline');
@@ -95,8 +94,14 @@ export function placeholderReel(field: Field, lines: readonly string[]) {
 	let touched = false;
 	let steps = 0;
 
-	/** Lines the reel up with the field's text box: position, padding and type. */
+	/**
+	 * Lines the reel up with the field's text box: position, padding and type. Runs only from
+	 * the ResizeObserver, which calls it once layout is done (including straight after observe,
+	 * before the first paint), so measuring never forces a layout mid-transition.
+	 */
 	function fit() {
+		if (parent && !parent.style.position && getComputedStyle(parent).position === 'static')
+			parent.style.position = 'relative';
 		const style = getComputedStyle(field);
 		Object.assign(reel.style, {
 			left: `${field.offsetLeft}px`,
@@ -185,14 +190,16 @@ export function placeholderReel(field: Field, lines: readonly string[]) {
 		sync();
 	});
 	visibility.observe(field);
-	// Values set from code (a cleared reply box) fire no event, so check now and then too.
-	const poll = setInterval(sync, 600);
+	// Values set from code (a cleared reply box) fire no event, so check now and then too, but
+	// only while the field is on screen and the app is showing (scrolling back in syncs anyway).
+	const poll = setInterval(() => {
+		if (onScreen && !document.hidden) sync();
+	}, 600);
 
 	for (const type of ['focus', 'input', 'change'] as const) field.addEventListener(type, sync);
 	field.addEventListener('blur', onBlur);
 	field.form?.addEventListener('reset', onReset);
 	document.addEventListener('visibilitychange', sync);
-	fit();
 	sync();
 
 	return {

@@ -217,8 +217,8 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		border: 2px solid var(--ring-colour);
-		color: #14100d;
+		border: 2px solid var(--ring-ink);
+		color: var(--colour-on-ring);
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
 			transform var(--duration-release) var(--spring-gentle);
@@ -231,7 +231,7 @@
 	}
 
 	.ring.checked {
-		background: var(--ring-colour);
+		background: var(--ring-ink);
 	}
 
 	.name {
@@ -242,7 +242,7 @@
 	.name.checked {
 		color: var(--colour-text-faint);
 		text-decoration: line-through;
-		text-decoration-color: rgb(245 237 230 / 0.3);
+		text-decoration-color: var(--colour-strike);
 	}
 
 	.remove {

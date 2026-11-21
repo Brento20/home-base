@@ -88,7 +88,7 @@
 		padding: 0 11px;
 		border: 1px solid var(--colour-hairline);
 		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.03);
+		background: var(--colour-press);
 		color: var(--colour-text-muted);
 		font-size: var(--text-caption);
 		font-weight: var(--weight-medium);

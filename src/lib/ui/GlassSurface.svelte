@@ -30,7 +30,11 @@
 	const PRESSED = '1.025 0.97';
 	const PRESSED_REDUCED = '0.985';
 
-	/** The app's gentle spring (tokens.css), with a stand-in where linear() easing isn't supported. */
+	/**
+	 * The app's gentle spring (tokens.css), with a stand-in where linear() easing isn't supported.
+	 * Read on the first release, not as each card mounts: reading a computed style forces the
+	 * whole page's styles to be worked out, and a screen mounts a dozen cards mid-transition.
+	 */
 	function springEasing() {
 		const spring = getComputedStyle(document.documentElement)
 			.getPropertyValue('--spring-gentle')
@@ -53,7 +57,7 @@
 		// and holds quick taps long enough to be felt. The card squishes when it is pressed
 		// itself or through its own link, not when a button inside it (a tick) is.
 		const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-		const easing = springEasing();
+		let easing: string | undefined;
 		let animation: Animation | undefined;
 		let pressed = false;
 
@@ -75,7 +79,7 @@
 			animation.cancel();
 			animation = target.animate([{ scale: from === 'none' ? '1' : from }, { scale: '1' }], {
 				duration: reduced.matches ? 160 : 620,
-				easing: reduced.matches ? 'ease-out' : easing
+				easing: reduced.matches ? 'ease-out' : (easing ??= springEasing())
 			});
 			animation.onfinish = () => (animation = undefined);
 		};

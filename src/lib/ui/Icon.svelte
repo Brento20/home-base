@@ -24,7 +24,14 @@
 		| 'filter'
 		| 'leaf'
 		| 'sparkle'
-		| 'camera';
+		| 'camera'
+		| 'wifi'
+		| 'phone'
+		| 'message'
+		| 'qr'
+		| 'basket'
+		| 'archive'
+		| 'share';
 </script>
 
 <script lang="ts">
@@ -73,6 +80,32 @@
 		<path d="M9.5 6l6 6-6 6" />
 	{:else if name === 'back'}
 		<path d="M14.5 6l-6 6 6 6" />
+	{:else if name === 'wifi'}
+		<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.6 15.9a5 5 0 0 1 6.8 0" />
+		<circle cx="12" cy="19.2" r="1.1" fill="currentColor" stroke="none" />
+	{:else if name === 'phone'}
+		<path
+			d="M6.6 3.5h2.2l1.4 4-2 1.3a11 11 0 0 0 7 7l1.3-2 4 1.4v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"
+		/>
+	{:else if name === 'message'}
+		<path
+			d="M12 4c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-1 0-2-.1-2.9-.4L5 19.5l1.2-3.4A6.6 6.6 0 0 1 3.5 11c0-3.9 3.8-7 8.5-7z"
+		/>
+	{:else if name === 'qr'}
+		<rect x="4" y="4" width="6" height="6" rx="1.2" />
+		<rect x="14" y="4" width="6" height="6" rx="1.2" />
+		<rect x="4" y="14" width="6" height="6" rx="1.2" />
+		<path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 19.5V20M20 14v.5" />
+	{:else if name === 'basket'}
+		<path d="M3.5 9.5h17l-1.6 9a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6z" />
+		<path d="M8 9.5 11 4M16 9.5 13 4M9.5 13.5v3M14.5 13.5v3" />
+	{:else if name === 'share'}
+		<path
+			d="M12 3.5v11M8 7.5l4-4 4 4M8.5 10.5H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1.5"
+		/>
+	{:else if name === 'archive'}
+		<rect x="3.5" y="4.5" width="17" height="4.5" rx="1.2" />
+		<path d="M5 9v8.5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4" />
 	{:else if name === 'repeat'}
 		<path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" />
 	{:else if name === 'close'}

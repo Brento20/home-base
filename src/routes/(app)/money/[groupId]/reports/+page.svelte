@@ -3,12 +3,15 @@
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { page } from '$app/state';
 	import CategoryBars from '#lib/features/expenses/CategoryBars.svelte';
+	import CategoryRing from '#lib/features/expenses/CategoryRing.svelte';
+	import PaceChart from '#lib/features/expenses/PaceChart.svelte';
 	import SegmentedNav from '#lib/ui/SegmentedNav.svelte';
 	import CompareBars from '#lib/features/expenses/CompareBars.svelte';
 	import TrendChart from '#lib/features/expenses/TrendChart.svelte';
 	import { categoryColour, categoryLabel } from '#lib/features/expenses/categories.js';
 	import { nameOf } from '#lib/features/expenses/describe.js';
 	import { formatMoney } from '#lib/features/expenses/money.js';
+	import { daysBetween } from '#lib/time.js';
 	import {
 		describeChange,
 		describeRange,
@@ -46,6 +49,46 @@
 			timeZone: 'UTC'
 		});
 	const count = (n: number) => `${n} ${n === 1 ? 'expense' : 'expenses'}`;
+
+	/** A short name for a range in a sentence: "October", or "the 14 days before". */
+	function rangeName(range: { from: string; to: string }) {
+		return isWholeMonth(range)
+			? new Date(`${range.from}T00:00:00Z`).toLocaleDateString('en-AU', {
+					month: 'long',
+					timeZone: 'UTC'
+				})
+			: describeRange(range);
+	}
+
+	// Overview's headline: the total, how it compares, and the daily average. This month is
+	// measured against the same point last month, not all of it, so day 5 isn't "down 80%".
+	const headline = $derived.by(() => {
+		if (data.mode !== 'overview') return null;
+		const { report, previous, pace } = data;
+		const soFar = data.isCurrentMonth && pace.now.length > 0;
+		const days = soFar ? pace.now.length : daysBetween(report.range.from, report.range.to) + 1;
+		const against = soFar
+			? (pace.before[Math.min(pace.now.length, pace.before.length) - 1] ?? 0)
+			: previous.totalCents;
+		const change = report.totalCents - against;
+		const ratio = against > 0 ? change / against : null;
+		const when = soFar ? `this time in ${rangeName(previous.range)}` : rangeName(previous.range);
+		return {
+			daily: Math.round(report.totalCents / Math.max(days, 1)),
+			change,
+			words:
+				against === 0 && report.totalCents === 0
+					? null
+					: against === 0
+						? `Nothing spent by ${when}`
+						: change === 0
+							? `Level with ${when}`
+							: `${formatMoney(Math.abs(change))}${ratio === null ? '' : ` (${Math.round(Math.abs(ratio) * 100)}%)`} ${change > 0 ? 'more' : 'less'} than ${when}`
+		};
+	});
+
+	const personColour = (id: string) =>
+		data.people.find((person) => person.id === id)?.accentColour ?? 'var(--colour-text-faint)';
 </script>
 
 <svelte:head>
@@ -139,8 +182,28 @@
 	<GlassCard>
 		<p class="total">{formatMoney(report.totalCents)}</p>
 		<p class="total-label">
-			spent across {count(report.count)}. Repayments aren’t counted.
+			{data.category ? `on ${categoryLabel(data.category).toLowerCase()} · ` : ''}spent across {count(
+				report.count
+			)}
 		</p>
+		{#if headline}
+			<div class="facts">
+				{#if headline.words}
+					<p class="fact">
+						<span
+							class="change"
+							class:up={headline.change > 0}
+							class:down={headline.change < 0}
+							aria-hidden="true">{headline.change > 0 ? '↑' : headline.change < 0 ? '↓' : '='}</span
+						>
+						{headline.words}
+					</p>
+				{/if}
+				<p class="fact">
+					<span class="fact-figure">{formatMoney(headline.daily)}</span> a day on average
+				</p>
+			</div>
+		{/if}
 	</GlassCard>
 
 	{#if report.count === 0}
@@ -148,22 +211,16 @@
 	{:else}
 		<section aria-labelledby="where-heading">
 			<h2 id="where-heading" class="section-label">Where it went</h2>
+			<CategoryRing
+				categories={report.categories}
+				totalCents={report.totalCents}
+				selected={data.category}
+				hrefFor={categoryHref}
+			/>
 			<CategoryBars
 				categories={report.categories}
 				selected={data.category}
 				hrefFor={categoryHref}
-			/>
-		</section>
-
-		<section aria-labelledby="trend-heading">
-			<h2 id="trend-heading" class="section-label">
-				{data.category ? `${categoryLabel(data.category)} over time` : 'Over time'}
-			</h2>
-			<TrendChart
-				series={data.trend}
-				bucket={report.bucket}
-				colour={data.category ? categoryColour(data.category) : 'var(--chart-1)'}
-				title={data.category ? categoryLabel(data.category) : 'Spending'}
 			/>
 		</section>
 
@@ -178,6 +235,64 @@
 					>
 				</div>
 				{@render drillList(data.drill)}
+			</section>
+		{/if}
+
+		<section aria-labelledby="trend-heading">
+			<h2 id="trend-heading" class="section-label">
+				{data.category ? `${categoryLabel(data.category)} over time` : 'Over time'}
+			</h2>
+			<TrendChart
+				series={data.trend}
+				bucket={report.bucket}
+				colour={data.category ? categoryColour(data.category) : 'var(--chart-1)'}
+				title={data.category ? categoryLabel(data.category) : 'Spending'}
+				today={data.today}
+			/>
+		</section>
+
+		<section aria-labelledby="pace-heading">
+			<h2 id="pace-heading" class="section-label">Pace</h2>
+			<PaceChart
+				now={data.pace.now}
+				before={data.pace.before}
+				nowLabel={rangeName(report.range)}
+				beforeLabel={rangeName(data.previous.range)}
+				colour={data.category ? categoryColour(data.category) : 'var(--chart-1)'}
+			/>
+		</section>
+
+		{#if data.paidBy.length > 1}
+			{@const paidTotal = data.paidBy.reduce((sum, row) => sum + row.cents, 0)}
+			<section aria-labelledby="paid-heading">
+				<h2 id="paid-heading" class="section-label">Who paid</h2>
+				<div class="split" aria-hidden="true">
+					{#each data.paidBy as row, index (row.personId)}
+						<span
+							class="split-part"
+							style:flex-grow={row.cents}
+							style:background={personColour(row.personId)}
+							style:--i={index}
+						></span>
+					{/each}
+				</div>
+				<ul class="split-key">
+					{#each data.paidBy as row (row.personId)}
+						<li>
+							<span class="split-dot" style:background={personColour(row.personId)}></span>
+							<span class="split-name">{nameOf(data.people, row.personId, data.me.id)}</span>
+							<span class="split-share">{Math.round((row.cents / paidTotal) * 100)}%</span>
+							<span class="drill-amount">{formatMoney(row.cents)}</span>
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+
+		{#if !data.category && data.biggest.length > 0}
+			<section aria-labelledby="biggest-heading">
+				<h2 id="biggest-heading" class="section-label">Biggest spends</h2>
+				{@render drillList(data.biggest)}
 			</section>
 		{/if}
 	{/if}
@@ -252,6 +367,21 @@
 				: `${describeChange(comparison.changeCents, comparison.changeRatio)} in ${bLabel}`}
 		</p>
 	</GlassCard>
+
+	{#if data.pace.a.length || data.pace.b.length}
+		<section aria-labelledby="compare-pace-heading">
+			<h2 id="compare-pace-heading" class="section-label">
+				{data.category ? `${categoryLabel(data.category)} pace` : 'Pace'}
+			</h2>
+			<PaceChart
+				now={data.pace.b}
+				before={data.pace.a}
+				nowLabel={bLabel}
+				beforeLabel={aLabel}
+				colour={data.category ? categoryColour(data.category) : 'var(--chart-1)'}
+			/>
+		</section>
+	{/if}
 
 	{#if comparison.categories.length > 0}
 		<section aria-labelledby="compare-heading">
@@ -360,6 +490,107 @@
 		margin-top: var(--space-xs);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
+	}
+
+	.facts {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		margin-top: var(--space-m);
+		padding-top: var(--space-s);
+		border-top: 1px solid var(--colour-hairline);
+	}
+
+	.fact {
+		font-size: var(--text-small);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.fact-figure {
+		font-weight: var(--weight-strong);
+	}
+
+	/* Spending more is worth noticing, not alarming: the arrow carries it, words say it. */
+	.change {
+		display: inline-grid;
+		place-items: center;
+		width: 20px;
+		height: 20px;
+		margin-right: 4px;
+		border-radius: 50%;
+		background: var(--colour-fill);
+		font-size: 0.75rem;
+		font-weight: var(--weight-strong);
+		vertical-align: 1px;
+	}
+
+	.change.up {
+		background: color-mix(in oklab, var(--colour-danger) 22%, transparent);
+	}
+
+	.change.down {
+		background: color-mix(in oklab, var(--colour-veg) 26%, transparent);
+	}
+
+	/* Who paid: one bar split in each person's colour, a 2px gap between. */
+	.split {
+		display: flex;
+		gap: 2px;
+		height: 12px;
+		overflow: hidden;
+		border-radius: 6px;
+	}
+
+	/* A hairline edge, so a pale colour (Silver) still shows on a light background. */
+	.split-part {
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		flex-basis: 0;
+		min-width: 4px;
+		animation: split-in 700ms var(--spring-soft) both;
+		animation-delay: calc(var(--i) * 80ms);
+		transform-origin: left;
+	}
+
+	@keyframes split-in {
+		from {
+			transform: scaleX(0);
+		}
+	}
+
+	.split-key {
+		margin: var(--space-s) 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.split-key li {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 40px;
+		font-size: var(--text-small);
+	}
+
+	.split-dot {
+		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+	}
+
+	.split-name {
+		flex: 1;
+	}
+
+	.split-share {
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.split-part {
+			animation: none;
+		}
 	}
 
 	section {

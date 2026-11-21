@@ -7,7 +7,7 @@
  * action dock) paint the same picture so the page melts into it, so they must move exactly
  * together. Each gets its own Web Animation, all set to the same wall-clock phase, so one
  * added later (the action dock on a form page) joins in step. It only moves background
- * position and size, and stays still with Reduce Motion.
+ * position and size, in small steps (see STEPS), and stays still with Reduce Motion.
  */
 
 /** Layer order matches `.backdrop-paint`: grain, then the three glows. */
@@ -50,6 +50,14 @@ const POSES: Pose[] = [
 /** One way through the poses; it then plays back the other way, so it never jumps. */
 const DURATION_MS = 45_000;
 
+/**
+ * Background position and size can't be animated on the GPU, so every change repaints these
+ * full-screen layers. At 60 frames a second that kept the phone busy for a drift you can't see
+ * frame to frame (well under a pixel each), so it moves in about eight steps a second instead:
+ * the same drift, a fraction of the work. Between steps nothing changes, so nothing repaints.
+ */
+const STEPS = Math.round((DURATION_MS / 1000) * 8);
+
 function keyframes(grain: string): Keyframe[] {
 	return POSES.map((pose, index) => ({
 		offset: index / (POSES.length - 1),
@@ -82,7 +90,8 @@ export function drift(element: HTMLElement) {
 		animation = element.animate(keyframes(grain), {
 			duration: DURATION_MS,
 			iterations: Infinity,
-			direction: 'alternate'
+			direction: 'alternate',
+			easing: `steps(${STEPS}, jump-none)`
 		});
 		// The same clock for every copy, however late it joins: the wall clock, so reopening
 		// the app carries on from where the drift would be rather than starting over.

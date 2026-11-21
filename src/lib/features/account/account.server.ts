@@ -3,6 +3,7 @@ import { avatarUrl } from '#lib/features/household/household.server.js';
 import { sampleAccount, sampleProfiles } from '#lib/server/sample-data.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
 import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
+import { isAvatarColour } from './colours.js';
 
 /** Sign-up, sign-in and profile details for the signed-in person. */
 
@@ -33,7 +34,7 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 
 	const { data, error: readError } = await supabase
 		.from('profiles')
-		.select('first_name, last_name, nickname, pronouns, date_of_birth, avatar_path')
+		.select('first_name, last_name, nickname, pronouns, date_of_birth, avatar_path, accent_colour')
 		.eq('id', user.id)
 		.single();
 
@@ -46,7 +47,8 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 		nickname: data.nickname,
 		pronouns: data.pronouns,
 		dateOfBirth: data.date_of_birth ?? '',
-		avatarUrl: avatarUrl(user.id, data.avatar_path)
+		avatarUrl: avatarUrl(user.id, data.avatar_path),
+		accentColour: data.accent_colour
 	};
 }
 
@@ -59,6 +61,8 @@ export function parseProfileForm(form: FormData) {
 		pronouns: text('pronouns'),
 		dateOfBirth: text('dateOfBirth')
 	};
+	// Only on Edit your profile; a colour from the list or nothing.
+	if (form.has('accentColour')) values.accentColour = text('accentColour').toLowerCase();
 	const errors: FieldErrors<ProfileField> = {};
 
 	if (!values.firstName) errors.firstName = 'Add your first name.';
@@ -68,6 +72,8 @@ export function parseProfileForm(form: FormData) {
 	if (!values.nickname) errors.nickname = 'Add what people call you.';
 	else if (values.nickname.length > 24) errors.nickname = 'Keep it under 24 characters.';
 	if (values.pronouns.length > 24) errors.pronouns = 'Keep it under 24 characters.';
+	if (values.accentColour !== undefined && !isAvatarColour(values.accentColour))
+		errors.accentColour = 'Pick one of the colours.';
 
 	if (!values.dateOfBirth) errors.dateOfBirth = 'Add your date of birth.';
 	else if (
@@ -113,6 +119,7 @@ export async function saveProfile(
 				: sampleProfiles[0].avatarUrl;
 		Object.assign(sampleAccount, values, { avatarUrl: sampleAvatar });
 		Object.assign(sampleProfiles[0], {
+			...(values.accentColour ? { accentColour: values.accentColour } : {}),
 			displayName: values.nickname,
 			initials: firstLetter(values.nickname),
 			avatarUrl: sampleAvatar
@@ -152,7 +159,8 @@ export async function saveProfile(
 			date_of_birth: values.dateOfBirth,
 			display_name: values.nickname,
 			initials: firstLetter(values.nickname),
-			avatar_path: avatarPath
+			avatar_path: avatarPath,
+			...(values.accentColour ? { accent_colour: values.accentColour } : {})
 		})
 		.eq('id', user.id);
 

@@ -1,8 +1,15 @@
 /*
  * home base design tokens.
  * Names describe what a value is for, so components read like plain English.
- * The palette shifts through the day via <html data-daypart="morning|day|evening">,
- * set before first paint by the inline script in app.html.
+ *
+ * Three attributes on <html>, set before first paint (app.html, hooks.server.ts):
+ * - data-mode="dark|light": the light or dark set of text, glass and surface colours below.
+ * - data-palette: the colour theme for this time of day (ground, accent, the glows' colours),
+ *   from src/lib/ui/theme.ts, which writes those blocks itself.
+ * - data-daypart="morning|day|evening": where the glows sit, so each part of the day has its
+ *   own shape whatever colours it's wearing.
+ *
+ * Components use these tokens, never raw colours, so they're right in both modes.
  */
 
 :root {
@@ -11,6 +18,7 @@
 	--text-caption: 0.8125rem; /* 13px */
 	--text-small: 0.9375rem; /* 15px */
 	--text-body: 1.0625rem; /* 17px */
+	--text-headline: 1.25rem; /* 20px, section headings (iOS Title 3) */
 	--text-control-value: 1.625rem; /* 26px */
 	--text-page-title: 1.75rem; /* 28px */
 	--text-event-title: 2.125rem; /* 34px, the largest text on Today */
@@ -42,10 +50,44 @@
 	--colour-text-muted: rgb(245 237 230 / 0.66);
 	--colour-text-faint: rgb(245 237 230 / 0.45);
 	--colour-on-accent: #1a0f08;
+	/* Text on a filled ring or avatar (people's colours are light). */
+	--colour-on-ring: #14100d;
+	--colour-strike: rgb(245 237 230 / 0.3);
+	--colour-danger: #f19a8f;
+	/* "Vegetarian" and friends. */
+	--colour-veg: #b9dca4;
+	/* How much to deepen a person's colour where it's a thin line (rings): none on dark. */
+	--ring-deepen: 0%;
 
 	/* Colour: surfaces */
 	--colour-hairline: rgb(255 255 255 / 0.08);
 	--colour-hairline-strong: rgb(255 255 255 / 0.14);
+	/* A row or card under the finger. */
+	--colour-press: rgb(255 255 255 / 0.04);
+	/* Quiet fills: chips, inactive pills, the slider track. */
+	--colour-fill: rgb(255 255 255 / 0.06);
+	--colour-fill-strong: rgb(255 255 255 / 0.12);
+	--colour-fill-stronger: rgb(255 255 255 / 0.22);
+	/* The chosen segment in a switch (Lists | Tasks): a raised glass pill. */
+	--pill-on: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.06));
+	--pill-on-edge: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+	/* The light caught along a raised edge. */
+	--edge-light: rgb(255 255 255 / 0.12);
+	/* Sunk into the page: fields, stepper wells. */
+	--colour-well: rgb(0 0 0 / 0.28);
+	/* Bars that float over the page (the tab bar, the action dock). */
+	--surface-bar: rgb(20 15 13 / 0.68);
+	/* Solid things that pop up: toasts, menus, the status bead. */
+	--surface-raised: rgb(36 30 26 / 0.98);
+	--surface-sheet: linear-gradient(180deg, rgb(34 27 23), rgb(20 16 13));
+	--surface-scrim: rgb(4 3 3 / 0.55);
+	/* Shadow ink: deep on dark, a soft warm grey on light. */
+	--shadow-colour: rgb(0 0 0 / 0.7);
+	/* The etched drawings on plan cards: a frosted line over a dark groove. */
+	--etch-line: #fff;
+	--etch-line-opacity: 0.07;
+	--etch-groove: #000;
+	--etch-groove-opacity: 0.22;
 	/* Cards: smoked glass with no live blur (see GlassSurface); the body keeps text at 4.5:1. */
 	--glass-body: rgb(18 14 12 / 0.56);
 	/* Live blur, kept for things that are briefly on screen (menus, notices, the refresh bead). */
@@ -69,28 +111,37 @@
 		rgb(255 214 176 / 0.06) 55%,
 		rgb(255 214 176 / 0.26) 100%
 	);
-	--shadow-lift: 0 18px 40px -16px rgb(0 0 0 / 0.65);
+	--shadow-lift: 0 18px 40px -16px var(--shadow-colour);
 
 	/* Monochrome grain tiled over the mesh. Dark specks, so the texture deepens the backdrop
 	   rather than lifting it towards grey. */
 	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0 0 0 -0.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 	--grain-size: 240px;
 
-	/* Evening palette (default): oxblood and ember */
+	/* The colour theme (theme.ts fills these per palette and mode; Ember, dark, until then). */
 	--colour-ground: #0b0807;
 	--colour-accent: #f4a86e;
-	--colour-accent-soft: rgb(255 172 112 / 0.1);
-	/* Dinners on the Plans calendar: lilac stays distinct from every time-of-day accent, colour-blind eyes included. */
-	--colour-dinner: #b49cf5;
-	--colour-accent-edge: rgb(255 192 142 / 0.26);
-	/* An accent button under the finger: a shade deeper, whatever the time of day. */
+	--glow-one: rgb(218 100 36 / 0.6);
+	--glow-two: rgb(112 26 40 / 0.55);
+	--glow-three: rgb(160 72 30 / 0.28);
+	/* Worked out from the accent, so every theme gets them. */
+	--colour-accent-soft: color-mix(in srgb, var(--colour-accent) 10%, transparent);
+	--colour-accent-edge: color-mix(in srgb, var(--colour-accent) 28%, transparent);
+	/* An accent button under the finger: a shade deeper, whatever the theme. */
 	--colour-accent-pressed: color-mix(in oklab, var(--colour-accent), #000 14%);
-	--glow-event: 0 24px 60px -18px rgb(232 112 44 / 0.5);
-	/* The glows are drawn on a layer 1.4 times the screen, centred, so they can drift without
-	   showing an edge (backdrop-drift.ts); the numbers are scaled to match. */
-	--mesh-one: radial-gradient(46.4% 30% at 80% 18.6%, rgb(218 100 36 / 0.6), transparent 72%);
-	--mesh-two: radial-gradient(42.9% 30% at 14.3% 62.9%, rgb(112 26 40 / 0.55), transparent 70%);
-	--mesh-three: radial-gradient(50% 25.7% at 57.1% 88.6%, rgb(160 72 30 / 0.28), transparent 72%);
+	--glow-event: 0 24px 60px -18px color-mix(in srgb, var(--colour-accent) 45%, transparent);
+	/* Dinners on the Plans calendar: lilac stays distinct from every theme's accent, colour-blind eyes included. */
+	--colour-dinner: #b49cf5;
+
+	/* Where the glows sit (the evening's shape until data-daypart says otherwise). They're drawn
+	   on a layer 1.4 times the screen, centred, so they can drift without showing an edge
+	   (backdrop-drift.ts); the numbers are scaled to match. */
+	--mesh-one-shape: 46.4% 30% at 80% 18.6%;
+	--mesh-two-shape: 42.9% 30% at 14.3% 62.9%;
+	--mesh-three-shape: 50% 25.7% at 57.1% 88.6%;
+	--mesh-one: radial-gradient(var(--mesh-one-shape), var(--glow-one), transparent 72%);
+	--mesh-two: radial-gradient(var(--mesh-two-shape), var(--glow-two), transparent 70%);
+	--mesh-three: radial-gradient(var(--mesh-three-shape), var(--glow-three), transparent 72%);
 
 	/*
 	 * Charts: one colour per expense category. A colour-blind-safe set validated against the dark
@@ -252,30 +303,83 @@
 }
 
 :root[data-daypart='morning'] {
-	--colour-ground: #080b0f;
-	--colour-accent: #a6cbec;
-	--colour-accent-soft: rgb(160 205 240 / 0.1);
-	--colour-accent-edge: rgb(170 212 242 / 0.24);
-	--glow-event: 0 24px 60px -18px rgb(80 140 205 / 0.45);
-	--mesh-one: radial-gradient(50% 30% at 20% 14.3%, rgb(64 112 168 / 0.58), transparent 72%);
-	--mesh-two: radial-gradient(39.3% 28.6% at 85.7% 38.6%, rgb(52 122 106 / 0.42), transparent 70%);
-	--mesh-three: radial-gradient(50% 27.1% at 53.6% 88.6%, rgb(200 152 82 / 0.26), transparent 72%);
+	--mesh-one-shape: 50% 30% at 20% 14.3%;
+	--mesh-two-shape: 39.3% 28.6% at 85.7% 38.6%;
+	--mesh-three-shape: 50% 27.1% at 53.6% 88.6%;
 }
 
 :root[data-daypart='day'] {
-	--colour-ground: #0a0909;
-	--colour-accent: #efc49c;
-	--colour-accent-soft: rgb(240 200 160 / 0.1);
-	--colour-accent-edge: rgb(240 205 170 / 0.24);
-	--glow-event: 0 24px 60px -18px rgb(200 130 80 / 0.42);
-	--mesh-one: radial-gradient(46.4% 28.6% at 71.4% 17.1%, rgb(176 112 76 / 0.46), transparent 72%);
-	--mesh-two: radial-gradient(42.9% 30% at 14.3% 60%, rgb(84 52 64 / 0.48), transparent 70%);
-	--mesh-three: radial-gradient(50% 25.7% at 53.6% 88.6%, rgb(120 96 72 / 0.24), transparent 72%);
+	--mesh-one-shape: 46.4% 28.6% at 71.4% 17.1%;
+	--mesh-two-shape: 42.9% 30% at 14.3% 60%;
+	--mesh-three-shape: 50% 25.7% at 53.6% 88.6%;
+}
+
+/*
+ * Light mode: dark ink on frosted glass. The theme's ground and glows come from theme.ts; this is
+ * everything that sits on them.
+ */
+:root[data-mode='light'] {
+	--colour-text: #1f1813;
+	--colour-text-muted: rgb(31 24 19 / 0.68);
+	--colour-text-faint: rgb(31 24 19 / 0.56);
+	--colour-on-accent: #fff;
+	--colour-on-ring: #1f1813;
+	--colour-strike: rgb(31 24 19 / 0.35);
+	--colour-danger: #b0352a;
+	--colour-veg: #3f7a32;
+	--colour-dinner: #6c50c8;
+	--ring-deepen: 30%;
+
+	--colour-hairline: rgb(31 24 19 / 0.1);
+	--colour-hairline-strong: rgb(31 24 19 / 0.16);
+	--colour-press: rgb(31 24 19 / 0.04);
+	--colour-fill: rgb(31 24 19 / 0.05);
+	--colour-fill-strong: rgb(31 24 19 / 0.1);
+	--colour-fill-stronger: rgb(31 24 19 / 0.2);
+	--colour-well: rgb(255 255 255 / 0.62);
+	--pill-on: linear-gradient(180deg, rgb(255 255 255), rgb(255 255 255 / 0.86));
+	--pill-on-edge: inset 0 1px 0 rgb(255 255 255), inset 0 0 0 1px rgb(31 24 19 / 0.08);
+	--edge-light: rgb(255 255 255 / 0.9);
+	--surface-bar: rgb(255 252 248 / 0.72);
+	--surface-raised: rgb(255 252 249 / 0.98);
+	--surface-sheet: linear-gradient(180deg, rgb(255 252 249), rgb(246 241 236));
+	--surface-scrim: rgb(40 30 24 / 0.28);
+	--shadow-colour: rgb(70 50 36 / 0.22);
+	--etch-line: #000;
+	--etch-line-opacity: 0.07;
+	--etch-groove: #fff;
+	--etch-groove-opacity: 0.6;
+
+	--glass-body: rgb(255 253 250 / 0.58);
+	--glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.85);
+	--glass-inner-light: inset 0 14px 28px -22px rgb(255 255 255 / 0.9);
+	--glass-rim: linear-gradient(
+		150deg,
+		rgb(255 255 255 / 0.95) 0%,
+		rgb(255 255 255 / 0.4) 24%,
+		rgb(31 24 19 / 0.06) 55%,
+		rgb(255 255 255 / 0.6) 100%
+	);
+	--glass-rim-warm: linear-gradient(
+		150deg,
+		color-mix(in srgb, var(--colour-accent) 55%, white) 0%,
+		color-mix(in srgb, var(--colour-accent) 20%, white) 26%,
+		rgb(31 24 19 / 0.06) 55%,
+		color-mix(in srgb, var(--colour-accent) 30%, white) 100%
+	);
+	--glow-event: 0 24px 60px -22px color-mix(in srgb, var(--colour-accent) 35%, transparent);
+	/* Lighter grain: dark specks on a pale ground read as dust. */
+	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
 	:root {
 		--glass-body: rgb(20 16 14 / 0.92);
 		--colour-text-muted: rgb(245 237 230 / 0.8);
+	}
+
+	:root[data-mode='light'] {
+		--glass-body: rgb(255 253 250 / 0.94);
+		--colour-text-muted: rgb(31 24 19 / 0.8);
 	}
 }

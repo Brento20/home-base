@@ -64,28 +64,31 @@
 		</div>
 	</header>
 
-	<dl class="details">
-		<div class="detail">
-			<dt>Due</dt>
-			<dd>{task.dueOn ? formatLongDate(task.dueOn, data.today) : 'Whenever'}</dd>
+	<!-- Label left, value right, on one panel, as in an event's details in Calendar. -->
+	<dl class="grouped details">
+		<div class="grouped-row">
+			<dt class="grouped-label">Due</dt>
+			<dd class="grouped-value" class:late={overdue}>
+				{task.dueOn ? formatLongDate(task.dueOn, data.today) : 'Whenever'}
+			</dd>
 		</div>
-		<div class="detail">
-			<dt>Repeats</dt>
-			<dd>{repeats || 'No'}</dd>
+		<div class="grouped-row">
+			<dt class="grouped-label">Repeats</dt>
+			<dd class="grouped-value">{repeats || 'Never'}</dd>
 		</div>
 		{#if task.completedAt && doneOn}
-			<div class="detail">
-				<dt>Ticked off</dt>
-				<dd>
+			<div class="grouped-row">
+				<dt class="grouped-label">Ticked off</dt>
+				<dd class="grouped-value">
 					{formatLongDate(doneOn, data.today)}{#if nameOf(task.completedBy)}
 						by {nameOf(task.completedBy)}{/if}
 				</dd>
 			</div>
 		{/if}
 		{#if nameOf(task.createdBy)}
-			<div class="detail">
-				<dt>Added by</dt>
-				<dd>{nameOf(task.createdBy)}</dd>
+			<div class="grouped-row">
+				<dt class="grouped-label">Added by</dt>
+				<dd class="grouped-value">{nameOf(task.createdBy)}</dd>
 			</div>
 		{/if}
 	</dl>
@@ -153,7 +156,7 @@
 	}
 
 	.status.overdue {
-		color: var(--colour-accent);
+		color: var(--colour-danger);
 	}
 
 	h1 {
@@ -183,32 +186,36 @@
 		width: 18px;
 		height: 18px;
 		border-radius: 50%;
-		border: 2px solid var(--ring-colour);
+		border: 2px solid var(--ring-ink);
 	}
 
 	.ring.anyone {
 		border-style: dashed;
 	}
 
-	.details {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-m);
-		margin: 0;
-		padding: 0 4px;
+	/* <dl> rows: separators drawn the grouped way, by sibling, since these aren't <li>s. */
+	.details > .grouped-row + .grouped-row {
+		box-shadow: inset 0 1px var(--colour-hairline);
+		background-clip: padding-box;
+	}
+
+	.details .grouped-row {
+		min-height: 50px;
 	}
 
 	dt {
-		margin-bottom: 4px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
 		color: var(--colour-text-muted);
 	}
 
 	dd {
 		margin: 0;
-		font-size: var(--text-body);
+		max-width: 65%;
+		color: var(--colour-text);
+		text-align: right;
+	}
+
+	dd.late {
+		color: var(--colour-danger);
 	}
 
 	form {
@@ -216,7 +223,8 @@
 	}
 
 	form button {
-		display: inline-flex;
+		display: flex;
+		width: 100%;
 		align-items: center;
 		justify-content: center;
 		gap: 8px;

@@ -201,7 +201,7 @@
 		height: 24px;
 		border-radius: var(--radius-pill);
 		background: var(--person-colour);
-		color: #14100d;
+		color: var(--colour-on-ring);
 		font-size: var(--text-caption);
 		font-weight: var(--weight-strong);
 	}

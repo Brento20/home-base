@@ -107,7 +107,7 @@
 		padding: 6px 6px 6px 18px;
 		border-radius: var(--radius-pill);
 		/* Nearly solid: it floats over page headings and has to read at a glance. */
-		background: rgb(20 16 14 / 0.92);
+		background: var(--surface-raised);
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
 		box-shadow:

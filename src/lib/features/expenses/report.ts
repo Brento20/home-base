@@ -238,3 +238,52 @@ export function describeChange(changeCents: number, ratio: number | null) {
 	const percent = ratio === null ? '' : ` (${Math.round(Math.abs(ratio) * 100)}%)`;
 	return `${direction} ${formatMoney(Math.abs(changeCents))}${percent}`;
 }
+
+/**
+ * Running total, day by day: [day 1's spending, days 1–2, …]. With `until`, the line stops there
+ * (this month stops at today rather than running flat to the 30th).
+ */
+export function paceOf(expenses: ReportExpense[], range: DateRange, until?: string): number[] {
+	const end = until && until < range.to ? until : range.to;
+	if (end < range.from) return [];
+	const byDay = new Map<string, number>();
+	for (const expense of expenses) {
+		if (expense.spentOn < range.from || expense.spentOn > end) continue;
+		byDay.set(expense.spentOn, (byDay.get(expense.spentOn) ?? 0) + expense.amountCents);
+	}
+	const days = daysBetween(range.from, end) + 1;
+	const pace: number[] = [];
+	let running = 0;
+	for (let i = 0; i < days; i++) {
+		running += byDay.get(addDays(range.from, i)) ?? 0;
+		pace.push(running);
+	}
+	return pace;
+}
+
+/** Who paid for what in a range, biggest payer first. */
+export function paidByTotals(expenses: ReportExpense[], range: DateRange) {
+	const totals = new Map<string, number>();
+	for (const expense of expenses) {
+		if (expense.spentOn < range.from || expense.spentOn > range.to) continue;
+		totals.set(expense.paidBy, (totals.get(expense.paidBy) ?? 0) + expense.amountCents);
+	}
+	return [...totals]
+		.map(([personId, cents]) => ({ personId, cents }))
+		.sort((a, b) => b.cents - a.cents);
+}
+
+/** The biggest few expenses in a range. */
+export function biggestExpenses(expenses: ReportExpense[], range: DateRange, count = 5) {
+	return expenses
+		.filter((e) => e.spentOn >= range.from && e.spentOn <= range.to)
+		.sort((a, b) => b.amountCents - a.amountCents || b.spentOn.localeCompare(a.spentOn))
+		.slice(0, count);
+}
+
+/** The range just before another, the same length (a whole month steps back a whole month). */
+export function previousRange(range: DateRange): DateRange {
+	if (isWholeMonth(range)) return shiftMonth(range, -1);
+	const days = daysBetween(range.from, range.to) + 1;
+	return { from: addDays(range.from, -days), to: addDays(range.from, -1) };
+}

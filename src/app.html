@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-AU" data-daypart="evening">
+<html lang="en-AU" data-daypart="evening" data-mode="%hb.mode%" data-palette="ember">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -9,11 +9,12 @@
 		/>
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="text-scale" content="scale" />
-		<meta name="theme-color" content="#0b0807" />
-		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="%hb.ground%" />
+		<meta name="color-scheme" content="%hb.mode%" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<!-- iPhones read this when the home-screen app opens: light text over a dark page, dark text on light. -->
+		<meta name="apple-mobile-web-app-status-bar-style" content="%hb.statusbar%" />
 		<meta name="apple-mobile-web-app-title" content="home base" />
 		<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.ico" sizes="48x48" />
@@ -38,73 +39,169 @@
 		<!-- iPhone launch screens: the backdrop with the house, one per screen size. -->
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1320x2868.png"
+			href="%sveltekit.assets%/splash/splash-1320x2868.png?v=2"
 			media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1206x2622.png"
+			href="%sveltekit.assets%/splash/splash-1206x2622.png?v=2"
 			media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1290x2796.png"
+			href="%sveltekit.assets%/splash/splash-1290x2796.png?v=2"
 			media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1179x2556.png"
+			href="%sveltekit.assets%/splash/splash-1179x2556.png?v=2"
 			media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1284x2778.png"
+			href="%sveltekit.assets%/splash/splash-1284x2778.png?v=2"
 			media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1170x2532.png"
+			href="%sveltekit.assets%/splash/splash-1170x2532.png?v=2"
 			media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1125x2436.png"
+			href="%sveltekit.assets%/splash/splash-1125x2436.png?v=2"
 			media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-1242x2688.png"
+			href="%sveltekit.assets%/splash/splash-1242x2688.png?v=2"
 			media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-828x1792.png"
+			href="%sveltekit.assets%/splash/splash-828x1792.png?v=2"
 			media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
 		/>
 		<link
 			rel="apple-touch-startup-image"
-			href="%sveltekit.assets%/splash/splash-750x1334.png"
+			href="%sveltekit.assets%/splash/splash-750x1334.png?v=2"
 			media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
 		/>
-		<script>
-			// Pick the palette before first paint so there's no flash. Kept in step with #lib/ui/daypart.ts.
-			(function () {
-				var preview = new URLSearchParams(location.search).get('daypart');
-				var hour = Number(
-					new Intl.DateTimeFormat('en-AU', {
-						hour: 'numeric',
-						hourCycle: 'h23',
-						timeZone: 'Australia/Sydney'
-					}).format(new Date())
-				);
-				var part = hour >= 5 && hour < 11 ? 'morning' : hour >= 11 && hour < 17 ? 'day' : 'evening';
-				if (preview === 'morning' || preview === 'day' || preview === 'evening') part = preview;
-				document.documentElement.dataset.daypart = part;
-			})();
+		<!-- This device's colour theme: the palettes, then the pick for the time of day before first
+		     paint, so there's no flash. Both written in by hooks.server.ts from src/lib/ui/theme.ts. -->
+		<style>
+			%hb.themecss%
+		</style>
+		<script nonce="%sveltekit.nonce%">
+			%hb.themescript%
 		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+		<!--
+			The launch screen, carried on: iOS shows the launch image (static/splash, made by
+			tools/make_launch.py) while the app loads; this is the same picture, so it takes over
+			seamlessly, holds for a beat (1.5s at least), then the backdrop fades softly away (0.9s), then
+			the logo (0.8s, starting 0.55s later). Only when
+			opened from the Home Screen, once per launch; never in a browser tab.
+		-->
+		<div class="launch" id="launch" aria-hidden="true">
+			<div class="launch-ground"></div>
+			<!-- launch-lockup --><svg
+				class="launch-logo"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 300 261.14"
+				fill="#f5ede6"
+			>
+				<path
+					transform="translate(-17.95 194.24) scale(0.27357)"
+					d="M66 0V-710H216V-411L196 -411Q204 -458 227 -488Q251 -518 286 -533Q322 -548 364 -548Q424 -548 464 -522Q504 -496 525 -450Q545 -404 545 -345V0H395V-309Q395 -369 377 -399Q358 -429 314 -429Q268 -429 242 -398Q216 -367 216 -305V0ZM939 12Q883 12 842 -12Q800 -36 777 -79L774 0H631V-710H781V-460Q802 -497 843 -523Q884 -548 939 -548Q1007 -548 1057 -513Q1107 -479 1135 -416Q1162 -353 1162 -268Q1162 -183 1135 -120Q1107 -57 1057 -23Q1007 12 939 12ZM897 -103Q947 -103 977 -147Q1008 -190 1008 -268Q1008 -346 978 -389Q948 -433 898 -433Q861 -433 835 -413Q808 -394 794 -357Q781 -320 781 -268Q781 -217 794 -180Q808 -143 834 -123Q861 -103 897 -103Z"
+				/>
+				<path
+					transform="translate(-4.44 260.43) scale(0.05903)"
+					d="M75 0V-710H181V-412L168 -414Q177 -459 201 -487Q225 -516 260 -530Q295 -544 337 -544Q395 -544 435 -518Q475 -493 495 -447Q516 -401 516 -342V0H410V-314Q410 -386 385 -420Q361 -455 309 -455Q251 -455 216 -419Q181 -382 181 -312V0ZM883 12Q807 12 750 -22Q693 -56 662 -119Q631 -182 631 -266Q631 -351 662 -413Q693 -475 750 -510Q807 -544 883 -544Q959 -544 1016 -510Q1073 -475 1104 -413Q1135 -351 1135 -266Q1135 -182 1104 -119Q1073 -56 1016 -22Q959 12 883 12ZM883 -80Q951 -80 988 -129Q1025 -179 1025 -266Q1025 -353 988 -403Q951 -452 883 -452Q816 -452 778 -403Q741 -353 741 -266Q741 -179 778 -129Q816 -80 883 -80ZM1252 0V-532H1349L1352 -400L1340 -404Q1349 -448 1372 -479Q1394 -510 1427 -527Q1460 -544 1499 -544Q1567 -544 1610 -506Q1653 -467 1664 -400L1647 -400Q1656 -447 1678 -479Q1699 -510 1733 -527Q1767 -544 1810 -544Q1866 -544 1906 -521Q1945 -497 1966 -452Q1986 -407 1986 -342V0H1880V-316Q1880 -385 1855 -420Q1830 -455 1779 -455Q1746 -455 1721 -438Q1696 -421 1683 -389Q1669 -357 1669 -312V0H1568V-312Q1568 -380 1546 -417Q1523 -455 1469 -455Q1435 -455 1411 -438Q1386 -421 1372 -389Q1358 -356 1358 -312V0ZM2354 12Q2276 12 2220 -22Q2163 -56 2132 -119Q2102 -182 2102 -266Q2102 -350 2132 -412Q2163 -475 2219 -509Q2275 -544 2351 -544Q2423 -544 2478 -511Q2533 -477 2564 -414Q2594 -351 2594 -262V-235H2212Q2216 -157 2254 -118Q2291 -79 2355 -79Q2402 -79 2433 -101Q2464 -123 2476 -160L2586 -153Q2565 -79 2504 -33Q2442 12 2354 12ZM2212 -315H2482Q2477 -386 2441 -420Q2406 -454 2351 -454Q2294 -454 2258 -418Q2221 -383 2212 -315ZM3239 12Q3184 12 3141 -12Q3099 -37 3076 -80L3073 0H2974V-710H3080V-457Q3101 -492 3142 -518Q3184 -544 3239 -544Q3308 -544 3359 -510Q3410 -476 3438 -413Q3465 -351 3465 -266Q3465 -181 3438 -119Q3410 -56 3359 -22Q3308 12 3239 12ZM3222 -80Q3283 -80 3319 -130Q3355 -179 3355 -266Q3355 -353 3319 -403Q3283 -452 3223 -452Q3178 -452 3146 -430Q3114 -408 3097 -366Q3080 -325 3080 -266Q3080 -209 3097 -167Q3114 -125 3146 -102Q3178 -80 3222 -80ZM3742 12Q3659 12 3609 -26Q3560 -64 3560 -133Q3560 -202 3601 -241Q3643 -279 3730 -296L3913 -331Q3913 -393 3884 -424Q3855 -454 3798 -454Q3747 -454 3718 -431Q3689 -409 3678 -365L3569 -372Q3584 -452 3644 -498Q3703 -544 3798 -544Q3906 -544 3962 -487Q4019 -429 4019 -325V-118Q4019 -99 4026 -91Q4032 -84 4047 -84H4066V0Q4061 1 4050 2Q4039 3 4027 3Q3993 3 3968 -8Q3944 -19 3932 -44Q3920 -70 3920 -113L3931 -108Q3923 -73 3896 -46Q3870 -19 3830 -3Q3789 12 3742 12ZM3759 -72Q3807 -72 3841 -90Q3875 -109 3894 -142Q3913 -175 3913 -217V-251L3757 -221Q3709 -212 3690 -192Q3670 -173 3670 -143Q3670 -109 3693 -90Q3717 -72 3759 -72ZM4366 12Q4289 12 4237 -11Q4186 -34 4159 -75Q4132 -115 4128 -168L4237 -173Q4245 -129 4274 -103Q4303 -77 4366 -77Q4416 -77 4442 -93Q4469 -109 4469 -144Q4469 -164 4460 -177Q4451 -190 4425 -199Q4399 -209 4348 -218Q4270 -233 4226 -253Q4183 -274 4165 -305Q4147 -335 4147 -379Q4147 -452 4202 -498Q4257 -544 4361 -544Q4434 -544 4481 -520Q4528 -495 4552 -455Q4576 -415 4581 -369L4472 -363Q4471 -388 4458 -409Q4446 -430 4422 -443Q4398 -455 4359 -455Q4307 -455 4282 -435Q4257 -415 4257 -383Q4257 -359 4267 -344Q4277 -329 4302 -319Q4327 -310 4369 -303Q4450 -290 4496 -270Q4542 -249 4561 -219Q4579 -188 4579 -145Q4579 -70 4521 -29Q4462 12 4366 12ZM4917 12Q4839 12 4783 -22Q4726 -56 4695 -119Q4665 -182 4665 -266Q4665 -350 4695 -412Q4726 -475 4782 -509Q4838 -544 4914 -544Q4986 -544 5041 -511Q5096 -477 5127 -414Q5157 -351 5157 -262V-235H4775Q4779 -157 4817 -118Q4854 -79 4918 -79Q4965 -79 4996 -101Q5027 -123 5039 -160L5149 -153Q5128 -79 5067 -33Q5005 12 4917 12ZM4775 -315H5045Q5040 -386 5004 -420Q4969 -454 4914 -454Q4857 -454 4821 -418Q4784 -383 4775 -315Z"
+				/></svg
+			><!-- /launch-lockup -->
+		</div>
+		<style>
+			.launch {
+				position: fixed;
+				inset: 0;
+				z-index: 1000;
+				pointer-events: none;
+			}
+			.launch-ground {
+				position: absolute;
+				inset: 0;
+				background-color: #0b0807;
+				background-image:
+					url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0 0 0 -0.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+					radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%),
+					radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%),
+					radial-gradient(70% 36% at 60% 104%, rgb(160 72 30 / 0.28), transparent 72%);
+				background-size:
+					240px 240px,
+					100% 100%,
+					100% 100%,
+					100% 100%;
+				background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+				transition: opacity 900ms cubic-bezier(0.4, 0, 0.2, 1);
+			}
+			/* Inline outlines (tools/make_launch.py), so it's there on the very first frame. */
+			.launch-logo {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 30vw;
+				height: auto;
+				transform: translate(-50%, -50%);
+				transition:
+					opacity 800ms cubic-bezier(0.4, 0, 0.2, 1) 550ms,
+					transform 1300ms cubic-bezier(0.2, 0.8, 0.2, 1) 550ms;
+			}
+			.launch.out .launch-ground {
+				opacity: 0;
+			}
+			.launch.out .launch-logo {
+				opacity: 0;
+				transform: translate(-50%, -50%) scale(1.04);
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.launch.out .launch-logo {
+					transform: translate(-50%, -50%);
+				}
+			}
+		</style>
+		<script nonce="%sveltekit.nonce%">
+			(function () {
+				var launch = document.getElementById('launch');
+				var standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+				var seen = false;
+				try {
+					seen = sessionStorage.getItem('hb-launched') === '1';
+					sessionStorage.setItem('hb-launched', '1');
+				} catch (e) {}
+				if (!standalone || seen) {
+					launch.remove();
+					return;
+				}
+				// Hold until the app has loaded, and at least long enough to read, then fade.
+				var shown = Date.now();
+				function go() {
+					setTimeout(
+						function () {
+							launch.classList.add('out');
+							setTimeout(function () {
+								launch.remove();
+							}, 1500);
+						},
+						Math.max(0, 1500 - (Date.now() - shown))
+					);
+				}
+				if (document.readyState === 'complete') go();
+				else addEventListener('load', go, { once: true });
+			})();
+		</script>
 		<!-- iPhones ignore the manifest's portrait lock, so a phone on its side gets this instead. -->
 		<div class="turn-upright">
 			<svg

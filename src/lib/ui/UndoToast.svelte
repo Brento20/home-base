@@ -68,10 +68,10 @@
 		padding: 0 4px 0 16px;
 		border-radius: var(--radius-pill);
 		/* The same look as the recipe page's "Tonight · You're cooking" notice. */
-		background: rgb(36 30 26 / 0.98);
+		background: var(--surface-raised);
 		box-shadow:
-			inset 0 0 0 1px rgb(255 255 255 / 0.1),
-			0 10px 28px -12px rgb(0 0 0 / 0.7);
+			inset 0 0 0 1px var(--colour-hairline-strong),
+			0 10px 28px -12px var(--shadow-colour);
 		transform: translateX(-50%);
 		animation: rise var(--duration-move, 280ms) var(--ease-out) both;
 	}

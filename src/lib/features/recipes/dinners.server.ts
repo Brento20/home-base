@@ -3,13 +3,15 @@ import { getHouseholdId, myId } from '#lib/features/household/household.server.j
 import {
 	completeTask,
 	deleteTask,
+	DINNER_COLUMNS,
 	TASK_COLUMNS,
+	toCookDinner,
 	toTask
 } from '#lib/features/tasks/tasks.server.js';
 import { dbError } from '#lib/server/db.js';
 import { sampleCheckins, sampleTasks } from '#lib/server/sample-data.js';
 import { addDays, isValidDateISO, isValidTime, todayISO, zonedToInstant } from '#lib/time.js';
-import type { FieldErrors, Profile, Task } from '#lib/types.js';
+import type { CookDinner, FieldErrors, Profile, Task } from '#lib/types.js';
 import {
 	cookTitle,
 	DEFAULT_DINNER_TIME,
@@ -113,22 +115,24 @@ export async function scheduleDinner(
 	return data.id;
 }
 
-/** A dinner task (404 for anything else). */
-export async function getDinner(locals: App.Locals, taskId: string): Promise<Task> {
+/** A dinner task with its whole recipe, for the cook view (404 for anything else). */
+export async function getDinner(locals: App.Locals, taskId: string): Promise<CookDinner> {
 	const { supabase } = locals;
-	let task: Task | undefined;
+	let task: CookDinner | null = null;
 	if (!supabase) {
-		task = sampleTasks.find((entry) => entry.id === taskId);
+		// Sample dinners carry their whole recipe already.
+		const found = sampleTasks.find((entry) => entry.id === taskId);
+		task = found?.recipe ? (found as CookDinner) : null;
 	} else if (UUID.test(taskId)) {
 		const { data, error: readError } = await supabase
 			.from('tasks')
-			.select(TASK_COLUMNS)
+			.select(DINNER_COLUMNS)
 			.eq('id', taskId)
 			.maybeSingle();
 		if (readError) dbError(readError);
-		if (data) task = toTask(data);
+		if (data) task = toCookDinner(data);
 	}
-	if (!task?.recipe) error(404, 'That dinner isn’t on the calendar any more.');
+	if (!task) error(404, 'That dinner isn’t on the calendar any more.');
 	return task;
 }
 

@@ -139,7 +139,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 22px 24px 18px;
+		padding: 18px 22px 16px;
 		border-radius: inherit;
 		box-shadow:
 			inset 0 0 0 1px var(--colour-hairline),
@@ -206,7 +206,7 @@
 
 	.done .title {
 		text-decoration: line-through;
-		text-decoration-color: rgb(245 237 230 / 0.4);
+		text-decoration-color: var(--colour-strike);
 	}
 
 	.footer {
@@ -247,7 +247,7 @@
 		height: var(--tap-target);
 		border: 1.5px solid var(--colour-accent-edge);
 		border-radius: 50%;
-		background: rgb(0 0 0 / 0.2);
+		background: var(--colour-well);
 		color: var(--colour-accent);
 		transition:
 			background-color var(--duration-quick) var(--ease-out),

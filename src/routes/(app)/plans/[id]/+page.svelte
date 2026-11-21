@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { describePlanTime, planDay } from '#lib/features/plans/describe.js';
 	import LinkedText from '#lib/features/plans/LinkedText.svelte';
+	import { planMotif } from '#lib/features/plans/motif.js';
+	import PlanMotif from '#lib/features/plans/PlanMotif.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { describeDaysAway, formatLongDate } from '#lib/time.js';
@@ -11,6 +13,7 @@
 	const plan = $derived(data.plan);
 	const day = $derived(planDay(plan));
 	const daysAway = $derived(describeDaysAway(day, data.today));
+	const motif = $derived(planMotif(plan));
 	const mapsHref = $derived(
 		plan.location ? `https://maps.apple.com/?q=${encodeURIComponent(plan.location)}` : null
 	);
@@ -29,6 +32,7 @@
 	<header class="hero">
 		<GlassSurface radius={28} />
 		<div class="hero-body">
+			{#if motif}<span class="motif"><PlanMotif {motif} /></span>{/if}
 			{#if daysAway}<p class="days-away">{daysAway}</p>{/if}
 			<h1>{plan.title}</h1>
 			<p class="when">
@@ -90,7 +94,7 @@
 	}
 
 	.from-post:active {
-		background: rgb(255 255 255 / 0.04);
+		background: var(--colour-press);
 	}
 
 	.from-post > :global(svg:first-child) {
@@ -136,6 +140,16 @@
 		box-shadow:
 			inset 0 0 0 1px var(--colour-hairline),
 			var(--glass-highlight);
+	}
+
+	/* The plan's drawing, etched into the glass in the corner, clear of the edges. */
+	.motif {
+		position: absolute;
+		right: 22px;
+		bottom: 22px;
+		z-index: -1;
+		width: 104px;
+		pointer-events: none;
 	}
 
 	.days-away {

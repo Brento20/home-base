@@ -2,6 +2,7 @@ import library from '#lib/features/recipes/library.json';
 import { cookTitle, scaleIngredients, type Recipe } from '#lib/features/recipes/recipe.js';
 import { addDays, todayISO, zonedToInstant } from '#lib/time.js';
 import type {
+	CookDinner,
 	AccountDetails,
 	Expense,
 	ExpenseGroup,
@@ -44,7 +45,8 @@ export const sampleAccount: AccountDetails = {
 	nickname: 'Brenton',
 	pronouns: 'he/him',
 	dateOfBirth: '',
-	avatarUrl: null
+	avatarUrl: null,
+	accentColour: '#e58440'
 };
 
 const [brenton, chris] = sampleProfiles;
@@ -70,6 +72,20 @@ export const sampleNotes: HomeNote[] = [
 		body: 'Red bin every Tuesday night. Yellow and green swap weeks.',
 		isSecret: false,
 		updatedAt: new Date().toISOString()
+	},
+	{
+		id: crypto.randomUUID(),
+		title: 'Plumber',
+		body: 'Dave · 0412 345 678',
+		isSecret: false,
+		updatedAt: new Date().toISOString()
+	},
+	{
+		id: crypto.randomUUID(),
+		title: 'Agent',
+		body: 'Priya at Harbour Realty · (02) 9555 0134',
+		isSecret: false,
+		updatedAt: new Date().toISOString()
 	}
 ];
 
@@ -85,6 +101,7 @@ export const sampleLists: ShoppingList[] = [
 	{
 		id: crypto.randomUUID(),
 		name: 'Groceries',
+		pinned: true,
 		completedAt: null,
 		items: [
 			item('Limes', false, brenton.id),
@@ -95,12 +112,14 @@ export const sampleLists: ShoppingList[] = [
 	{
 		id: crypto.randomUUID(),
 		name: 'Hardware run',
+		pinned: false,
 		completedAt: null,
 		items: [item('Picture hooks', false, brenton.id), item('Sandpaper', false, brenton.id)]
 	},
 	{
 		id: crypto.randomUUID(),
 		name: 'Party supplies',
+		pinned: false,
 		completedAt: zonedToInstant(addDays(today, -3), '15:20').toISOString(),
 		items: [item('Ice', true, chris.id), item('Candles', true, brenton.id)]
 	}
@@ -145,7 +164,12 @@ export const sampleTasks: Task[] = [
 const libraryRecipe = (id: string) =>
 	(library as Omit<Recipe, 'custom'>[]).find((r) => r.id === id)!;
 
-const dinner = (recipeId: string, cook: string, dayOffset: number, time: string | null): Task => {
+const dinner = (
+	recipeId: string,
+	cook: string,
+	dayOffset: number,
+	time: string | null
+): CookDinner => {
 	const recipe = libraryRecipe(recipeId);
 	return {
 		...task(cookTitle(recipe.title), cook, addDays(today, dayOffset)),
@@ -344,6 +368,56 @@ export const sampleFeedPosts: FeedPost[] = [
 		photoUrl: null,
 		createdAt: minutesAgo(25),
 		reactions: [{ profileId: chris.id, reaction: 'thumbs_up' }],
+		replies: [],
+		plans: []
+	},
+	{
+		id: 'sample-post-plumber',
+		authorId: chris.id,
+		body: 'Plumber’s booked for Thursday morning. I’ll work from home.',
+		photoUrl: null,
+		createdAt: minutesAgo(60 * 24 * 3),
+		reactions: [],
+		replies: [],
+		plans: []
+	},
+	{
+		id: 'sample-post-plant',
+		authorId: brenton.id,
+		body: 'The fiddle leaf has a new leaf. We’re basically farmers now.',
+		photoUrl: null,
+		createdAt: minutesAgo(60 * 24 * 4),
+		reactions: [],
+		replies: [],
+		plans: []
+	},
+	{
+		id: 'sample-post-wifi',
+		authorId: chris.id,
+		body: 'Wi-Fi was down for an hour. Restarted the router, all good.',
+		photoUrl: null,
+		createdAt: minutesAgo(60 * 24 * 5),
+		reactions: [],
+		replies: [],
+		plans: []
+	},
+	{
+		id: 'sample-post-bins',
+		authorId: brenton.id,
+		body: 'Council collects the green bin on Monday this week (public holiday).',
+		photoUrl: null,
+		createdAt: minutesAgo(60 * 24 * 7),
+		reactions: [],
+		replies: [],
+		plans: []
+	},
+	{
+		id: 'sample-post-movie',
+		authorId: chris.id,
+		body: 'Movie night Saturday? I’ll do popcorn.',
+		photoUrl: null,
+		createdAt: minutesAgo(60 * 24 * 9),
+		reactions: [],
 		replies: [],
 		plans: []
 	}

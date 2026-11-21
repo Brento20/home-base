@@ -10,9 +10,13 @@
 		values: { title: string; body: string; isSecret: boolean };
 		errors?: FieldErrors<'title' | 'body'>;
 		submitLabel: string;
+		/** Example text to show instead of the usual rotating ones (a contact: "Plumber"). */
+		examples?: { title: string[]; body: string[] };
 	}
 
-	let { action, values, errors = {}, submitLabel }: Props = $props();
+	let { action, values, errors = {}, submitLabel, examples }: Props = $props();
+	const titleExamples = $derived(examples?.title ?? PLACEHOLDERS.noteTitle);
+	const bodyExamples = $derived(examples?.body ?? PLACEHOLDERS.noteBody);
 	let saving = $state(false);
 </script>
 
@@ -36,8 +40,8 @@
 			name="title"
 			value={values.title}
 			maxlength="60"
-			placeholder={PLACEHOLDERS.noteTitle[0]}
-			use:placeholderReel={PLACEHOLDERS.noteTitle}
+			placeholder={titleExamples[0]}
+			use:placeholderReel={titleExamples}
 			required
 			aria-invalid={errors.title ? 'true' : undefined}
 		/>
@@ -51,8 +55,8 @@
 			name="body"
 			rows="5"
 			maxlength="2000"
-			placeholder={PLACEHOLDERS.noteBody[0]}
-			use:placeholderReel={PLACEHOLDERS.noteBody}
+			placeholder={bodyExamples[0]}
+			use:placeholderReel={bodyExamples}
 			aria-invalid={errors.body ? 'true' : undefined}>{values.body}</textarea
 		>
 		{#if errors.body}<span class="field-error">{errors.body}</span>{/if}

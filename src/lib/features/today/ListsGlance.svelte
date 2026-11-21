@@ -1,5 +1,10 @@
 <script lang="ts">
-	/** The open lists on Today, each with how many items are left. */
+	/**
+	 * Lists on Today: the Shopping list as a widget with its quick-add field, so something
+	 * remembered on the bus goes straight on it, and any other open lists as a short grouped
+	 * panel underneath.
+	 */
+	import ShoppingCard from '#lib/features/lists/ShoppingCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { ListSummary } from '#lib/types.js';
 
@@ -8,23 +13,31 @@
 	}
 
 	let { lists }: Props = $props();
+
+	const shopping = $derived(lists.find((list) => list.pinned));
+	const others = $derived(lists.filter((list) => !list.pinned).slice(0, 3));
 </script>
 
-<section aria-labelledby="lists-heading">
+<section class="glance" aria-labelledby="lists-heading">
 	<div class="heading-row">
 		<h2 id="lists-heading" class="section-label">Lists</h2>
 		<a class="see-all" href="/lists">All lists</a>
 	</div>
-	{#if lists.length === 0}
-		<p class="empty">No lists on the go. <a href="/lists">Start one</a></p>
-	{:else}
-		<ul>
-			{#each lists as list (list.id)}
+
+	{#if shopping}
+		<ShoppingCard list={shopping} />
+	{/if}
+
+	{#if others.length}
+		<ul class="grouped others">
+			{#each others as list (list.id)}
 				<li>
-					<a class="row" href="/lists/{list.id}">
-						<span class="name">{list.name}</span>
-						<span class="count">{list.total === 0 ? 'Empty' : `${list.remaining} to get`}</span>
-						<Icon name="chevron" size={16} />
+					<a class="grouped-row" href="/lists/{list.id}">
+						<span class="grouped-label">{list.name}</span>
+						<span class="grouped-value"
+							>{list.total === 0 ? 'Empty' : `${list.remaining} to get`}</span
+						>
+						<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
 					</a>
 				</li>
 			{/each}
@@ -37,64 +50,29 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
+		margin-bottom: 2px;
 	}
 
+	/* A bold heading with a tinted link beside it, as in Health's Summary. */
 	.section-label {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-strong);
+		letter-spacing: var(--tracking-tight);
+		color: var(--colour-text);
 	}
 
 	.see-all {
-		padding: 10px 0;
-		font-size: var(--text-caption);
-		color: var(--colour-text-muted);
+		padding: 6px 0;
+		font-size: var(--text-small);
+		color: var(--colour-accent);
 		text-decoration: none;
 	}
 
-	ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
+	.others {
+		margin-top: 10px;
 	}
 
-	.row {
-		display: flex;
-		align-items: center;
-		gap: var(--space-m);
-		min-height: 52px;
-		color: inherit;
-		text-decoration: none;
-		border-bottom: 1px solid var(--colour-hairline);
-	}
-
-	li:last-child .row {
-		border-bottom: 0;
-	}
-
-	.name {
-		flex: 1;
-		min-width: 0;
-		font-size: var(--text-body);
-		overflow-wrap: anywhere;
-	}
-
-	.count {
-		font-size: var(--text-caption);
-		color: var(--colour-text-muted);
-	}
-
-	.row :global(svg) {
-		color: var(--colour-text-faint);
-	}
-
-	.empty {
-		padding: var(--space-s) 0;
-		color: var(--colour-text-faint);
-	}
-
-	.empty a {
-		color: var(--colour-text-muted);
+	.others .grouped-value {
+		font-size: var(--text-small);
 	}
 </style>

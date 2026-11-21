@@ -55,7 +55,30 @@
 	let frame = 0;
 	function onScroll() {
 		cancelAnimationFrame(frame);
-		frame = requestAnimationFrame(updateActive);
+		frame = requestAnimationFrame(() => {
+			updateActive();
+			moveIndicator();
+		});
+	}
+
+	/*
+	 * The indicator under the row: a slim track with a bar that follows the scroll position
+	 * itself, every frame, rather than jumping when a card settles. It's written straight to the
+	 * element's transform (no Svelte state), so following a swipe costs a single composited move.
+	 */
+	let thumb = $state<HTMLElement>();
+	function moveIndicator() {
+		if (!track || !thumb) return;
+		const range = track.scrollWidth - track.clientWidth;
+		const progress = range > 0 ? Math.min(1, Math.max(0, track.scrollLeft / range)) : 0;
+		thumb.style.setProperty('--progress', String(progress));
+	}
+
+	// Tapping the track jumps to the card under that point.
+	function jump(event: MouseEvent) {
+		const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+		const ratio = (event.clientX - box.left) / box.width;
+		goTo(Math.round(Math.min(1, Math.max(0, ratio)) * (pageCount - 1)));
 	}
 
 	function goTo(index: number) {
@@ -67,6 +90,7 @@
 		ticked = [...ticked, id];
 		await tick();
 		updateActive();
+		moveIndicator();
 	}
 
 	// Once fresh data no longer includes a ticked chore, forget it.
@@ -138,18 +162,17 @@
 		</ol>
 
 		{#if pageCount > 1}
-			<div class="dots" aria-hidden="true">
-				{#each { length: pageCount } as _, index (index)}
-					<button
-						type="button"
-						class="dot"
-						class:active={index === active}
-						tabindex="-1"
-						aria-label="Show card {index + 1}"
-						onclick={() => goTo(index)}
-					></button>
-				{/each}
-			</div>
+			<!-- Swiping is the main way; the track still takes a forgiving tap. -->
+			<button
+				type="button"
+				class="indicator"
+				tabindex="-1"
+				aria-hidden="true"
+				style:--pages={pageCount}
+				onclick={jump}
+			>
+				<span class="indicator-track"><span class="indicator-thumb" bind:this={thumb}></span></span>
+			</button>
 		{/if}
 	</section>
 {/if}
@@ -181,7 +204,7 @@
 		 * to the page; what follows in the page sits on top of the empty padding, so taps
 		 * there still reach the to-do list.
 		 */
-		margin: -24px 0 -56px;
+		margin: -24px 0 -66px;
 		padding: 24px var(--bleed) 80px;
 		list-style: none;
 		overflow-x: auto;
@@ -307,40 +330,46 @@
 	}
 
 	.more-body a:global([data-pressed]) {
-		background: rgb(255 255 255 / 0.05);
+		background: var(--colour-fill);
 	}
 
-	.dots {
+	/*
+	 * A slim track with a bar that slides along it as the row scrolls, like the scroll position
+	 * in a page view on iOS, but continuous: it moves with your finger, not after the snap. The
+	 * bar is one page's share of the track (never shorter than 14px).
+	 */
+	.indicator {
 		position: relative;
 		display: flex;
 		justify-content: center;
-		gap: 6px;
-		margin-top: 4px;
-	}
-
-	/* Swiping is the main way; the dots still take a forgiving tap. */
-	.dot::after {
-		content: '';
-		position: absolute;
-		inset: -12px -3px;
-	}
-
-	.dot {
-		position: relative;
-		width: 6px;
-		height: 6px;
-		padding: 0;
+		width: 100%;
+		margin-top: 2px;
+		padding: 10px 0;
 		border: 0;
-		border-radius: var(--radius-pill);
-		background: rgb(255 255 255 / 0.22);
-		transition:
-			width var(--duration-settle) var(--ease-spring),
-			background-color var(--duration-quick) var(--ease-out);
+		background: none;
 	}
 
-	.dot.active {
-		width: 18px;
+	.indicator-track {
+		--track: min(72px, calc(var(--pages) * 14px));
+		--bar: max(14px, calc(var(--track) / var(--pages)));
+		position: relative;
+		width: var(--track);
+		height: 4px;
+		overflow: hidden;
+		border-radius: 2px;
+		background: var(--colour-fill-stronger);
+	}
+
+	.indicator-thumb {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: var(--bar);
+		height: 100%;
+		border-radius: inherit;
 		background: var(--colour-accent);
+		transform: translateX(calc(var(--progress, 0) * (var(--track) - var(--bar))));
+		will-change: transform;
 	}
 
 	.empty {

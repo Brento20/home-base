@@ -19,13 +19,13 @@
 
 <SoloScreen
 	title={heading}
-	lead="Give it a name and a password. Anyone you share both with can join."
+	lead="Give it a name. Once it’s built, invite people with a link from Home settings."
 >
 	{#snippet top()}
 		<a class="button-quiet" href="/setup"><Icon name="back" size={18} /> Back</a>
 	{/snippet}
 
 	<GlassCard>
-		<HomeForm mode="build" name={form?.name} errors={form?.errors} message={form?.message} />
+		<HomeForm name={form?.name} errors={form?.errors} message={form?.message} />
 	</GlassCard>
 </SoloScreen>

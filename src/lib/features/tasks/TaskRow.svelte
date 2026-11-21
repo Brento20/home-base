@@ -18,9 +18,11 @@
 		action: string;
 		/** Where tapping the task's name goes: its page, with all its details. */
 		openHref?: string;
+		/** Leave the date off when the section heading already says it (Today, Tomorrow). */
+		hideDue?: boolean;
 	}
 
-	let { task, people, today, action, openHref }: Props = $props();
+	let { task, people, today, action, openHref, hideDue = false }: Props = $props();
 
 	// Ticked straight away; the row leaves for Past tasks once the server confirms.
 	let ticking = $state(false);
@@ -85,10 +87,8 @@
 			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
 					><Icon name="repeat" size={14} /></span
 				>{/if}
-			{#if dueLabel}<span class="due" class:overdue>{dueLabel}</span>{/if}
+			{#if dueLabel && !hideDue}<span class="due" class:overdue>{dueLabel}</span>{/if}
 		</span>
-		{#if openHref}<span class="chevron" aria-hidden="true"><Icon name="chevron" size={18} /></span
-			>{/if}
 	</svelte:element>
 </li>
 
@@ -141,8 +141,8 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		border: 2px solid var(--ring-colour);
-		color: #14100d;
+		border: 2px solid var(--ring-ink);
+		color: var(--colour-on-ring);
 		transition:
 			background-color var(--duration-quick) var(--ease-out),
 			transform var(--duration-release) var(--spring-gentle);
@@ -161,7 +161,7 @@
 
 	.ticking .ring {
 		border-style: solid;
-		background: var(--ring-colour);
+		background: var(--ring-ink);
 	}
 
 	.ticking .anyone .ring {
@@ -177,8 +177,7 @@
 		flex: 1;
 		min-width: 0;
 		min-height: var(--row-height);
-		margin-right: -12px;
-		padding-right: 4px;
+		padding-right: 2px;
 		color: inherit;
 		text-decoration: none;
 		-webkit-tap-highlight-color: transparent;
@@ -209,7 +208,7 @@
 
 	.ticking .title {
 		text-decoration: line-through;
-		text-decoration-color: rgb(245 237 230 / 0.3);
+		text-decoration-color: var(--colour-strike);
 	}
 
 	.meta {
@@ -226,13 +225,8 @@
 		color: var(--colour-text-faint);
 	}
 
+	/* Late is red, as in Reminders. */
 	.due.overdue {
-		color: var(--colour-accent);
-	}
-
-	.chevron {
-		display: grid;
-		flex: none;
-		color: var(--colour-text-faint);
+		color: var(--colour-danger);
 	}
 </style>

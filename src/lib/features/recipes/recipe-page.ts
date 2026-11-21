@@ -11,9 +11,12 @@
  */
 import {
 	BLANK_RECIPE_FORM,
+	ingredientLine,
+	parseIngredientLine,
 	PROTEIN_OPTIONS,
 	SERVINGS_MAX,
 	SERVINGS_MIN,
+	type Ingredient,
 	type RecipeFormValues
 } from './recipe.js';
 
@@ -321,7 +324,13 @@ export function valuesFromRecipeData(data: Record<string, unknown>): RecipeFormV
 		isVegetarian: vegan || /VegetarianDiet/i.test(diets),
 		isVegan: vegan,
 		proteins: proteinsIn(ingredients),
-		ingredients: ingredients.slice(0, 60).join('\n'),
+		// Read and written back the way the form saves them, so ranges and units come out clean.
+		ingredients: ingredients
+			.map((line) => parseIngredientLine(line))
+			.filter((ingredient): ingredient is Ingredient => ingredient !== null)
+			.slice(0, 60)
+			.map(ingredientLine)
+			.join('\n'),
 		steps: steps.slice(0, 40).join('\n'),
 		energyKj: hasNutrition ? String(Math.round(kcal! * 4.184)) : '',
 		proteinG: hasNutrition ? grams(nutrition.proteinContent) : '',

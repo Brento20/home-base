@@ -66,9 +66,21 @@
 	</section>
 {/if}
 
-<ConfirmDelete action="?/delete" label="Delete list" />
+{#if data.list.pinned}
+	{#if editing}
+		<p class="group-note pinned-note">
+			The Shopping list is always here, so you can add to it from Today. Rename it if you like.
+		</p>
+	{/if}
+{:else}
+	<ConfirmDelete action="?/delete" label="Delete list" />
+{/if}
 
 <style>
+	.pinned-note {
+		margin-top: var(--space-m);
+	}
+
 	.manage {
 		margin-top: var(--space-xl);
 	}

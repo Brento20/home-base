@@ -1,57 +1,33 @@
-import { dbError, friendlyMessage } from '#lib/server/db.js';
+import { isCurrency, isTimeZone } from '#lib/home.js';
+import { friendlyMessage } from '#lib/server/db.js';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { sampleHousehold } from '#lib/server/sample-data.js';
+import { sampleHome } from '#lib/server/sample-home.js';
 import type { FieldErrors } from '#lib/types.js';
 
 /**
- * Building, joining and looking after a home. The checks that matter live in the database
- * functions (create_household, join_household, set_household_password); this file shapes the
- * forms and turns their messages into something the page can show.
+ * Building and looking after a home. The checks that matter live in the database functions
+ * (create_household and the update rules on households); this file shapes the forms and turns
+ * their messages into something the page can show. Joining is by invite link (invites.server.ts).
  */
 
 export const HOME_NAME_MIN = 3;
 export const HOME_NAME_MAX = 30;
-export const HOME_PASSWORD_MIN = 8;
 
-const NO_MATCH = 'That name and password don’t match.';
+const messageFrom = (problem: PostgrestError) => friendlyMessage(problem);
 
-type HomeField = 'name' | 'password';
-
-/** A home name already in use is the one constraint people can run into here. */
-const messageFrom = (problem: PostgrestError) =>
-	problem.code === '23505' ? 'That name is taken. Try another.' : friendlyMessage(problem);
-
-export function parseHomeForm(form: FormData, { checkStrength }: { checkStrength: boolean }) {
+export function parseHomeForm(form: FormData) {
 	const name = String(form.get('name') ?? '').trim();
-	const password = String(form.get('password') ?? '');
-	const errors: FieldErrors<HomeField> = {};
-
+	const errors: FieldErrors<'name'> = {};
 	if (name.length < HOME_NAME_MIN || name.length > HOME_NAME_MAX)
 		errors.name = `Use ${HOME_NAME_MIN} to ${HOME_NAME_MAX} characters.`;
-	if (!password) errors.password = 'Enter the home password.';
-	else if (checkStrength && password.length < HOME_PASSWORD_MIN)
-		errors.password = `Use at least ${HOME_PASSWORD_MIN} characters.`;
-
-	return { name, password, errors, valid: Object.keys(errors).length === 0 };
+	return { name, errors, valid: Object.keys(errors).length === 0 };
 }
 
-export async function createHome(locals: App.Locals, name: string, password: string) {
+export async function createHome(locals: App.Locals, name: string) {
 	if (!locals.supabase) return { message: null };
-	const { error: problem } = await locals.supabase.rpc('create_household', {
-		home_name: name,
-		home_password: password
-	});
+	const { error: problem } = await locals.supabase.rpc('create_household', { home_name: name });
 	return { message: problem ? messageFrom(problem) : null };
-}
-
-export async function joinHome(locals: App.Locals, name: string, password: string) {
-	if (!locals.supabase) return { message: null };
-	const { data, error: problem } = await locals.supabase.rpc('join_household', {
-		home_name: name,
-		home_password: password
-	});
-	if (problem) return { message: messageFrom(problem) };
-	return { message: data ? null : NO_MATCH };
 }
 
 export async function renameHome(locals: App.Locals, householdId: string, name: string) {
@@ -69,21 +45,37 @@ export async function renameHome(locals: App.Locals, householdId: string, name: 
 	return { message: null };
 }
 
-export async function setHomePassword(locals: App.Locals, householdId: string, password: string) {
-	if (!locals.supabase) return { message: null };
-	const { error: problem } = await locals.supabase.rpc('set_household_password', {
-		target_household: householdId,
-		new_password: password
-	});
-	return { message: problem ? messageFrom(problem) : null };
+/**
+ * Where the home is: its time zone and currency (src/lib/home.ts). Owners only, like renaming:
+ * the database's update rule refuses anyone else, which shows here as no rows changed.
+ */
+export async function setHomePlace(
+	locals: App.Locals,
+	householdId: string,
+	place: { timeZone: string; currency: string }
+) {
+	if (!isTimeZone(place.timeZone)) return { message: 'Pick a time zone from the list.' };
+	if (!isCurrency(place.currency)) return { message: 'Pick a currency from the list.' };
+	if (!locals.supabase) {
+		Object.assign(sampleHome, place);
+		return { message: null };
+	}
+	const { data, error: problem } = await locals.supabase
+		.from('households')
+		.update({ time_zone: place.timeZone, currency: place.currency })
+		.eq('id', householdId)
+		.select('id');
+	if (problem) return { message: messageFrom(problem) };
+	if (!data?.length) return { message: 'Only the home’s owner can change this.' };
+	return { message: null };
 }
 
-/** Whether the home has a password yet. A home without one can't be joined. */
-export async function homeHasPassword(locals: App.Locals, householdId: string) {
-	if (!locals.supabase) return true;
-	const { data, error: problem } = await locals.supabase.rpc('household_has_password', {
-		target_household: householdId
-	});
-	if (problem) dbError(problem);
-	return Boolean(data);
+/**
+ * Leaves the home. The last person out deletes it and everything in it; if the last owner
+ * leaves, the longest-standing member becomes owner (leave_household in the database).
+ */
+export async function leaveHome(locals: App.Locals) {
+	if (!locals.supabase) return { message: 'The sample home can’t be left. It’s only a preview.' };
+	const { error: problem } = await locals.supabase.rpc('leave_household');
+	return { message: problem ? messageFrom(problem) : null };
 }

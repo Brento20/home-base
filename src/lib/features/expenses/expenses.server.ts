@@ -125,37 +125,50 @@ async function readBalances(locals: App.Locals, group: ExpenseGroup): Promise<Ba
 	}));
 }
 
-/** The groups you're in, with your balance in each. */
+/**
+ * The groups you're in, with your balance in each. The groups and every balance come back
+ * together (household_group_balances), so this is one trip, not one per group after another.
+ */
 export async function listGroups(locals: App.Locals): Promise<ExpenseGroupSummary[]> {
 	const me = meId(locals);
-	const groups: ExpenseGroup[] = [];
+	const summary = (group: ExpenseGroup, balances: Balance[]): ExpenseGroupSummary => ({
+		...group,
+		myNetCents: balances.find((b) => b.profileId === me)?.netCents ?? 0,
+		myDebts: simplifyDebts(balances).filter((debt) => debt.from === me || debt.to === me)
+	});
 
-	if (!locals.supabase) {
-		groups.push(...sampleExpenseGroups.filter((group) => group.memberIds.includes(me)));
-	} else {
-		const { data, error: problem } = await locals.supabase
+	if (!locals.supabase)
+		return sampleExpenseGroups
+			.filter((group) => group.memberIds.includes(me))
+			.map((group) => summary(group, sampleBalances(group)));
+
+	const [{ data, error: problem }, { data: rows, error: balanceProblem }] = await Promise.all([
+		locals.supabase
 			.from('expense_groups')
 			.select('id, name, expense_group_members ( profile_id )')
 			.eq('household_id', await getHouseholdId(locals))
-			.order('created_at');
-		fail500(problem);
-		for (const row of data ?? [])
-			groups.push({
+			.order('created_at'),
+		locals.supabase.rpc('household_group_balances')
+	]);
+	fail500(problem);
+	fail500(balanceProblem);
+
+	const balancesByGroup = new Map<string, Balance[]>();
+	for (const row of (rows ?? []) as { group_id: string; profile_id: string; net_cents: number }[]) {
+		const list = balancesByGroup.get(row.group_id) ?? [];
+		list.push({ profileId: row.profile_id, netCents: Number(row.net_cents) });
+		balancesByGroup.set(row.group_id, list);
+	}
+
+	return (data ?? []).map((row) =>
+		summary(
+			{
 				id: row.id,
 				name: row.name,
 				memberIds: row.expense_group_members.map((m: { profile_id: string }) => m.profile_id)
-			});
-	}
-
-	return Promise.all(
-		groups.map(async (group) => {
-			const balances = await readBalances(locals, group);
-			return {
-				...group,
-				myNetCents: balances.find((b) => b.profileId === me)?.netCents ?? 0,
-				myDebts: simplifyDebts(balances).filter((debt) => debt.from === me || debt.to === me)
-			};
-		})
+			},
+			balancesByGroup.get(row.id) ?? []
+		)
 	);
 }
 

@@ -10,9 +10,11 @@
 		/** Form action, e.g. "?/delete". */
 		action: string;
 		label?: string;
+		/** What the armed button says. */
+		confirmLabel?: string;
 	}
 
-	let { action, label = 'Delete' }: Props = $props();
+	let { action, label = 'Delete', confirmLabel = 'Tap again to delete' }: Props = $props();
 
 	// Two taps instead of a browser confirm dialog: the first arms it, the second deletes.
 	let armed = $state(false);
@@ -29,7 +31,7 @@
 
 <form class="confirm-delete" method="POST" {action} use:enhance>
 	<button class="delete" class:armed onclick={arm} aria-live="polite">
-		{armed ? 'Tap again to delete' : label}
+		{armed ? confirmLabel : label}
 	</button>
 </form>
 

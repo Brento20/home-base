@@ -6,6 +6,7 @@
  * page just shows the form empty with a friendly "enter it manually" line (AI_OOPS in voice.ts).
  */
 import { ANTHROPIC_API_KEY, ANTHROPIC_BASE_URL } from '$app/env/private';
+import { getRequestEvent } from '$app/server';
 
 /** False when no key is set: the helpers hide, and every form works by hand as before. */
 export const aiConfigured = Boolean(ANTHROPIC_API_KEY);
@@ -37,6 +38,39 @@ interface Ask {
 }
 
 /**
+ * A cap on AI calls per person, so one account (or a script using it) can't run up the bill:
+ * AI_PER_MINUTE a minute each. Deployed, Cloudflare's rate limiter counts (the AI_LIMITER
+ * binding in wrangler.jsonc, keyed by the person's id); anywhere without it (dev, preview) a
+ * simple count in memory stands in. Over the cap, the helper fails like any other hiccup: the
+ * form stays empty with the usual "enter it manually" line.
+ */
+export const AI_PER_MINUTE = 10;
+const recentCalls = new Map<string, number[]>();
+
+export async function aiAllowed(): Promise<boolean> {
+	let event;
+	try {
+		event = getRequestEvent();
+	} catch {
+		return true; // Not inside a request (a test): nothing to count against.
+	}
+	const who = event.locals.user?.id ?? event.getClientAddress();
+	const limiter = event.platform?.env?.AI_LIMITER;
+	if (limiter) {
+		try {
+			return (await limiter.limit({ key: who })).success;
+		} catch {
+			return true; // The limiter itself failing shouldn't take the helpers down.
+		}
+	}
+	const now = Date.now();
+	const calls = (recentCalls.get(who) ?? []).filter((at) => now - at < 60_000);
+	if (calls.length >= AI_PER_MINUTE) return false;
+	recentCalls.set(who, [...calls, now]);
+	return true;
+}
+
+/**
  * Asks Claude for an answer shaped like `schema`. Returns the parsed answer, or null if anything
  * at all goes wrong: the caller falls back to the empty form.
  */
@@ -49,6 +83,10 @@ export async function askForJson<T>({
 	timeoutMs = 25_000
 }: Ask): Promise<T | null> {
 	if (!ANTHROPIC_API_KEY) return null;
+	if (!(await aiAllowed())) {
+		console.warn('AI helper skipped: over the per-person limit');
+		return null;
+	}
 	const base = (ANTHROPIC_BASE_URL || 'https://api.anthropic.com').replace(/\/$/, '');
 
 	try {

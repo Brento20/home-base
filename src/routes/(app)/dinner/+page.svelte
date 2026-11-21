@@ -244,7 +244,7 @@
 		transform: translateY(-50%);
 		border: 0;
 		border-radius: 50%;
-		background: rgb(255 255 255 / 0.08);
+		background: var(--colour-fill);
 		color: var(--colour-text-muted);
 	}
 	/* A bigger tap area than the little circle shows. */
@@ -311,7 +311,7 @@
 
 	.more[aria-expanded='true'] {
 		color: var(--colour-text);
-		border-color: rgb(255 255 255 / 0.24);
+		border-color: var(--colour-fill-stronger);
 	}
 
 	.more-filters {
@@ -320,7 +320,7 @@
 		gap: var(--space-m);
 		padding: var(--space-m);
 		border-radius: 22px;
-		background: rgb(255 255 255 / 0.03);
+		background: var(--colour-press);
 		box-shadow: inset 0 0 0 1px var(--colour-hairline);
 		animation: open-down 320ms cubic-bezier(0.22, 1, 0.36, 1);
 	}

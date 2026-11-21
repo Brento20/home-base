@@ -1,26 +1,36 @@
-import { HOUSEHOLD_LOCALE, HOUSEHOLD_TIME_ZONE } from '#lib/config.js';
+import { homeSettings, LOCALE } from '#lib/home.js';
 
 /**
- * Dates and times in the household's time zone, on the server (which may run in UTC)
- * and on the phone alike. Calendar dates are plain 'YYYY-MM-DD' strings.
+ * Dates and times in the household's time zone (src/lib/home.ts), on the server (which may run
+ * in UTC) and on the phone alike. Calendar dates are plain 'YYYY-MM-DD' strings.
  */
 
-const zone = { timeZone: HOUSEHOLD_TIME_ZONE };
-
-const partsFormatter = new Intl.DateTimeFormat('en-CA', {
-	...zone,
-	year: 'numeric',
-	month: '2-digit',
-	day: '2-digit',
-	hour: '2-digit',
-	minute: '2-digit',
-	hourCycle: 'h23'
-});
+// One formatter per time zone, made the first time it's needed: a server serves many homes.
+const partsFormatters = new Map<string, Intl.DateTimeFormat>();
+function partsFormatter() {
+	const { timeZone } = homeSettings();
+	let formatter = partsFormatters.get(timeZone);
+	if (!formatter) {
+		formatter = new Intl.DateTimeFormat('en-CA', {
+			timeZone,
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit',
+			hourCycle: 'h23'
+		});
+		partsFormatters.set(timeZone, formatter);
+	}
+	return formatter;
+}
 
 /** The household-local calendar date and clock time of an instant. */
 export function zonedParts(instant: Date) {
 	const parts = Object.fromEntries(
-		partsFormatter.formatToParts(instant).map((part) => [part.type, part.value])
+		partsFormatter()
+			.formatToParts(instant)
+			.map((part) => [part.type, part.value])
 	);
 	return {
 		date: `${parts.year}-${parts.month}-${parts.day}`,
@@ -103,13 +113,11 @@ export function formatDinnerWhen(dateISO: string, time: string | null, today = t
 	return time ? `${name}, ${formatTimeOfDay(time)}` : name;
 }
 
-const weekdayShort = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, {
-	weekday: 'short',
-	timeZone: 'UTC'
-});
-const weekdayLong = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, { weekday: 'long', timeZone: 'UTC' });
-const monthShort = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, { month: 'short', timeZone: 'UTC' });
-const monthLong = new Intl.DateTimeFormat(HOUSEHOLD_LOCALE, { month: 'long', timeZone: 'UTC' });
+// Names for calendar dates (already local), so these read the date as UTC whatever the home.
+const weekdayShort = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', timeZone: 'UTC' });
+const weekdayLong = new Intl.DateTimeFormat(LOCALE, { weekday: 'long', timeZone: 'UTC' });
+const monthShort = new Intl.DateTimeFormat(LOCALE, { month: 'short', timeZone: 'UTC' });
+const monthLong = new Intl.DateTimeFormat(LOCALE, { month: 'long', timeZone: 'UTC' });
 
 const asUtcDate = (dateISO: string) => new Date(`${dateISO}T00:00:00Z`);
 

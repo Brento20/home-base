@@ -164,7 +164,7 @@
 		height: 36px;
 		border: 0;
 		border-radius: 50%;
-		background: rgb(14 11 10 / 0.7);
+		background: var(--surface-bar);
 		color: var(--colour-text);
 		-webkit-backdrop-filter: blur(12px);
 		backdrop-filter: blur(12px);

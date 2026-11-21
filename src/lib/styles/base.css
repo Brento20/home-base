@@ -211,7 +211,7 @@ html[data-nav] [data-still='action-fade'] {
  */
 ::view-transition-group(tab-bar) {
 	border-radius: var(--radius-pill);
-	background: rgb(16 12 10 / 0.82);
+	background: var(--surface-raised);
 }
 
 /* Same screen both sides: just show the new one. */
@@ -321,4 +321,13 @@ summary,
 	-webkit-user-select: none;
 	user-select: none;
 	-webkit-touch-callout: none;
+}
+
+/*
+ * A person's colour as a thin ring or a filled tick: as it is on dark; deepened on light, where a
+ * pale colour (white, cream) would vanish into the page. Set --ring-colour on the element.
+ */
+[style*='--ring-colour'],
+.ring {
+	--ring-ink: color-mix(in oklab, var(--ring-colour), #000 var(--ring-deepen));
 }

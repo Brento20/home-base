@@ -7,14 +7,14 @@
  * - Pulling down from the top refreshes.
  */
 
-import { TABS, tabIndexFor } from './tabs.js';
+import { TABS, isTabView, tabIndexFor } from './tabs.js';
 
 export type SwipeAction =
 	| { kind: 'tab'; href: string; label: string; direction: 'next' | 'previous' }
 	| { kind: 'back'; fallback: string };
 
 /** Is this one of the tab bar's own pages? */
-export const isTabRoot = (pathname: string) => TABS.some((tab) => tab.href === pathname);
+export const isTabRoot = (pathname: string) => isTabView(pathname);
 
 /**
  * The action for a horizontal swipe. `dx` is the finger's travel: negative is a swipe to the

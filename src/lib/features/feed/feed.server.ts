@@ -16,11 +16,14 @@ export const REPLY_BODY_MAX = 1000;
 const PHOTO_MAX_BYTES = 3 * 1024 * 1024;
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-/** How many posts Today shows at first, and how many more each "load older" adds. */
-export const FEED_FIRST_PAGE = 5;
-export const FEED_PAGE = 10;
-/** The most posts one page load will return, however far someone scrolls. */
-const FEED_MAX = 200;
+/**
+ * Today loads only the newest few posts with the page; older ones come a few at a time from
+ * /feed/older as you scroll (FeedSection), so the page and its 20-second refresh stay light.
+ */
+export const FEED_FIRST_PAGE = 3;
+export const FEED_PAGE = 5;
+/** The most one /feed/older request will return. */
+export const FEED_MAX = 50;
 
 interface PostRow {
 	id: string;
@@ -66,28 +69,29 @@ const toPost = (row: PostRow): FeedPost => ({
 
 /** The signed-in person's id (sample mode: the first sample person). */
 
-/** How many posts to show, from the ?feed= count Today keeps as you scroll. */
-export function feedLimit(requested: string | null) {
-	const count = Number(requested);
-	if (!Number.isInteger(count) || count < FEED_FIRST_PAGE) return FEED_FIRST_PAGE;
-	return Math.min(count, FEED_MAX);
-}
-
-/** The newest `limit` posts, and whether there are older ones. */
+/**
+ * The newest `limit` posts (or the `limit` before the `before` time), and whether there are
+ * older ones still.
+ */
 export async function listFeed(
 	locals: App.Locals,
-	limit = FEED_FIRST_PAGE
+	limit = FEED_FIRST_PAGE,
+	before?: string
 ): Promise<{ posts: FeedPost[]; hasMore: boolean }> {
 	const { supabase } = locals;
 	if (!supabase) {
-		const sorted = [...sampleFeedPosts].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+		const sorted = [...sampleFeedPosts]
+			.filter((post) => !before || post.createdAt < before)
+			.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 		return { posts: sorted.slice(0, limit), hasMore: sorted.length > limit };
 	}
 
-	const { data, error: readError } = await supabase
+	let query = supabase
 		.from('feed_posts')
 		.select(COLUMNS)
-		.eq('household_id', await getHouseholdId(locals))
+		.eq('household_id', await getHouseholdId(locals));
+	if (before) query = query.lt('created_at', before);
+	const { data, error: readError } = await query
 		.order('created_at', { ascending: false })
 		.limit(limit + 1);
 
@@ -315,4 +319,16 @@ export async function toggleReaction(locals: App.Locals, postId: string, reactio
 						{ onConflict: 'post_id,profile_id' }
 					);
 	if (writeError) dbError(writeError);
+}
+
+/** Whether the home has posted anything yet (for Today's getting-started card). */
+export async function hasAnyPost(locals: App.Locals): Promise<boolean> {
+	if (!locals.supabase) return sampleFeedPosts.length > 0;
+	const { data, error: readError } = await locals.supabase
+		.from('feed_posts')
+		.select('id')
+		.eq('household_id', await getHouseholdId(locals))
+		.limit(1);
+	if (readError) dbError(readError);
+	return (data ?? []).length > 0;
 }

@@ -58,7 +58,7 @@ What makes a good line:
 - Lead with today: the reader's chores (name the actual chore), tonight's dinner, today's plans. Mention the rest of the week only if today is quiet.
 - If money is owed, give it a playful nudge with the exact name and amount: owing someone is a reason to skip a treat; being owed is a reason to remind them.
 - A joke that comes from the actual task works best: the bathroom means rubber gloves, bins mean a midnight sprint, a big dinner means stretchy pants.
-- One or two short sentences, at most 200 characters in all. At most one emoji, and only if it earns its place.
+- One or two short sentences, at most 140 characters in all. At most one emoji, and only if it earns its place.
 
 Rules:
 - Use only the facts given. Never invent chores, plans, people, days or amounts.
@@ -66,6 +66,7 @@ Rules:
 - "cook": "you" means the reader is cooking; a name means that person is; "anyone" means nobody's claimed it.
 - No guilt trips about health, weight, drinking problems or money troubles. Light teasing only.
 - Don't start with "Hey", "Ah" or "Looks like". Don't use dashes.
+- Keep responses short and punchy (up to 140 characters), like a cheeky housemate.
 
 The style, for flavour only (don't copy it): "Grab the rubber gloves, you're on bathroom duty today plus 2 other jobs. Maybe skip that extra cocktail: you owe Chris $595."`;
 
