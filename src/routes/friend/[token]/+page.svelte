@@ -83,7 +83,7 @@
 
 	{#snippet footer()}
 		{#if link?.usable && !link.isYou && data.stage === 'signed-out'}
-			<p class="note">Once you’re signed in, open this link again.</p>
+			<p class="note">After you sign in you’ll come straight back here.</p>
 		{/if}
 	{/snippet}
 </SoloScreen>

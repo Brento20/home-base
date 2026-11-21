@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { forgetFriendLink, savedFriendLink } from '#lib/features/friends/friend-cookie.server.js';
 import type { Handle } from '@sveltejs/kit/hooks';
 import { redirectFor, stageFor } from '#lib/features/account/stage.js';
 import { DEFAULT_HOME, homeFrom, setHomeSettingsSource, type HomeSettings } from '#lib/home.js';
@@ -149,6 +150,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const target = redirectFor(locals.stage, event.route.id);
 	if (target && target !== event.url.pathname) redirect(303, target);
+
+	// A friend link opened before you could accept it (signed out, say): back to it now you can.
+	const friendLink = savedFriendLink(event.cookies);
+	if (
+		friendLink &&
+		(locals.stage === 'ready' || locals.stage === 'home') &&
+		event.request.method === 'GET' &&
+		!event.route.id?.startsWith('/friend/')
+	) {
+		forgetFriendLink(event.cookies);
+		redirect(303, `/friend/${friendLink}`);
+	}
 
 	const response = await resolve(event, {
 		...themed(await deviceTheme(event), locals.home),
