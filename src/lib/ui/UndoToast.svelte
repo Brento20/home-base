@@ -36,7 +36,7 @@
 {#if shown}
 	<div class="undo-toast" role="status" data-still="undo-toast">
 		<Icon name="check" size={16} />
-		<span class="message">{message}</span>
+		<span class="message one-line">{message}</span>
 		<form
 			method="POST"
 			{action}
@@ -73,7 +73,7 @@
 			inset 0 0 0 1px var(--colour-hairline-strong),
 			0 10px 28px -12px var(--shadow-colour);
 		transform: translateX(-50%);
-		animation: rise var(--duration-move, 280ms) var(--ease-out) both;
+		animation: rise var(--duration-settle) var(--ease-out) both;
 	}
 
 	.undo-toast > :global(svg) {
@@ -84,10 +84,7 @@
 	.message {
 		flex: 1;
 		min-width: 0;
-		overflow: hidden;
 		font-size: var(--text-small);
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	form {

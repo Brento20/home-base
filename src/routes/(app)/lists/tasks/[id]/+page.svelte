@@ -50,7 +50,7 @@
 	<header class="hero">
 		<GlassSurface radius={28} />
 		<div class="hero-body">
-			<p class="status" class:overdue class:done={!!task.completedAt}>{status}</p>
+			<p class="status caption-label" class:overdue class:done={!!task.completedAt}>{status}</p>
 			<h1>{task.title}</h1>
 			<p class="who">
 				<span
@@ -146,13 +146,6 @@
 		box-shadow:
 			inset 0 0 0 1px var(--colour-hairline),
 			var(--glass-highlight);
-	}
-
-	.status {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.status.overdue {

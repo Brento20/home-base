@@ -71,16 +71,16 @@
 		maxlength="120"
 		required
 	/>
-	<button class="add-button" aria-label="Add item">
+	<button class="add-button round-accent" aria-label="Add item">
 		<Icon name="plus" size={20} />
 	</button>
 </form>
 {#if message}<p class="message" role="alert">{message}</p>{/if}
 
 {#if items.length === 0}
-	<p class="summary">Nothing on this list yet.</p>
+	<p class="summary caption-label">Nothing on this list yet.</p>
 {:else}
-	<p class="summary" aria-live="polite">
+	<p class="summary caption-label" aria-live="polite">
 		{remaining === 0 ? 'All got' : `${remaining} to get`}
 	</p>
 {/if}
@@ -101,7 +101,7 @@
 <!-- Ticked things gather at the foot, as in Reminders, with Clear to take them away. -->
 {#if ticked.length}
 	<div class="ticked-head">
-		<p class="summary">{ticked.length} ticked</p>
+		<p class="summary caption-label">{ticked.length} ticked</p>
 		<form
 			method="POST"
 			action="?/clearTicked"
@@ -186,27 +186,10 @@
 			0 0 0 3px var(--colour-accent-soft);
 	}
 
+	/* Above the field's glass. */
 	.add-button {
 		position: relative;
 		z-index: 1;
-		display: grid;
-		place-items: center;
-		width: var(--tap-target);
-		height: var(--tap-target);
-		border: 0;
-		border-radius: 50%;
-		background: var(--colour-accent);
-		color: var(--colour-on-accent);
-		transition:
-			transform var(--duration-release) var(--spring-gentle),
-			background-color var(--duration-quick) var(--ease-out);
-	}
-
-	.add-button:global([data-pressed]) {
-		transform: scale(0.9);
-		background: var(--colour-accent-pressed);
-		transition-duration: var(--duration-press);
-		transition-timing-function: var(--ease-out);
 	}
 
 	.message {
@@ -217,10 +200,6 @@
 
 	.summary {
 		margin: 28px 0 var(--space-xs);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.items {

@@ -210,7 +210,7 @@
 		<p class="quiet spaced">No expenses in {describeRange(report.range)}.</p>
 	{:else}
 		<section aria-labelledby="where-heading">
-			<h2 id="where-heading" class="section-label">Where it went</h2>
+			<h2 id="where-heading" class="section-label caption-label">Where it went</h2>
 			<CategoryRing
 				categories={report.categories}
 				totalCents={report.totalCents}
@@ -227,7 +227,7 @@
 		{#if data.category && data.drill}
 			<section aria-labelledby="drill-heading">
 				<div class="drill-head">
-					<h2 id="drill-heading" class="section-label">
+					<h2 id="drill-heading" class="section-label caption-label">
 						{categoryLabel(data.category)} · {count(data.drill.length)}
 					</h2>
 					<a class="button-quiet" href={categoryHref(null)} data-sveltekit-reset="false"
@@ -239,7 +239,7 @@
 		{/if}
 
 		<section aria-labelledby="trend-heading">
-			<h2 id="trend-heading" class="section-label">
+			<h2 id="trend-heading" class="section-label caption-label">
 				{data.category ? `${categoryLabel(data.category)} over time` : 'Over time'}
 			</h2>
 			<TrendChart
@@ -252,7 +252,7 @@
 		</section>
 
 		<section aria-labelledby="pace-heading">
-			<h2 id="pace-heading" class="section-label">Pace</h2>
+			<h2 id="pace-heading" class="section-label caption-label">Pace</h2>
 			<PaceChart
 				now={data.pace.now}
 				before={data.pace.before}
@@ -265,7 +265,7 @@
 		{#if data.paidBy.length > 1}
 			{@const paidTotal = data.paidBy.reduce((sum, row) => sum + row.cents, 0)}
 			<section aria-labelledby="paid-heading">
-				<h2 id="paid-heading" class="section-label">Who paid</h2>
+				<h2 id="paid-heading" class="section-label caption-label">Who paid</h2>
 				<div class="split" aria-hidden="true">
 					{#each data.paidBy as row, index (row.personId)}
 						<span
@@ -291,7 +291,7 @@
 
 		{#if !data.category && data.biggest.length > 0}
 			<section aria-labelledby="biggest-heading">
-				<h2 id="biggest-heading" class="section-label">Biggest spends</h2>
+				<h2 id="biggest-heading" class="section-label caption-label">Biggest spends</h2>
 				{@render drillList(data.biggest)}
 			</section>
 		{/if}
@@ -370,7 +370,7 @@
 
 	{#if data.pace.a.length || data.pace.b.length}
 		<section aria-labelledby="compare-pace-heading">
-			<h2 id="compare-pace-heading" class="section-label">
+			<h2 id="compare-pace-heading" class="section-label caption-label">
 				{data.category ? `${categoryLabel(data.category)} pace` : 'Pace'}
 			</h2>
 			<PaceChart
@@ -385,7 +385,7 @@
 
 	{#if comparison.categories.length > 0}
 		<section aria-labelledby="compare-heading">
-			<h2 id="compare-heading" class="section-label">By category</h2>
+			<h2 id="compare-heading" class="section-label caption-label">By category</h2>
 			<CompareBars
 				categories={comparison.categories}
 				{aLabel}
@@ -399,7 +399,9 @@
 	{#if data.category && data.drill}
 		<section aria-labelledby="drill-heading">
 			<div class="drill-head">
-				<h2 id="drill-heading" class="section-label">{categoryLabel(data.category)}</h2>
+				<h2 id="drill-heading" class="section-label caption-label">
+					{categoryLabel(data.category)}
+				</h2>
 				<a class="button-quiet" href={categoryHref(null)} data-sveltekit-reset="false"
 					>All categories</a
 				>
@@ -599,10 +601,6 @@
 
 	.section-label {
 		margin-bottom: var(--space-s);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.quiet {

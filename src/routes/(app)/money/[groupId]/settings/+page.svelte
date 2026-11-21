@@ -62,7 +62,7 @@
 	</GlassCard>
 
 	<section aria-labelledby="members-heading">
-		<h2 id="members-heading" class="section-label">In this group</h2>
+		<h2 id="members-heading" class="section-label caption-label">In this group</h2>
 		<ul class="people">
 			{#each data.people as person (person.id)}
 				<li>
@@ -108,10 +108,6 @@
 
 	.section-label {
 		margin-bottom: var(--space-m);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.people {

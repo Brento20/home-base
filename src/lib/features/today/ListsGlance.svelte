@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
 	/**
 	 * Lists on Today: the Shopping list as a widget with its quick-add field, so something
 	 * remembered on the bus goes straight on it, and any other open lists as a short grouped
@@ -19,9 +20,9 @@
 </script>
 
 <section class="glance" aria-labelledby="lists-heading">
-	<div class="heading-row">
-		<h2 id="lists-heading" class="section-label">Lists</h2>
-		<a class="see-all" href="/lists">All lists</a>
+	<div class="heading-row section-heading-row">
+		<h2 id="lists-heading" class="section-heading">Lists</h2>
+		<a class="see-all section-heading-link" href="/lists">All lists</a>
 	</div>
 
 	{#if shopping}
@@ -31,7 +32,12 @@
 	{#if others.length}
 		<ul class="grouped others">
 			{#each others as list (list.id)}
-				<li>
+				<li
+					in:arrive
+					out:leave
+					animate:glide
+					use:changed={`${list.name}|${list.remaining}|${list.total}`}
+				>
 					<a class="grouped-row" href="/lists/{list.id}">
 						<span class="grouped-label">{list.name}</span>
 						<span class="grouped-value"
@@ -47,25 +53,11 @@
 
 <style>
 	.heading-row {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
 		margin-bottom: 2px;
-	}
-
-	/* A bold heading with a tinted link beside it, as in Health's Summary. */
-	.section-label {
-		font-size: var(--text-headline);
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
-		color: var(--colour-text);
 	}
 
 	.see-all {
 		padding: 6px 0;
-		font-size: var(--text-small);
-		color: var(--colour-accent);
-		text-decoration: none;
 	}
 
 	.others {

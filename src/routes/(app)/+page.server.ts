@@ -10,55 +10,65 @@ import { allDone, START_COOKIE, startSteps } from '#lib/features/today/getting-s
 import { weekSummary } from '#lib/features/today/week.server.js';
 import { todayISO } from '#lib/time.js';
 import { LIVE_DATA } from '#lib/live-data.js';
+import { graceFor, soonOrLater, unwrap } from '#lib/server/soon.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, parent, cookies, depends }) => {
+export const load: PageServerLoad = async ({ locals, parent, cookies, depends, isDataRequest }) => {
 	// Reloaded every minute while it's showing (live-refresh.ts), without the shared layout.
 	depends(LIVE_DATA);
-	// The feed is below the fold, so it isn't waited for: the screen shows (and the slide in
-	// starts) as soon as the rest is here, and the posts follow a moment later. Just the newest
-	// few: older ones load from /feed/older as you scroll.
+	// The feed is below the fold, so it never holds the screen up: the posts follow a moment
+	// later. Just the newest few: older ones load from /feed/older as you scroll.
 	const feed = listFeed(locals).then((page) => ({ ...page, pageSize: FEED_PAGE }));
 	feed.catch(() => {}); // a failure shows in the page; don't let it go unhandled here
 
 	const starting = !cookies.get(START_COOKIE);
-	const [plans, tasks, lists, scores, groups, posted] = await Promise.all([
-		listUpcomingPlans(locals, 20),
-		listTasksComingUp(locals),
-		listActiveLists(locals),
-		getScores(locals),
-		// For the line under the date: who owes whom.
-		listGroups(locals),
-		// Only a new home's getting-started card needs to know.
-		starting ? hasAnyPost(locals) : true
-	]);
-	const { household } = await parent();
-	const week = weekSummary(locals, plans, tasks, groups, household.members);
+	const screen = (async () => {
+		const [plans, tasks, lists, scores, groups, posted, { household }] = await Promise.all([
+			listUpcomingPlans(locals, 20),
+			listTasksComingUp(locals),
+			listActiveLists(locals),
+			getScores(locals),
+			// For the line under the date: who owes whom.
+			listGroups(locals),
+			// Only a new home's getting-started card needs to know.
+			starting ? hasAnyPost(locals) : true,
+			parent()
+		]);
+		const week = weekSummary(locals, plans, tasks, groups, household.members);
 
-	// First things for a new home, from what's already loaded. Once they're done (or the card's
-	// dismissed) a cookie keeps it gone, even if the home later empties out.
-	let start = starting
-		? startSteps({
-				members: household.members.length,
-				tasks: tasks.length,
-				plans: plans.length,
-				posts: posted ? 1 : 0
-			})
-		: null;
-	if (start && allDone(start)) {
-		rememberStarted(cookies);
-		start = null;
-	}
+		// First things for a new home, from what's already loaded. Once they're done (or the
+		// card's dismissed) a cookie keeps it gone, even if the home later empties out.
+		let start = starting
+			? startSteps({
+					members: household.members.length,
+					tasks: tasks.length,
+					plans: plans.length,
+					posts: posted ? 1 : 0
+				})
+			: null;
+		if (start && allDone(start)) {
+			// Too late once the screen has been streamed; the next load tries again.
+			try {
+				rememberStarted(cookies);
+			} catch {
+				// Headers already sent.
+			}
+			start = null;
+		}
 
-	return {
-		start,
-		week: { plain: week.plain, fingerprint: week.key },
-		comingUp: mergeComingUp(pickComingUp(plans, 6), tasks),
-		lists: lists.slice(0, 4),
-		scores,
-		feed,
-		today: todayISO()
-	};
+		return {
+			start,
+			week: { plain: week.plain, fingerprint: week.key },
+			comingUp: mergeComingUp(pickComingUp(plans, 6), tasks),
+			lists: lists.slice(0, 4),
+			scores
+		};
+	})();
+
+	// Arrives whole when it can; otherwise the phone shows its last copy, or placeholders, and
+	// this fills in (src/lib/server/soon.ts, src/lib/ui/kept.svelte.ts).
+	const soon = await soonOrLater(screen, graceFor('today', isDataRequest, cookies));
+	return { screen: unwrap(soon), feed, today: todayISO() };
 };
 
 function rememberStarted(cookies: Cookies) {

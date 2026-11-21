@@ -11,6 +11,7 @@
 	import { formatDayLabel, formatLongDate, formatTimeOfDay } from '#lib/time.js';
 	import type { Plan, Profile, Task } from '#lib/types.js';
 	import { entriesByDate, monthGrid, monthLabel, monthOf, shiftMonth } from './calendar.js';
+	import EntryCard from './EntryCard.svelte';
 	import PlanRow from './PlanRow.svelte';
 
 	interface Props {
@@ -235,7 +236,7 @@
 	</p>
 
 	<section class="day-plans" aria-live="polite" aria-labelledby="selected-day">
-		<h3 id="selected-day" class="day-label">{dayHeading(selected)}</h3>
+		<h3 id="selected-day" class="day-label caption-label">{dayHeading(selected)}</h3>
 		{#if dayEntries.length}
 			<ul>
 				{#each dayEntries as entry (entry.kind + entry.id)}
@@ -244,18 +245,15 @@
 					{:else}
 						{@const dinner = entry.dinner}
 						<li>
-							<a class="dinner-card" class:past={!!dinner.completedAt} href={dinnerHref(dinner)}>
-								<GlassSurface radius={22} squish />
-								<span class="body">
-									<span class="when">
-										<Icon name="dinner" size={14} />
-										Dinner{dinner.dueTime ? ` · ${formatTimeOfDay(dinner.dueTime)}` : ''}
-									</span>
-									<span class="title">{dinner.recipe?.title ?? dinner.title}</span>
-									<span class="detail">{cook(dinner)}</span>
-									<span class="chevron"><Icon name="chevron" size={18} /></span>
-								</span>
-							</a>
+							<EntryCard
+								href={dinnerHref(dinner)}
+								when="Dinner{dinner.dueTime ? ` · ${formatTimeOfDay(dinner.dueTime)}` : ''}"
+								icon="dinner"
+								tone="dinner"
+								title={dinner.recipe?.title ?? dinner.title}
+								detail={cook(dinner)}
+								past={!!dinner.completedAt}
+							/>
 						</li>
 					{/if}
 				{/each}
@@ -472,83 +470,12 @@
 		list-style: none;
 	}
 
-	/* The same card as a plan (PlanRow.svelte), with a lilac dinner label. */
-	.dinner-card {
-		position: relative;
-		display: block;
-		border-radius: 22px;
-		color: inherit;
-		text-decoration: none;
-		-webkit-touch-callout: none;
-		transition: opacity var(--duration-quick) var(--ease-out);
-	}
-
-	.dinner-card.past {
-		opacity: 0.55;
-	}
-
-	.body {
-		position: relative;
-		z-index: 1;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		column-gap: var(--space-m);
-		min-height: var(--row-height);
-		padding: 14px 14px 14px 18px;
-		border-radius: inherit;
-		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
-			var(--glass-highlight);
-		transition: background-color var(--duration-quick) var(--ease-out);
-	}
-
-	.dinner-card:global([data-pressed]) .body {
-		background-color: var(--colour-press);
-	}
-
-	.when {
-		display: inline-flex;
-		grid-column: 1;
-		align-items: center;
-		gap: 6px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-dinner);
-	}
-
-	.title {
-		grid-column: 1;
-		margin-top: 3px;
-		font-size: var(--text-body);
-		font-weight: var(--weight-medium);
-		overflow-wrap: anywhere;
-	}
-
-	.detail {
-		grid-column: 1;
-		margin-top: 2px;
-		font-size: var(--text-caption);
-		color: var(--colour-text-muted);
-	}
-
-	.chevron {
-		grid-column: 2;
-		grid-row: 1 / span 3;
-		align-self: center;
-		color: var(--colour-text-faint);
-	}
-
 	.day-plans {
 		margin-top: 28px;
 	}
 
 	.day-label {
 		margin: 0 0 10px 4px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	ul {

@@ -111,7 +111,7 @@
 {:else}
 	{#each months as month (month.key)}
 		<section class="month" aria-labelledby="month-{month.key}">
-			<h2 id="month-{month.key}" class="section-label">{month.label}</h2>
+			<h2 id="month-{month.key}" class="section-label caption-label">{month.label}</h2>
 			<ul>
 				{#each month.items as item (item.kind === 'expense' ? item.expense.id : item.settlement.id)}
 					<ActivityRow {item} groupId={data.group.id} people={data.people} {me} />
@@ -193,10 +193,6 @@
 
 	.section-label {
 		margin-bottom: var(--space-xs);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.month ul {

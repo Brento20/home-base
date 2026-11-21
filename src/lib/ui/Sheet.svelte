@@ -77,7 +77,7 @@
 
 	.sheet::backdrop {
 		background: var(--surface-scrim);
-		animation: dim-in 260ms var(--ease-out);
+		animation: fade-in 260ms var(--ease-out);
 	}
 
 	.panel {
@@ -136,12 +136,6 @@
 	@keyframes sheet-out {
 		to {
 			transform: translateY(100%);
-		}
-	}
-
-	@keyframes dim-in {
-		from {
-			opacity: 0;
 		}
 	}
 

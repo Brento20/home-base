@@ -48,7 +48,7 @@
 		aria-label={label ?? task.title}
 	></a>
 	<div class="body">
-		<span class="when" class:late={!dinner && daysLate > 0}>
+		<span class="when caption-label" class:late={!dinner && daysLate > 0}>
 			{dinner ? 'Dinner' : 'Chore'} · {when}
 			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
 					><Icon name="repeat" size={13} /></span
@@ -173,10 +173,6 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 		transition: color var(--highlight-speed) var(--ease-out);
 	}
 

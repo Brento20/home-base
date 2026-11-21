@@ -86,7 +86,7 @@
 	</label>
 
 	<label class="all-day">
-		<input type="checkbox" name="allDay" checked={values.allDay} />
+		<input class="hidden-input" type="checkbox" name="allDay" checked={values.allDay} />
 		<span class="switch" aria-hidden="true"></span>
 		All day
 	</label>
@@ -192,12 +192,6 @@
 		min-height: var(--tap-target);
 		font-size: var(--text-body);
 		cursor: pointer;
-	}
-
-	.all-day input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	.switch {

@@ -7,6 +7,7 @@
 	import { enhance } from '$app/forms';
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
+	import { arrive, changed, leave } from '#lib/ui/motion.js';
 	import { formatDueLabel } from '#lib/time.js';
 	import type { Profile, Task } from '#lib/types.js';
 
@@ -43,7 +44,13 @@
 	);
 </script>
 
-<li class="task-row" class:ticking>
+<li
+	class="task-row"
+	class:ticking
+	in:arrive
+	out:leave
+	use:changed={`${task.title}|${task.assigneeId}|${task.dueOn}|${task.dueTime}|${task.repeat}`}
+>
 	<!-- Only the circle ticks it off; the rest of the row opens the task. -->
 	<form
 		method="POST"

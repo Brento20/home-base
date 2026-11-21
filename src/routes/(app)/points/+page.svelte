@@ -69,7 +69,7 @@
 </div>
 
 <section class="recent" aria-labelledby="recent-heading">
-	<h2 id="recent-heading" class="section-label">Recent points</h2>
+	<h2 id="recent-heading" class="section-label caption-label">Recent points</h2>
 	{#if data.recent.length === 0}
 		<p class="empty">{emptyLine}</p>
 	{:else}
@@ -174,10 +174,6 @@
 
 	.section-label {
 		margin-bottom: var(--space-xs);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	ul {

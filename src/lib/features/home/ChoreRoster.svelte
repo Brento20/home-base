@@ -65,7 +65,7 @@
 						{@const late = chore.dueOn !== null && chore.dueOn < today}
 						<li>
 							<a href="/lists/tasks/{chore.id}">
-								<span class="title">{chore.title}</span>
+								<span class="title one-line">{chore.title}</span>
 								{#if chore.repeat !== 'none'}
 									<span class="repeat" aria-label="Repeats"><Icon name="repeat" size={14} /></span>
 								{/if}
@@ -145,10 +145,7 @@
 	.title {
 		flex: 1;
 		min-width: 0;
-		overflow: hidden;
 		font-size: var(--text-small);
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.repeat {

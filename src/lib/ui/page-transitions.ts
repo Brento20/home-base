@@ -75,14 +75,14 @@ const REVEAL_MAX_STEPS = 6;
 const REVEAL_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 /**
- * Fades the screen's sections up into place, one after another, top to bottom. A section is a
+ * Fades the screen's sections up into place, one after another, top to bottom. Also used when
+ * a screen that arrived as placeholders gets its content, so it cascades in the same way. A section is a
  * direct child of the page, except the page's main stack or form, whose own children step in
  * one by one. Only sections you can see animate. Opacity and transform, on the compositor.
  */
-function reveal() {
-	const page = document.querySelector<HTMLElement>('[data-page]');
-	if (!page) return;
-	const sections = [...page.children].flatMap((child) =>
+export function reveal(root: Element | null = document.querySelector('[data-page]')) {
+	if (!root) return;
+	const sections = [...root.children].flatMap((child) =>
 		child.matches('.stack, .form-stack, [data-view-content]') ? [...child.children] : [child]
 	);
 	let step = 0;

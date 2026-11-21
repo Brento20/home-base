@@ -83,7 +83,7 @@
 </PageHeader>
 
 <section aria-labelledby="people-heading">
-	<h2 id="people-heading" class="section-label">Everyone here</h2>
+	<h2 id="people-heading" class="section-label caption-label">Everyone here</h2>
 	<ul class="people">
 		{#each data.household.members as person (person.id)}
 			<li>
@@ -96,7 +96,7 @@
 </section>
 
 <section aria-labelledby="place-heading">
-	<h2 id="place-heading" class="section-label">Where home is</h2>
+	<h2 id="place-heading" class="section-label caption-label">Where home is</h2>
 	{#if data.isOwner}
 		<GlassCard>
 			<form
@@ -157,7 +157,7 @@
 
 {#if data.isOwner}
 	<section aria-labelledby="invite-heading">
-		<h2 id="invite-heading" class="section-label">Inviting people</h2>
+		<h2 id="invite-heading" class="section-label caption-label">Inviting people</h2>
 		<p class="explain">
 			Send someone a link. It lasts a week and only lets in the people it was made for.
 		</p>
@@ -261,7 +261,7 @@
 {/if}
 
 <section class="leave" aria-labelledby="leave-heading">
-	<h2 id="leave-heading" class="section-label">Leaving</h2>
+	<h2 id="leave-heading" class="section-label caption-label">Leaving</h2>
 	<p class="explain">
 		{#if alone}
 			You’re the only one here, so leaving deletes {data.household.name} and everything in it, for good.
@@ -288,10 +288,6 @@
 
 	.section-label {
 		margin-bottom: var(--space-m);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.people {
@@ -368,6 +364,6 @@
 	}
 
 	.danger {
-		color: var(--colour-danger, #d4453b);
+		color: var(--colour-danger);
 	}
 </style>

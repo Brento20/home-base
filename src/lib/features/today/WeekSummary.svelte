@@ -67,7 +67,7 @@
 </script>
 
 <p class="week" aria-live="polite">
-	{#key friendly}
+	{#key friendly ?? plain}
 		<span class="line">
 			{#if friendly}
 				<!-- Marked as AI-written, as Apple's guidance asks. -->
@@ -95,13 +95,7 @@
 
 	.line {
 		display: block;
-		animation: settle 400ms var(--ease-out) both;
-	}
-
-	@keyframes settle {
-		from {
-			opacity: 0;
-		}
+		animation: fade-in 400ms var(--ease-out) both;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

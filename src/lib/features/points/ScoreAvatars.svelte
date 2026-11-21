@@ -1,15 +1,17 @@
 <script lang="ts">
+	import { reform } from '#lib/ui/motion.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import type { Profile, Score } from '#lib/types.js';
 
 	interface Props {
 		people: Profile[];
-		scores: Score[];
+		/** Null while the screen's data is on its way: just the faces, no numbers yet. */
+		scores: Score[] | null;
 	}
 
 	let { people, scores }: Props = $props();
 
-	const weekOf = (id: string) => scores.find((score) => score.profileId === id)?.thisWeek ?? 0;
+	const weekOf = (id: string) => scores?.find((score) => score.profileId === id)?.thisWeek ?? 0;
 	const label = $derived(
 		`Scores this week: ${people.map((person) => `${person.displayName} ${weekOf(person.id)}`).join(', ')}`
 	);
@@ -20,12 +22,20 @@
 	{#each people as person (person.id)}
 		<span class="person">
 			<Avatar {person} size={36} ring />
-			<span class="points">{weekOf(person.id)}</span>
+			{#if scores}
+				{#key weekOf(person.id)}<span class="points" in:reform>{weekOf(person.id)}</span>{/key}
+			{:else}
+				<span class="points waiting" aria-hidden="true">&nbsp;</span>
+			{/if}
 		</span>
 	{/each}
 </a>
 
 <style>
+	.waiting {
+		visibility: hidden;
+	}
+
 	.score-avatars {
 		display: flex;
 		align-items: center;

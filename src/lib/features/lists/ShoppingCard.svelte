@@ -89,7 +89,9 @@
 				enterkeyhint="done"
 				maxlength="120"
 			/>
-			<button class="add" aria-label="Add to {list.name}"><Icon name="plus" size={18} /></button>
+			<button class="add round-accent" aria-label="Add to {list.name}"
+				><Icon name="plus" size={18} /></button
+			>
 		</form>
 		<p class="visually-hidden" aria-live="polite">{message}</p>
 	</div>
@@ -192,17 +194,10 @@
 		color: var(--colour-text-faint);
 	}
 
+	/* A smaller round accent button, with its tap area widened below. */
 	.add {
-		display: grid;
-		place-items: center;
 		width: 36px;
 		height: 36px;
-		flex: none;
-		border: 0;
-		border-radius: 50%;
-		background: var(--colour-accent);
-		color: var(--colour-on-accent);
-		transition: transform var(--duration-release) var(--spring-gentle);
 	}
 
 	.add:global([data-pressed]) {

@@ -10,17 +10,27 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import RoundButton from '#lib/ui/RoundButton.svelte';
+	import { kept } from '#lib/ui/kept.svelte.js';
+	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
+	import Reveal from '#lib/ui/Reveal.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	// The copy this phone kept until fresh data lands (src/lib/ui/kept.svelte.ts).
+	const screen = kept(
+		() => 'home',
+		() => data.screen
+	);
 
 	// Said a little differently each visit (src/lib/copy/voice.ts).
 	const emptyLine = pick(EMPTY.notes);
 
 	// The Wi-Fi and phone numbers are read out of the notes (src/lib/features/home/house-info.ts).
-	const wifi = $derived(wifiFrom(data.notes));
-	const contacts = $derived(contactsFrom(data.notes));
-	const notes = $derived(otherNotes(data.notes, wifi, contacts));
+	const allNotes = $derived(screen.current?.notes ?? []);
+	const wifi = $derived(wifiFrom(allNotes));
+	const contacts = $derived(contactsFrom(allNotes));
+	const notes = $derived(otherNotes(allNotes, wifi, contacts));
 
 	const FEEDBACK = 'brenton.weaver@gmail.com';
 </script>
@@ -44,62 +54,68 @@
 	{/each}
 </a>
 
-<section aria-labelledby="jobs-heading">
-	<div class="section-head">
-		<h2 id="jobs-heading" class="section-label">This week’s jobs</h2>
-		<a class="section-link" href="/lists/tasks">All tasks</a>
-	</div>
-	{#if data.chores.length === 0}
-		<p class="empty">Nothing due this week. Enjoy it.</p>
-	{:else}
-		<ChoreRoster
-			chores={data.chores}
-			people={data.household.members}
-			scores={data.scores}
-			meId={data.me.id}
-		/>
-	{/if}
-</section>
-
-<section aria-labelledby="info-heading">
-	<h2 id="info-heading" class="section-label">House info</h2>
-	<div class="info">
-		{#if wifi}
-			<WifiCard {wifi} />
-		{/if}
-		{#if contacts.length}
-			<ContactList {contacts} />
-		{/if}
-		{#if !wifi || !contacts.length}
-			<div class="starters">
-				{#if !wifi}
-					<a class="starter" href="/home/notes/new?template=wifi"
-						><Icon name="wifi" size={18} /> Add the Wi-Fi</a
-					>
-				{/if}
-				<a class="starter" href="/home/notes/new?template=contact"
-					><Icon name="phone" size={18} /> Add a contact</a
-				>
+<Reveal of={screen} placeholder={[354, 282, 184]} gap={40} label="Loading home">
+	{#snippet children(home)}
+		<section aria-labelledby="jobs-heading">
+			<div class="section-heading-row">
+				<h2 id="jobs-heading" class="section-label section-heading">This week’s jobs</h2>
+				<a class="section-heading-link" href="/lists/tasks">All tasks</a>
 			</div>
-		{:else}
-			<a class="add-contact" href="/home/notes/new?template=contact">Add a contact</a>
-		{/if}
-	</div>
-</section>
+			{#if home.chores.length === 0}
+				<p class="empty">Nothing due this week. Enjoy it.</p>
+			{:else}
+				<ChoreRoster
+					chores={home.chores}
+					people={data.household.members}
+					scores={home.scores}
+					meId={data.me.id}
+				/>
+			{/if}
+		</section>
 
-<section aria-labelledby="notes-heading">
-	<h2 id="notes-heading" class="section-label">Notes</h2>
-	{#if notes.length === 0}
-		<p class="empty">{emptyLine}</p>
-		<a class="button-secondary" href="/home/notes/new">Add a note</a>
-	{:else}
-		<div class="note-list">
-			{#each notes as note (note.id)}
-				<NoteCard {note} />
-			{/each}
-		</div>
-	{/if}
-</section>
+		<section aria-labelledby="info-heading">
+			<h2 id="info-heading" class="section-label section-heading">House info</h2>
+			<div class="info">
+				{#if wifi}
+					<WifiCard {wifi} />
+				{/if}
+				{#if contacts.length}
+					<ContactList {contacts} />
+				{/if}
+				{#if !wifi || !contacts.length}
+					<div class="starters">
+						{#if !wifi}
+							<a class="starter" href="/home/notes/new?template=wifi"
+								><Icon name="wifi" size={18} /> Add the Wi-Fi</a
+							>
+						{/if}
+						<a class="starter" href="/home/notes/new?template=contact"
+							><Icon name="phone" size={18} /> Add a contact</a
+						>
+					</div>
+				{:else}
+					<a class="add-contact" href="/home/notes/new?template=contact">Add a contact</a>
+				{/if}
+			</div>
+		</section>
+
+		<section aria-labelledby="notes-heading">
+			<h2 id="notes-heading" class="section-label section-heading">Notes</h2>
+			{#if notes.length === 0}
+				<p class="empty">{emptyLine}</p>
+				<a class="button-secondary" href="/home/notes/new">Add a note</a>
+			{:else}
+				<div class="note-list">
+					{#each notes as note (note.id)}
+						<div in:arrive out:leave animate:glide use:changed={`${note.title}|${note.updatedAt}`}>
+							<NoteCard {note} />
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</section>
+	{/snippet}
+</Reveal>
 
 <section class="help" aria-labelledby="help-heading">
 	<h2 id="help-heading" class="group-title">Help &amp; privacy</h2>
@@ -201,25 +217,9 @@
 		margin-top: var(--space-xl);
 	}
 
-	.section-head {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-	}
-
 	/* A bold heading with a tinted link beside it, as in Health's Summary. */
 	.section-label {
-		font-size: var(--text-headline);
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
-		color: var(--colour-text);
 		margin-bottom: var(--space-s);
-	}
-
-	.section-link {
-		font-size: var(--text-small);
-		color: var(--colour-accent);
-		text-decoration: none;
 	}
 
 	.empty {

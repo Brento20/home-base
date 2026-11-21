@@ -33,7 +33,7 @@
 	<GlassSurface radius={28} squish />
 	<span class="body">
 		{#if motif}<span class="motif"><PlanMotif {motif} /></span>{/if}
-		<span class="when"
+		<span class="when caption-label"
 			>{when}{#if countdown}<span>{` · ${countdown}`}</span>{/if}</span
 		>
 		<span class="title">{plan.title}</span>
@@ -107,10 +107,6 @@
 	}
 
 	.when {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 		transition: color var(--highlight-speed) var(--ease-out);
 	}
 

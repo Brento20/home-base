@@ -18,7 +18,7 @@
 <section class="start" aria-labelledby="start-heading">
 	<div class="heading-row">
 		<div>
-			<h2 id="start-heading" class="section-label">Getting started</h2>
+			<h2 id="start-heading" class="caption-label">Getting started</h2>
 			<p class="progress">{done} of {steps.length} done</p>
 		</div>
 		<form method="POST" action="?/dismissStart" use:enhance>
@@ -57,13 +57,6 @@
 		margin: 0 0 8px 16px;
 	}
 
-	.section-label {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
-	}
-
 	.progress {
 		font-size: var(--text-caption);
 		color: var(--colour-text-faint);
@@ -93,7 +86,7 @@
 	.tick.done {
 		background: var(--colour-accent);
 		box-shadow: none;
-		color: var(--colour-on-accent, #1a1a1a);
+		color: var(--colour-on-accent);
 	}
 
 	.is-done .grouped-label {

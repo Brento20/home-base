@@ -122,8 +122,12 @@ export function parsePlanForm(form: FormData) {
 	return { input, errors, values, valid };
 }
 
-/** How many plans the Plans list shows before "Show later plans". */
-export const PLANS_PAGE = 30;
+/**
+ * How many plans the Plans list draws at first: about two screens. More load as you scroll near
+ * the end. A long list is slow to slide in and out of however little data it is (the browser
+ * draws and photographs the whole page for the transition), so the list grows only as needed.
+ */
+export const PLANS_PAGE = 12;
 export const PLANS_PAGE_MAX = 100;
 
 /**

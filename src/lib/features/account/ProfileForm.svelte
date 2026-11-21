@@ -181,6 +181,7 @@
 					{@const wornBy = housemateColours[option.hex]}
 					<label class="swatch" class:on={colour === option.hex}>
 						<input
+							class="hidden-input"
 							type="radio"
 							name="accentColour"
 							value={option.hex}
@@ -310,12 +311,6 @@
 		align-items: center;
 		gap: 6px;
 		cursor: pointer;
-	}
-
-	.swatch input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	.swatch-colour {

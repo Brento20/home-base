@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { arrive, glide, leave } from '#lib/ui/motion.js';
 	/**
 	 * The home feed on Today. The page brings only the newest few posts (and the 20-second refresh
 	 * keeps just those fresh); scrolling near the end fetches older ones from /feed/older, a few at
@@ -96,9 +97,9 @@
 </script>
 
 <section class="feed" aria-labelledby="feed-heading">
-	<div class="heading-row">
-		<h2 id="feed-heading" class="section-label">Home feed</h2>
-		<a class="see-all" href="/feed/new">Post update</a>
+	<div class="section-heading-row">
+		<h2 id="feed-heading" class="section-heading">Home feed</h2>
+		<a class="see-all section-heading-link" href="/feed/new">Post update</a>
 	</div>
 
 	{#if arriving === null && unavailable}
@@ -110,7 +111,7 @@
 	{:else}
 		<ol class="posts">
 			{#each shown as post (post.id)}
-				<li><PostCard {post} {people} {me} /></li>
+				<li in:arrive={{ y: -12 }} out:leave animate:glide><PostCard {post} {people} {me} /></li>
 			{/each}
 		</ol>
 
@@ -140,25 +141,8 @@
 		opacity: 0.5;
 	}
 
-	.heading-row {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-	}
-
-	/* A bold heading with a tinted link beside it, as in Health's Summary. */
-	.section-label {
-		font-size: var(--text-headline);
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
-		color: var(--colour-text);
-	}
-
 	.see-all {
 		padding: 10px 0;
-		font-size: var(--text-small);
-		color: var(--colour-accent);
-		text-decoration: none;
 	}
 
 	.posts {

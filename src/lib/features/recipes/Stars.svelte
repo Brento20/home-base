@@ -35,6 +35,7 @@
 		{#each [1, 2, 3, 4, 5] as stars (stars)}
 			<label class="star" class:on={stars <= shown} data-press>
 				<input
+					class="hidden-input"
 					type="radio"
 					{name}
 					value={stars}
@@ -92,12 +93,6 @@
 		transform: scale(0.85);
 		transition-duration: var(--duration-press);
 		transition-timing-function: var(--ease-out);
-	}
-
-	.input input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	.input .star:has(input:focus-visible) {

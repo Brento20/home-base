@@ -46,7 +46,7 @@
 			<span class="swatch" style:--swatch={categoryColour(expense.category)} aria-hidden="true"
 			></span>
 			<span class="text">
-				<span class="title">{expense.description}</span>
+				<span class="one-line">{expense.description}</span>
 				<span class="meta">
 					{nameOf(people, expense.paidBy, me)} paid {formatMoney(
 						expense.amountCents
@@ -69,7 +69,7 @@
 			<span class="day">{day}</span>
 			<span class="swatch repayment" aria-hidden="true"></span>
 			<span class="text">
-				<span class="title">
+				<span class="one-line">
 					{describeSettlement(
 						settlement.paidBy,
 						settlement.paidTo,
@@ -128,12 +128,6 @@
 		flex-direction: column;
 		gap: 2px;
 		min-width: 0;
-	}
-
-	.title {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.meta {

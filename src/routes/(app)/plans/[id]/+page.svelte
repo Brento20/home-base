@@ -44,7 +44,7 @@
 
 	{#if plan.location}
 		<section class="detail" aria-labelledby="where-heading">
-			<h2 id="where-heading" class="detail-label">Where</h2>
+			<h2 id="where-heading" class="detail-label caption-label">Where</h2>
 			<p class="detail-text">{plan.location}</p>
 			{#if mapsHref}
 				<a class="button-quiet maps" href={mapsHref} target="_blank" rel="noopener noreferrer"
@@ -56,7 +56,7 @@
 
 	{#if plan.notes}
 		<section class="detail" aria-labelledby="notes-heading">
-			<h2 id="notes-heading" class="detail-label">Notes</h2>
+			<h2 id="notes-heading" class="detail-label caption-label">Notes</h2>
 			<p class="detail-text notes"><LinkedText text={plan.notes} /></p>
 		</section>
 	{/if}
@@ -186,10 +186,6 @@
 
 	.detail-label {
 		margin-bottom: 6px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.detail-text {

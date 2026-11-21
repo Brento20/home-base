@@ -27,7 +27,7 @@
 		</div>
 	{/if}
 	<div class="title-row">
-		<h1>{title}</h1>
+		<h1 class="page-title">{title}</h1>
 		{#if action}{@render action()}{/if}
 	</div>
 </header>
@@ -55,12 +55,5 @@
 		justify-content: space-between;
 		gap: var(--space-m);
 		min-height: var(--tap-target);
-	}
-
-	h1 {
-		font-size: var(--text-page-title);
-		line-height: 1.12;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
 	}
 </style>

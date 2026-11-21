@@ -43,7 +43,7 @@
 {:else}
 	{#each groups as group (group.label)}
 		<section class="day">
-			<h2 class="day-label">{group.label}</h2>
+			<h2 class="day-label caption-label">{group.label}</h2>
 			<ul>
 				{#each group.tasks as task (task.id)}
 					{@const person = doneBy(task)}
@@ -80,10 +80,6 @@
 
 	.day-label {
 		margin-bottom: var(--space-xs);
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	ul {

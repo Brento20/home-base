@@ -296,3 +296,42 @@ test('Live refresh: Today reloads its own data each minute, other screens nothin
 	await page.waitForTimeout(300);
 	expect(data).toEqual([]);
 });
+
+test('Tabs keep their last screen: back to a tab shows it at once, then updates', async ({
+	page,
+	context
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/');
+	const tabs = [
+		{ name: 'Plans', url: /\/plans/, loading: 'Loading plans' },
+		{ name: 'Lists', url: /\/lists$/, loading: 'Loading lists' },
+		{ name: 'Money', url: /\/money/, loading: 'Loading money' },
+		{ name: 'Home', url: /\/home/, loading: 'Loading home' },
+		{ name: 'Today', url: /\/$/, loading: 'Loading today' }
+	];
+	for (const tab of tabs) {
+		await page.locator('nav').getByRole('link', { name: tab.name }).click();
+		await expect(page).toHaveURL(tab.url);
+		await page.waitForLoadState('networkidle');
+	}
+	await page.locator('nav').getByRole('link', { name: 'Lists' }).click();
+	await expect(page).toHaveURL(/\/lists$/);
+	await page.locator('[data-page]').getByRole('link', { name: 'Tasks', exact: true }).click();
+	await expect(page).toHaveURL(/\/lists\/tasks/);
+	await expect(page.locator('.task-row').first()).toBeVisible();
+
+	// The phone tells the server which tabs it has a copy of.
+	const kept = (await context.cookies()).find((cookie) => cookie.name === 'hb_kept')?.value ?? '';
+	expect(kept.split('.')).toEqual(
+		expect.arrayContaining(['today', 'plans', 'lists', 'tasks', 'money', 'home'])
+	);
+
+	// Back on each tab, its content is there straight away: no placeholders.
+	for (const tab of tabs) {
+		await page.locator('nav').getByRole('link', { name: tab.name }).click();
+		await expect(page).toHaveURL(tab.url);
+		await expect(page.getByRole('status', { name: tab.loading })).toHaveCount(0);
+	}
+	expect(errors).toEqual([]);
+});

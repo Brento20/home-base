@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { arrive, glide, leave } from '#lib/ui/motion.js';
 	/**
 	 * The open tasks on Lists › Tasks, grouped by when they're due, as in Reminders' Scheduled
 	 * list: Overdue, Today, Tomorrow, Next 7 days, Later, then No date. Everyone or Mine at the
@@ -61,7 +62,7 @@
 </script>
 
 <div class="bar">
-	<p class="summary" aria-live="polite">
+	<p class="caption-label" aria-live="polite">
 		{shown.length === 0 ? 'Nothing to do' : `${shown.length} to do`}
 	</p>
 	<div class="who" role="group" aria-label="Whose tasks">
@@ -88,7 +89,13 @@
 	<p class="empty">Nothing of yours to do. Nice.</p>
 {:else}
 	{#each sections as section (section.key)}
-		<section class="section" aria-labelledby="tasks-{section.key}">
+		<section
+			class="section"
+			aria-labelledby="tasks-{section.key}"
+			in:arrive
+			out:leave
+			animate:glide
+		>
 			<h2 class="section-title" class:overdue={section.key === 'overdue'} id="tasks-{section.key}">
 				{section.title}
 			</h2>
@@ -126,13 +133,6 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-top: 22px;
-	}
-
-	.summary {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	/* A small two-way switch, like the filter pills in Mail. */

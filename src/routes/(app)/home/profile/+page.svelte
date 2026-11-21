@@ -54,7 +54,7 @@
 <AppearanceSettings />
 
 <section class="account" aria-labelledby="account-heading">
-	<h2 id="account-heading" class="section-label">Account</h2>
+	<h2 id="account-heading" class="section-label caption-label">Account</h2>
 	<ul class="group">
 		<li class="row static">
 			<span class="row-name">Email</span>
@@ -83,10 +83,6 @@
 
 	.section-label {
 		margin: 0 0 10px 4px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	/* The same grouped list as Appearance. */

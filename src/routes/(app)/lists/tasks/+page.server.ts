@@ -10,10 +10,17 @@ import {
 import { readTask } from '#lib/features/tasks/quick.server.js';
 import { aiConfigured } from '#lib/server/ai.js';
 import { todayISO } from '#lib/time.js';
+import { graceFor, soonOrLater, unwrap } from '#lib/server/soon.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	return { tasks: await listOpenTasks(locals), today: todayISO() };
+export const load: PageServerLoad = async ({ locals, cookies, isDataRequest }) => {
+	// Arrives whole when it can; otherwise the phone shows its last copy (or placeholders) and
+	// it fills in (src/lib/server/soon.ts, src/lib/ui/kept.svelte.ts).
+	const screen = listOpenTasks(locals).then((tasks) => ({ tasks }));
+	return {
+		screen: unwrap(await soonOrLater(screen, graceFor('tasks', isDataRequest, cookies))),
+		today: todayISO()
+	};
 };
 
 export const actions: Actions = {

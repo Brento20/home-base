@@ -124,7 +124,9 @@
 				<Icon name="sparkle" size={20} />
 			</button>
 		{/if}
-		<button class="add-button" aria-label="Add task"><Icon name="plus" size={20} /></button>
+		<button class="add-button round-accent" aria-label="Add task"
+			><Icon name="plus" size={20} /></button
+		>
 	</div>
 	{#if errors?.title}<p class="field-error">{errors.title}</p>{/if}
 	{#if reading}
@@ -208,27 +210,10 @@
 		color: var(--colour-text-faint);
 	}
 
+	/* Above the field's glass. */
 	.add-button {
 		position: relative;
 		z-index: 1;
-		display: grid;
-		place-items: center;
-		width: var(--tap-target);
-		height: var(--tap-target);
-		border: 0;
-		border-radius: 50%;
-		background: var(--colour-accent);
-		color: var(--colour-on-accent);
-		transition:
-			transform var(--duration-release) var(--spring-gentle),
-			background-color var(--duration-quick) var(--ease-out);
-	}
-
-	.add-button:global([data-pressed]) {
-		transform: scale(0.9);
-		background: var(--colour-accent-pressed);
-		transition-duration: var(--duration-press);
-		transition-timing-function: var(--ease-out);
 	}
 
 	/* Always there, so it's easy to find; dimmed until there's something typed for it to read. */

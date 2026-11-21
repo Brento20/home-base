@@ -57,6 +57,7 @@
 			<li>
 				<label class="item" data-press>
 					<input
+						class="hidden-input"
 						type="checkbox"
 						name="ingredient"
 						value={index}
@@ -107,12 +108,6 @@
 		border-bottom: 1px solid var(--colour-hairline);
 		cursor: pointer;
 		transition: opacity var(--duration-quick) var(--ease-out);
-	}
-
-	.item input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	.tick {

@@ -76,12 +76,13 @@
 </script>
 
 <section class="appearance" aria-labelledby="appearance-heading">
-	<h2 id="appearance-heading" class="section-label">Appearance</h2>
+	<h2 id="appearance-heading" class="section-label caption-label">Appearance</h2>
 
 	<div class="modes" role="radiogroup" aria-label="Light or dark">
 		{#each ['light', 'dark'] as const as mode (mode)}
 			<label class="mode" class:on={theme.mode === mode}>
 				<input
+					class="hidden-input"
 					type="radio"
 					name="appearance-mode"
 					value={mode}
@@ -103,7 +104,7 @@
 		{/each}
 	</div>
 
-	<h3 class="section-label">Background through the day</h3>
+	<h3 class="section-label caption-label">Background through the day</h3>
 	<ul class="group">
 		{#each PARTS as part (part.key)}
 			{@const palette = paletteOf(theme[part.key])}
@@ -144,6 +145,7 @@
 			{#each PALETTES as palette (palette.id)}
 				<label class="swatch" class:on={theme[part] === palette.id}>
 					<input
+						class="hidden-input"
 						type="radio"
 						name="appearance-{part}"
 						value={palette.id}
@@ -169,20 +171,10 @@
 
 	.section-label {
 		margin: 0 0 10px 4px;
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	h3.section-label {
 		margin-top: var(--space-xl);
-	}
-
-	input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	/* Light or Dark: two little screens side by side. */

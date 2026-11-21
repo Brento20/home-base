@@ -7,35 +7,35 @@
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { formatTodayHeading } from '#lib/time.js';
+	import { kept } from '#lib/ui/kept.svelte.js';
+	import Reveal from '#lib/ui/Reveal.svelte';
 	import UndoToast from '#lib/ui/UndoToast.svelte';
 	import type { PageProps } from './$types';
 
+	// The real sections' heights, so placeholders hold their place exactly.
+	const COMING_UP_HEIGHT = 214;
+	const LISTS_HEIGHT = 219;
+
 	let { data, form }: PageProps = $props();
+
+	// The screen is the copy this phone kept from last time until fresh data lands, then updates
+	// in place (src/lib/ui/kept.svelte.ts); the first visit on a slow day shows placeholders.
+	const screen = kept(
+		() => 'today',
+		() => data.screen
+	);
+	const feed = kept(
+		() => 'today-feed',
+		() => data.feed
+	);
+	const today = $derived(screen.current);
 
 	const heading = $derived(formatTodayHeading(new Date(`${data.today}T12:00:00Z`)));
 	const tonight = $derived(
-		data.comingUp.find(
+		today?.comingUp.find(
 			(item) => item.kind === 'task' && item.task.recipe && item.task.dueOn === data.today
 		)
 	);
-
-	// The feed streams in after the rest of the screen. Keep showing the last posts while a
-	// refresh's arrive, so the feed never blanks out every minute.
-	type FeedPage = Awaited<typeof data.feed>;
-	let feed = $state<FeedPage | null>(null);
-	let feedFailed = $state(false);
-	$effect(() => {
-		let current = true;
-		data.feed.then(
-			(page) => {
-				if (!current) return;
-				feed = page;
-				feedFailed = false;
-			},
-			() => current && (feedFailed = true)
-		);
-		return () => (current = false);
-	});
 </script>
 
 <svelte:head>
@@ -44,25 +44,33 @@
 
 <header class="header">
 	<div class="heading">
-		<h1>
+		<h1 class="page-title">
 			{heading.primary}
 			<span class="month">{heading.secondary}</span>
 		</h1>
-		<WeekSummary plain={data.week.plain} fingerprint={data.week.fingerprint} ai={data.ai} />
+		{#if today}
+			<WeekSummary plain={today.week.plain} fingerprint={today.week.fingerprint} ai={data.ai} />
+		{:else}
+			<span class="line-waiting" aria-hidden="true"><span></span><span></span><span></span></span>
+		{/if}
 	</div>
-	<ScoreAvatars people={data.household.members} scores={data.scores} />
+	<ScoreAvatars people={data.household.members} scores={today?.scores ?? null} />
 </header>
 
 <div class="stack">
-	{#if data.start}<GettingStarted steps={data.start} />{/if}
-	<ComingUp items={data.comingUp} people={data.household.members} today={data.today} />
-	<ListsGlance lists={data.lists} />
+	<Reveal of={screen} placeholder={[COMING_UP_HEIGHT, LISTS_HEIGHT]} gap={24} label="Loading today">
+		{#snippet children(today)}
+			{#if today.start}<GettingStarted steps={today.start} />{/if}
+			<ComingUp items={today.comingUp} people={data.household.members} today={data.today} />
+			<ListsGlance lists={today.lists} />
+		{/snippet}
+	</Reveal>
 	<HomeShortcuts tonight={tonight?.kind === 'task' ? (tonight.task.recipe?.title ?? null) : null} />
 	<FeedSection
-		posts={feed?.posts ?? null}
-		unavailable={feedFailed}
-		hasMore={feed?.hasMore ?? false}
-		pageSize={feed?.pageSize ?? 5}
+		posts={feed.current?.posts ?? null}
+		unavailable={feed.failed && !feed.current}
+		hasMore={feed.current?.hasMore ?? false}
+		pageSize={feed.current?.pageSize ?? 5}
 		people={data.household.members}
 		me={data.me.id}
 	/>
@@ -89,17 +97,34 @@
 		min-width: 0;
 	}
 
-	h1 {
-		font-size: var(--text-page-title);
-		line-height: 1.12;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
-	}
-
 	.month {
 		display: block;
 		font-weight: var(--weight-regular);
 		color: var(--colour-text-muted);
+	}
+
+	/* The day's line, still on its way: a soft bar where it will be. */
+	.line-waiting {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		margin-top: 10px;
+	}
+
+	.line-waiting > span {
+		display: block;
+		width: 85%;
+		height: 0.9em;
+		border-radius: 6px;
+		background: var(--colour-fill);
+	}
+
+	.line-waiting > span:nth-child(2) {
+		width: 95%;
+	}
+
+	.line-waiting > span:last-child {
+		width: 55%;
 	}
 
 	.stack {

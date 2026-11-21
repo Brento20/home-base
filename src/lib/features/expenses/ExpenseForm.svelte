@@ -166,10 +166,16 @@
 				{@const owed = owedBy(person.id)}
 				<li class:out={!isIn}>
 					<label class="who">
-						<input type="checkbox" name="included" value={person.id} bind:group={included} />
+						<input
+							class="hidden-input"
+							type="checkbox"
+							name="included"
+							value={person.id}
+							bind:group={included}
+						/>
 						<span class="tick" aria-hidden="true"></span>
 						<Avatar {person} size={30} />
-						<span class="name">{label(person.id)}</span>
+						<span class="one-line">{label(person.id)}</span>
 					</label>
 					{#if isIn && method !== 'equal'}
 						<span class="mini">
@@ -287,12 +293,6 @@
 		cursor: pointer;
 	}
 
-	.who input {
-		position: absolute;
-		opacity: 0;
-		pointer-events: none;
-	}
-
 	/* A ring that fills when the person is included. */
 	.tick {
 		display: grid;
@@ -319,12 +319,6 @@
 	.who input:focus-visible + .tick {
 		outline: 2px solid var(--colour-accent);
 		outline-offset: 2px;
-	}
-
-	.name {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.mini {

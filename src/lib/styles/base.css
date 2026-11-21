@@ -66,6 +66,69 @@ a {
 }
 
 /*
+ * Shared patterns. Use these rather than restyling the same thing in a component: a component
+ * adds only its own spacing.
+ */
+
+/* The screen's big title (PageHeader, Today's date). */
+.page-title {
+	font-size: var(--text-page-title);
+	line-height: 1.12;
+	font-weight: var(--weight-strong);
+	letter-spacing: var(--tracking-tight);
+}
+
+/* A bold section heading, with an optional tinted link on the right, as in Health's Summary. */
+.section-heading-row {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+.section-heading {
+	font-size: var(--text-headline);
+	font-weight: var(--weight-strong);
+	letter-spacing: var(--tracking-tight);
+	color: var(--colour-text);
+}
+
+.section-heading-link {
+	font-size: var(--text-small);
+	color: var(--colour-accent);
+	text-decoration: none;
+}
+
+/* A small grey label over a group: a form section, a day in a list, a card's eyebrow. */
+.caption-label {
+	font-size: var(--text-caption);
+	font-weight: var(--weight-medium);
+	letter-spacing: var(--tracking-label);
+	color: var(--colour-text-muted);
+}
+
+/* Text that stays on one line and trails off. */
+.one-line {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* A real input kept for forms and the keyboard, drawn by its label instead (switches, chips). */
+.hidden-input,
+.choice-pill input,
+.extra-toggle {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+/*
  * A phone turned on its side. Installed on Android, the manifest keeps the app portrait; iPhones
  * ignore that, so a short landscape screen (a phone, not a tablet) shows this note and hides the
  * app, which stays as it was underneath. Turning back picks up exactly where you were.

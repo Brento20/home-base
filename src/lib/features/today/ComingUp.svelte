@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
 	/**
@@ -115,6 +116,13 @@
 			cancelAnimationFrame(frame);
 		};
 	});
+
+	/** What a card shows: when it changes after the card first appears, the card pops. */
+	function signature(item: (typeof items)[number]) {
+		return item.kind === 'plan'
+			? `${item.plan.title}|${item.plan.startsAt}|${item.plan.location}`
+			: `${item.task.title}|${item.task.assigneeId}|${item.task.dueOn}|${item.task.dueTime}`;
+	}
 </script>
 
 {#if visible.length === 0}
@@ -126,7 +134,14 @@
 	<section class="coming-up" aria-label="Coming up">
 		<ol class="track" bind:this={track} onscroll={onScroll}>
 			{#each visible as item, index (item.id)}
-				<li class="slide" class:active={index === active}>
+				<li
+					class="slide"
+					class:active={index === active}
+					in:arrive={{ x: 28, y: 0 }}
+					out:leave
+					animate:glide
+					use:changed={signature(item)}
+				>
 					<span class="slide-glow" aria-hidden="true"></span>
 					{#if item.kind === 'plan'}
 						<PlanHeroCard

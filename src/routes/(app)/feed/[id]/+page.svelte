@@ -41,7 +41,7 @@
 <PostCard {post} {people} me={data.me.id} full />
 
 <section class="conversation" aria-labelledby="replies-heading">
-	<h2 id="replies-heading" class="section-label">
+	<h2 id="replies-heading" class="caption-label">
 		{post.replies.length === 0
 			? 'No replies yet'
 			: `${post.replies.length} ${post.replies.length === 1 ? 'reply' : 'replies'}`}
@@ -126,13 +126,6 @@
 
 	.conversation {
 		margin-top: var(--space-l);
-	}
-
-	.section-label {
-		font-size: var(--text-caption);
-		font-weight: var(--weight-medium);
-		letter-spacing: var(--tracking-label);
-		color: var(--colour-text-muted);
 	}
 
 	.replies {
