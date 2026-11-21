@@ -25,10 +25,19 @@ export interface AccountDetails {
 	avatarUrl: string | null;
 	/** Their colour (#e58440): avatar, rings, points. From AVATAR_COLOURS. */
 	accentColour: string;
+	/** A line about themselves that friends see. */
+	bio: string;
 }
 
 export type ProfileField =
-	'firstName' | 'lastName' | 'nickname' | 'pronouns' | 'dateOfBirth' | 'photo' | 'accentColour';
+	| 'firstName'
+	| 'lastName'
+	| 'nickname'
+	| 'pronouns'
+	| 'dateOfBirth'
+	| 'photo'
+	| 'accentColour'
+	| 'bio';
 
 export type ProfileValues = Pick<
 	AccountDetails,
@@ -36,6 +45,8 @@ export type ProfileValues = Pick<
 > & {
 	/** Missing when the form has no colour picker (signing up: a colour is given on joining). */
 	accentColour?: string;
+	/** Missing when the form has no bio field (signing up). */
+	bio?: string;
 };
 
 /** Something everyone in the home might need: the wifi, bin nights, the spare key. */
@@ -126,6 +137,29 @@ export interface Plan {
 	allDay: boolean;
 	/** The feed post this plan was made from, if any. */
 	postId?: string | null;
+	/** Set when another home invited yours: who sent it and from which home. Only they can edit it. */
+	invitedBy?: { name: string; home: string } | null;
+	/** Homes this home has invited (on your own plans). */
+	guestHomes?: { id: string; name: string }[];
+	/** Your answer, on a plan with guests: going, not going, or none yet. */
+	myResponse?: PlanResponse | null;
+}
+
+export type PlanResponse = 'going' | 'not_going';
+
+/** Someone on a plan with guests: from the plan's home or an invited one. */
+export interface PlanGuest {
+	id: string;
+	name: string;
+	initials: string;
+	colour: string;
+	avatarUrl: string | null;
+	home: string;
+	isHostHome: boolean;
+	response: PlanResponse | null;
+	isYou: boolean;
+	/** You both went, it's over, and you're not friends yet: one tap to be friends. */
+	canAdd: boolean;
 }
 
 /** Field-level messages for a form that failed validation. */
@@ -201,6 +235,11 @@ export interface FeedReply {
 	body: string;
 	/** ISO instant. */
 	createdAt: string;
+	/**
+	 * On postcard replies, who wrote it as the database recorded it: the sender and the home it
+	 * went to can't look each other up.
+	 */
+	author?: { name: string; initials: string; colour: string };
 }
 
 /** A plan made from a post, shown on the post. */
@@ -221,8 +260,8 @@ export interface FeedPost {
 	photoUrl: string | null;
 	/** ISO instant. */
 	createdAt: string;
-	/** Who reacted with what; one reaction each. */
-	reactions: { profileId: string; reaction: FeedReaction }[];
+	/** Who reacted with what; one reaction each. Postcard reactions carry the person's name. */
+	reactions: { profileId: string; reaction: FeedReaction; name?: string }[];
 	/** Oldest first. */
 	replies: FeedReply[];
 	plans: FeedPlanLink[]; /** Set when it's a postcard from a friend of someone here, not a post by the home. */
@@ -233,6 +272,8 @@ export interface FeedPost {
 export interface PostcardFrom {
 	/** Null once they've deleted their account. */
 	profileId: string | null;
+	/** The friend it was addressed to (null for older postcards). */
+	toProfileId: string | null;
 	name: string;
 	initials: string;
 	colour: string;
@@ -246,6 +287,8 @@ export interface Friend {
 	initials: string;
 	colour: string;
 	avatarUrl: string | null;
+	/** A line about themselves; empty if they haven't written one. */
+	bio: string;
 	/** Null when they're not in a home (so postcards can't reach them). */
 	homeName: string | null;
 	/** ISO instant. */

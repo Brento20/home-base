@@ -11,9 +11,11 @@
 		post: FeedPost;
 		people: Profile[];
 		me: string;
+		/** Where the tap goes: the post's page by default; a postcard's page for postcards. */
+		action?: string;
 	}
 
-	let { post, people, me }: Props = $props();
+	let { post, people, me, action = `/feed/${post.id}?/react` }: Props = $props();
 
 	// What you just tapped, shown until the server's answer arrives (null = took it back).
 	let pending = $state<{ reaction: FeedReaction | null } | null>(null);
@@ -33,7 +35,7 @@
 <form
 	class="reactions"
 	method="POST"
-	action="/feed/{post.id}?/react"
+	{action}
 	use:enhance={({ submitter }) => {
 		const tapped = (submitter as HTMLButtonElement | null)?.value as FeedReaction | undefined;
 		if (tapped) {

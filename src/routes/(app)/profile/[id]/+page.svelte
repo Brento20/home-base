@@ -1,9 +1,11 @@
 <script lang="ts">
 	/**
-	 * A friend: who they are, their home's name, since when, and the things you can do: send a
-	 * postcard to their home's feed, remove them, or block them.
+	 * A friend: their colour, photo, name and the line about themselves, their home's name and
+	 * since when, then every postcard between you (either way), and Send a postcard. Removing or
+	 * blocking them is at the foot.
 	 */
-	import Avatar from '#lib/ui/Avatar.svelte';
+	import PostcardList from '#lib/features/friends/PostcardList.svelte';
+	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -16,6 +18,11 @@
 	const since = $derived(
 		new Date(friend.friendsSince).toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' })
 	);
+	const facts = $derived([
+		...(friend.homeName ? [{ icon: 'home' as const, text: friend.homeName }] : []),
+		{ text: `Friends since ${since}` }
+	]);
+	const nameOf = (id: string | null) => (id === friend.id ? friend.name : null);
 </script>
 
 <svelte:head>
@@ -29,24 +36,17 @@
 </PageHeader>
 
 <div class="stack">
-	<section class="card-hero" aria-label="About {friend.name}">
-		<Avatar
-			person={{
-				displayName: friend.name,
-				initials: friend.initials,
-				accentColour: friend.colour,
-				avatarUrl: friend.avatarUrl
-			}}
-			size={88}
-			ring
-		/>
-		<div class="who">
-			{#if friend.homeName}
-				<p class="sub home"><Icon name="home" size={14} /> {friend.homeName}</p>
-			{/if}
-			<p class="sub">Friends since {since}</p>
-		</div>
-	</section>
+	<ProfileHeader
+		person={{
+			displayName: friend.name,
+			initials: friend.initials,
+			accentColour: friend.colour,
+			avatarUrl: friend.avatarUrl
+		}}
+		name={friend.name}
+		bio={friend.bio}
+		{facts}
+	/>
 
 	{#if data.sent}
 		<p class="sent" role="status">Postcard sent. It’s on {friend.name}’s home feed now.</p>
@@ -62,6 +62,14 @@
 		</p>
 	{/if}
 
+	<section aria-labelledby="between-heading">
+		<h2 id="between-heading" class="section-heading">Postcards between you</h2>
+		{#if data.postcards.length}
+			<PostcardList postcards={data.postcards} me={data.me.id} {nameOf} />
+		{:else}
+			<p class="explain">None yet. Send the first one.</p>
+		{/if}
+	</section>
 	{#if form?.message}<p class="field-error" role="alert">{form.message}</p>{/if}
 </div>
 
@@ -79,35 +87,6 @@
 		gap: var(--space-l);
 	}
 
-	.card-hero {
-		display: flex;
-		align-items: center;
-		gap: var(--space-m);
-		padding: 4px;
-	}
-
-	.who {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.sub {
-		color: var(--colour-text-muted);
-	}
-
-	.home {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.note {
-		margin-top: var(--space-s);
-		font-size: var(--text-caption);
-		color: var(--colour-text-faint);
-	}
-
 	.send {
 		display: flex;
 		align-items: center;
@@ -121,5 +100,11 @@
 
 	.explain {
 		color: var(--colour-text-muted);
+	}
+
+	.note {
+		margin-top: var(--space-s);
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
 	}
 </style>

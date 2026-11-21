@@ -336,7 +336,7 @@ test('Tabs keep their last screen: back to a tab shows it at once, then updates'
 	expect(errors).toEqual([]);
 });
 
-test('Friends and postcards: your profile, a friend, a friend link, a postcard', async ({
+test('Friends and postcards: profile, friends, a friend link, a postcard and a reply', async ({
 	page,
 	context
 }) => {
@@ -345,7 +345,16 @@ test('Friends and postcards: your profile, a friend, a friend link, a postcard',
 	await page.getByRole('link', { name: 'You & friends' }).click();
 	await expect(page).toHaveURL(/\/profile$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You');
-	await expect(page.locator('.grouped-row', { hasText: 'Sam' })).toContainText('The Terrace');
+	await expect(page.locator('.friend', { hasText: 'Sam' })).toContainText('The Terrace');
+
+	// A line about yourself, written in Edit and shown at the top of your profile.
+	await page.getByRole('link', { name: 'Edit' }).click();
+	await page.getByLabel('About you').fill(`Waters plants ${run}`);
+	await page.getByLabel('Date of birth').fill('1990-06-15'); // required; the sample has none
+	await page.getByRole('button', { name: 'Save', exact: true }).click();
+	await expect(page).toHaveURL(/\/home$/);
+	await open(page, '/profile');
+	await expect(page.locator('.profile-header')).toContainText(`Waters plants ${run}`);
 
 	// A friend link: shown once, listed until it's used or cancelled.
 	await page.getByRole('button', { name: 'Make a friend link' }).click();
@@ -360,8 +369,9 @@ test('Friends and postcards: your profile, a friend, a friend link, a postcard',
 	await expect(other.getByRole('heading', { level: 1 })).toHaveText('This friend link has run out');
 
 	// A friend's page, and a postcard to their home.
-	await page.locator('.grouped-row', { hasText: 'Sam' }).click();
+	await page.locator('.friend', { hasText: 'Sam' }).click();
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sam');
+	await expect(page.locator('.profile-header')).toContainText('Fig tree custodian');
 	await page.getByRole('link', { name: 'Send a postcard' }).click();
 	await expect(page.locator('select[name="to"]')).toHaveValue('sample-sam');
 	// A photo and a few lines, through the same composer as a feed post.
@@ -378,14 +388,33 @@ test('Friends and postcards: your profile, a friend, a friend link, a postcard',
 	await page.getByRole('button', { name: 'Send', exact: true }).click();
 	await expect(page).toHaveURL(/\/profile\/sample-sam\?sent/);
 	await expect(page.getByRole('status')).toContainText('Postcard sent');
+	// It's in the postcards between you, and opens as yours, with Take it back.
+	const sent = page.locator('.postcard-list .grouped-row', {
+		hasText: `Wish you were here ${run}`
+	});
+	await expect(sent).toContainText('To Sam');
+	await sent.click();
+	await expect(page.locator('.postcard')).toContainText('Your postcard to Sam');
+	await expect(page.getByRole('button', { name: 'Take it back' })).toBeVisible();
 
-	// Sam's postcard to this home sits in the feed, and opens on its own page.
+	// Sam's postcard to this home sits in the feed: react on the card, reply on its page.
 	await open(page, '/');
 	const postcard = page.locator('.postcard').first();
 	if (await postcard.count()) {
 		await expect(postcard).toContainText('Postcard from Sam');
+		const love = postcard.getByRole('button', { name: /^Love/ });
+		const pressed = await love.getAttribute('aria-pressed');
+		await love.click();
+		await expect(love).toHaveAttribute('aria-pressed', pressed === 'true' ? 'false' : 'true');
 		await postcard.locator('.open').click();
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Postcard');
+		await expect(page.getByRole('link', { name: 'Send one back' })).toHaveAttribute(
+			'href',
+			'/postcards/new?to=sample-sam'
+		);
+		await page.locator('textarea#reply').fill(`Count me in ${run}`);
+		await page.getByRole('button', { name: 'Send', exact: true }).click();
+		await expect(page.locator('.reply', { hasText: `Count me in ${run}` })).toContainText('You');
 		await page.getByRole('button', { name: 'Take it down' }).click();
 		await page.getByRole('button', { name: 'Tap again to take it down' }).click();
 		await expect(page).toHaveURL(/\/$/);
@@ -430,5 +459,49 @@ test('House-sitter link: pick what to share, open it signed out, stop it', async
 	await open(sitter, link);
 	await expect(sitter.getByRole('heading', { level: 1 })).toHaveText('This link has ended');
 	await sitterContext.close();
+	expect(errors).toEqual([]);
+});
+
+test('Plan invites: answer for yourself, see who is going, invite a friend, add someone you went with', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/plans');
+	const invite = page.locator('a', { hasText: 'Long lunch at The Terrace' }).first();
+	await expect(invite).toContainText('Sam invited you');
+
+	// Another home's plan: no Edit, and your answer is yours alone.
+	await invite.click();
+	await expect(page.getByText('Sam invited your home')).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Edit' })).toHaveCount(0);
+	const going = page.getByRole('button', { name: 'Going', exact: true });
+	if ((await going.getAttribute('aria-pressed')) === 'true') await going.click(); // a rerun
+	await going.click();
+	await expect(going).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.locator('.summary-line').first()).toContainText('you are going');
+	await expect(page.locator('.guest', { hasText: 'Chris' })).toContainText('Hasn’t replied');
+
+	// Your own plan: invite a friend, and their home turns up on the guest list.
+	await open(page, '/plans');
+	await page.locator('a', { hasText: 'Saturday markets' }).first().click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Saturday markets');
+	const inviteSam = page.locator('.grouped-row', { hasText: 'The Terrace' }).getByRole('button', {
+		name: 'Invite'
+	});
+	if (await inviteSam.count()) await inviteSam.click();
+	await expect(page.locator('.home-title', { hasText: 'The Terrace' })).toBeVisible();
+	await expect(page.locator('.guest', { hasText: 'Brenton (you)' })).toContainText('Going');
+
+	// A plan you went to together: add Alex as a friend without a link.
+	await open(page, '/plans/sample-plan-trivia');
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Trivia night');
+	const alex = page.locator('.guest', { hasText: 'Alex' });
+	const add = alex.getByRole('button', { name: 'Add friend' });
+	if (await add.count()) {
+		await add.click();
+		await expect(page.getByRole('status')).toContainText('You’re friends now');
+		await open(page, '/profile');
+		await expect(page.locator('.friend', { hasText: 'Alex' })).toBeVisible();
+	}
 	expect(errors).toEqual([]);
 });

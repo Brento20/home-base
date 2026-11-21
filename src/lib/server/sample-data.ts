@@ -48,7 +48,8 @@ export const sampleAccount: AccountDetails = {
 	pronouns: 'he/him',
 	dateOfBirth: '',
 	avatarUrl: null,
-	accentColour: '#e58440'
+	accentColour: '#e58440',
+	bio: 'Makes a mean lasagne. Will water your plants.'
 };
 
 const [brenton, chris] = sampleProfiles;
@@ -232,8 +233,44 @@ export const samplePlans: Plan[] = [
 	plan('Dinner at home', 0, '19:00', 'Brenton’s cooking'),
 	plan('Saturday markets', 4, '09:00', '', 'Carriageworks'),
 	plan('Chris’s birthday', 9, null),
-	plan('Dinner booking', 11, '19:30', 'Table for 4', 'Firedoor')
+	plan('Dinner booking', 11, '19:30', 'Table for 4', 'Firedoor'),
+	// Sam's home invited this one, and an earlier one everyone went to.
+	{
+		...plan(
+			'Long lunch at The Terrace',
+			3,
+			'13:00',
+			'Bring a salad. Figs provided.',
+			'The Terrace'
+		),
+		id: 'sample-plan-invite',
+		invitedBy: { name: 'Sam', home: 'The Terrace' }
+	},
+	{
+		...plan('Trivia night', -2, '19:30', '', 'The Lord Nelson'),
+		id: 'sample-plan-trivia',
+		invitedBy: { name: 'Sam', home: 'The Terrace' }
+	}
 ];
+
+/** People in Sam's home, The Terrace, for plans with guests in sample mode. */
+export const sampleTerrace = [
+	{ id: 'sample-sam', name: 'Sam', initials: 'S', colour: '#8fb7a5' },
+	{ id: 'sample-alex', name: 'Alex', initials: 'A', colour: '#c79ad6' }
+];
+
+/** Homes invited to each sample plan, and everyone's answers ("plan:person" → answer). */
+export const sampleGuestHomes: Record<string, string[]> = {
+	'sample-plan-invite': ['home base'],
+	'sample-plan-trivia': ['home base']
+};
+export const sampleResponses = new Map<string, 'going' | 'not_going'>([
+	['sample-plan-invite:sample-sam', 'going'],
+	['sample-plan-trivia:sample-sam', 'going'],
+	['sample-plan-trivia:sample-alex', 'going'],
+	['sample-plan-trivia:sample-brenton', 'going'],
+	['sample-plan-trivia:sample-chris', 'not_going']
+]);
 
 /** Calendar events already imported in sample mode, so a second import adds nothing. */
 export const sampleImportedUids = new Set<string>();
@@ -434,6 +471,7 @@ export const sampleFriends: Friend[] = [
 		initials: 'S',
 		colour: '#8fb7a5',
 		avatarUrl: null,
+		bio: 'Fig tree custodian. Always up for a long lunch.',
 		homeName: 'The Terrace',
 		friendsSince: new Date(Date.now() - 40 * 86_400_000).toISOString()
 	}
@@ -453,10 +491,41 @@ export const samplePostcards: FeedPost[] = [
 		plans: [],
 		postcard: {
 			profileId: 'sample-sam',
+			toProfileId: 'sample-brenton',
 			name: 'Sam',
 			initials: 'S',
 			colour: '#8fb7a5',
 			home: 'The Terrace'
+		}
+	}
+];
+
+/** Postcards this home has sent (in sample mode they go nowhere, but show on profiles). */
+export const sampleSentPostcards: FeedPost[] = [
+	{
+		id: 'sample-postcard-sent-1',
+		authorId: null,
+		body: 'Thanks for lunch! Bringing the good olive oil next time.',
+		photoUrl: null,
+		createdAt: new Date(Date.now() - 3 * 86_400_000).toISOString(),
+		reactions: [{ profileId: 'sample-sam', reaction: 'heart', name: 'Sam' }],
+		replies: [
+			{
+				id: 'sample-postcard-reply-1',
+				authorId: 'sample-sam',
+				body: 'Any time. Bring Chris too!',
+				createdAt: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+				author: { name: 'Sam', initials: 'S', colour: '#8fb7a5' }
+			}
+		],
+		plans: [],
+		postcard: {
+			profileId: 'sample-brenton',
+			toProfileId: 'sample-sam',
+			name: 'Brenton',
+			initials: 'B',
+			colour: '#e58440',
+			home: 'home base'
 		}
 	}
 ];

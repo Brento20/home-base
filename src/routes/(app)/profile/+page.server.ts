@@ -9,16 +9,18 @@ import {
 	revokeFriendLink,
 	unblockPerson
 } from '#lib/features/friends/friends.server.js';
+import { listRecentPostcards } from '#lib/features/friends/postcards.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [account, friends, links, blocked] = await Promise.all([
+	const [account, friends, links, blocked, postcards] = await Promise.all([
 		getAccountDetails(locals),
 		listFriends(locals),
 		listFriendLinks(locals),
-		listBlocked(locals)
+		listBlocked(locals),
+		listRecentPostcards(locals, 5)
 	]);
-	return { account, friends, links, blocked };
+	return { account, friends, links, blocked, postcards };
 };
 
 export const actions: Actions = {

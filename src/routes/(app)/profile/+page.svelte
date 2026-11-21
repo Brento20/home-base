@@ -1,10 +1,13 @@
 <script lang="ts">
 	/**
-	 * Your profile as friends see it, with your friends below. Friends are added by link: make
-	 * one here, send it, and whoever opens it becomes your friend (src/routes/friend/[token]).
+	 * Your profile as friends see it (your colour, photo, name and the line about you), then your
+	 * friends, then your home's latest postcards, sent and received. Friends are added by link:
+	 * make one here, send it, and whoever opens it becomes your friend (src/routes/friend/[token]).
 	 * Links nobody has used yet can be cancelled; people you've blocked can be unblocked.
 	 */
 	import { enhance } from '$app/forms';
+	import PostcardList from '#lib/features/friends/PostcardList.svelte';
+	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -28,6 +31,13 @@
 		avatarUrl: account.avatarUrl
 	});
 
+	const facts = $derived([
+		{ icon: 'home' as const, text: data.household.name },
+		...(account.pronouns ? [{ text: account.pronouns }] : [])
+	]);
+	const nameOf = (id: string | null) =>
+		data.friends.find((friend) => friend.id === id)?.name ?? null;
+
 	// "Expires Saturday", "Expires Sat 29 Nov".
 	const expires = (instant: string) => {
 		const label = formatDayLabel(todayISO(new Date(instant)));
@@ -49,53 +59,52 @@
 </PageHeader>
 
 <div class="stack">
-	<section class="card-hero" aria-label="Your profile">
-		<Avatar person={me} size={88} ring />
-		<div class="who">
-			<p class="name">{shownName}</p>
-			{#if account.nickname && fullName !== account.nickname}<p class="sub">{fullName}</p>{/if}
-			{#if account.pronouns}<p class="sub">{account.pronouns}</p>{/if}
-			<p class="sub home"><Icon name="home" size={14} /> {data.household.name}</p>
-		</div>
-	</section>
+	<ProfileHeader person={me} name={shownName} bio={account.bio} {facts} />
+	{#if !account.bio}
+		<a class="add-bio" href="/home/profile">Add a line about yourself</a>
+	{/if}
 
 	<section aria-labelledby="friends-heading">
-		<h2 id="friends-heading" class="group-title">Friends</h2>
+		<div class="section-heading-row">
+			<h2 id="friends-heading" class="section-heading">
+				Friends{#if data.friends.length}<span class="count">{data.friends.length}</span>{/if}
+			</h2>
+			<a class="section-heading-link" href="#add-heading">Add</a>
+		</div>
 		{#if data.friends.length}
-			<ul class="grouped">
+			<ul class="friends">
 				{#each data.friends as friend (friend.id)}
 					<li>
-						<a class="grouped-row" href="/profile/{friend.id}">
-							<span class="grouped-icon avatar-slot">
-								<Avatar
-									person={{
-										displayName: friend.name,
-										initials: friend.initials,
-										accentColour: friend.colour,
-										avatarUrl: friend.avatarUrl
-									}}
-									size={30}
-								/>
-							</span>
-							<span class="grouped-label">
-								{friend.name}
-								<span class="grouped-sub">{friend.homeName ?? 'Not in a home yet'}</span>
-							</span>
-							<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
+						<a class="friend" href="/profile/{friend.id}">
+							<Avatar
+								person={{
+									displayName: friend.name,
+									initials: friend.initials,
+									accentColour: friend.colour,
+									avatarUrl: friend.avatarUrl
+								}}
+								size={60}
+								ring
+							/>
+							<span class="friend-name">{friend.name}</span>
+							<span class="friend-home">{friend.homeName ?? ''}</span>
 						</a>
 					</li>
 				{/each}
 			</ul>
-			<p class="group-note">
-				Friends see your name, photo and home’s name, and can send postcards to your home’s feed.
-				Nothing else.
-			</p>
 		{:else}
 			<p class="empty">
-				No friends here yet. Send someone a friend link and they’ll turn up here once they open it.
+				No friends here yet. Make a friend link below and they’ll turn up here once they open it.
 			</p>
 		{/if}
 	</section>
+
+	{#if data.postcards.length}
+		<section aria-labelledby="postcards-heading">
+			<h2 id="postcards-heading" class="section-heading">Postcards</h2>
+			<PostcardList postcards={data.postcards} me={data.me.id} {nameOf} />
+		</section>
+	{/if}
 
 	<section aria-labelledby="add-heading">
 		<h2 id="add-heading" class="group-title">Add a friend</h2>
@@ -174,38 +183,58 @@
 		gap: var(--space-l);
 	}
 
-	.card-hero {
-		display: flex;
-		align-items: center;
-		gap: var(--space-m);
-		padding: 4px;
+	.add-bio {
+		margin-top: calc(var(--space-l) * -1 + 10px);
+		align-self: center;
+		font-size: var(--text-small);
+		color: var(--colour-accent);
 	}
 
-	.who {
+	.count {
+		margin-left: 8px;
+		font-weight: var(--weight-regular);
+		color: var(--colour-text-faint);
+	}
+
+	/* Faces in a grid, four across on a phone. */
+	.friends {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+		gap: 14px 8px;
+		margin: var(--space-s) 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.friend {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
-		min-width: 0;
-	}
-
-	.name {
-		font-size: var(--text-headline);
-		font-weight: var(--weight-strong);
-		line-height: 1.2;
-	}
-
-	.sub {
-		color: var(--colour-text-muted);
-	}
-
-	.home {
-		display: inline-flex;
 		align-items: center;
 		gap: 6px;
+		padding: 6px 0;
+		border-radius: 16px;
+		color: inherit;
+		text-align: center;
+		text-decoration: none;
 	}
 
-	.avatar-slot {
-		background: none;
+	.friend-name {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: var(--text-small);
+		font-weight: var(--weight-medium);
+	}
+
+	.friend-home {
+		max-width: 100%;
+		margin-top: -4px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
 	}
 
 	.explain {

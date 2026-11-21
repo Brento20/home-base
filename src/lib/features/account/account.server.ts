@@ -8,6 +8,8 @@ import { isAvatarColour } from './colours.js';
 /** Sign-up, sign-in and profile details for the signed-in person. */
 
 export const PASSWORD_MIN = 10;
+/** The line about yourself that friends see. */
+export const BIO_MAX = 140;
 const PHOTO_MAX_BYTES = 1024 * 1024;
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -34,7 +36,9 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 
 	const { data, error: readError } = await supabase
 		.from('profiles')
-		.select('first_name, last_name, nickname, pronouns, date_of_birth, avatar_path, accent_colour')
+		.select(
+			'first_name, last_name, nickname, pronouns, date_of_birth, avatar_path, accent_colour, bio'
+		)
 		.eq('id', user.id)
 		.single();
 
@@ -48,7 +52,8 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 		pronouns: data.pronouns,
 		dateOfBirth: data.date_of_birth ?? '',
 		avatarUrl: avatarUrl(user.id, data.avatar_path),
-		accentColour: data.accent_colour
+		accentColour: data.accent_colour,
+		bio: data.bio ?? ''
 	};
 }
 
@@ -63,6 +68,8 @@ export function parseProfileForm(form: FormData) {
 	};
 	// Only on Edit your profile; a colour from the list or nothing.
 	if (form.has('accentColour')) values.accentColour = text('accentColour').toLowerCase();
+	// Only on Edit your profile too.
+	if (form.has('bio')) values.bio = text('bio').replace(/\s+/g, ' ');
 	const errors: FieldErrors<ProfileField> = {};
 
 	if (!values.firstName) errors.firstName = 'Add your first name.';
@@ -72,6 +79,8 @@ export function parseProfileForm(form: FormData) {
 	if (!values.nickname) errors.nickname = 'Add what people call you.';
 	else if (values.nickname.length > 24) errors.nickname = 'Keep it under 24 characters.';
 	if (values.pronouns.length > 24) errors.pronouns = 'Keep it under 24 characters.';
+	if (values.bio !== undefined && values.bio.length > BIO_MAX)
+		errors.bio = `Keep it under ${BIO_MAX} characters.`;
 	if (values.accentColour !== undefined && !isAvatarColour(values.accentColour))
 		errors.accentColour = 'Pick one of the colours.';
 
@@ -160,7 +169,8 @@ export async function saveProfile(
 			display_name: values.nickname,
 			initials: firstLetter(values.nickname),
 			avatar_path: avatarPath,
-			...(values.accentColour ? { accent_colour: values.accentColour } : {})
+			...(values.accentColour ? { accent_colour: values.accentColour } : {}),
+			...(values.bio !== undefined ? { bio: values.bio } : {})
 		})
 		.eq('id', user.id);
 

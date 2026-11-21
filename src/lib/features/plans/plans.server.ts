@@ -1,7 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { dbError } from '#lib/server/db.js';
-import { getHouseholdId } from '#lib/features/household/household.server.js';
-import { sampleFeedPosts, samplePlans, sampleImportedUids } from '#lib/server/sample-data.js';
+import { getHouseholdId, myId } from '#lib/features/household/household.server.js';
+import {
+	sampleFeedPosts,
+	sampleGuestHomes,
+	sampleImportedUids,
+	samplePlans,
+	sampleResponses
+} from '#lib/server/sample-data.js';
 import type { ImportedPlan } from './calendar-import.server.js';
 import {
 	addDays,
@@ -11,7 +17,7 @@ import {
 	zonedParts,
 	zonedToInstant
 } from '#lib/time.js';
-import type { FieldErrors, Plan } from '#lib/types.js';
+import type { FieldErrors, Plan, PlanResponse } from '#lib/types.js';
 
 import {
 	PLAN_LOCATION_MAX,
@@ -25,12 +31,17 @@ import {
 /**
  * Plans: the dated events on Today and the Plans tab. Times are stored as instants and shown
  * in the household's time zone; all-day plans start at local midnight.
+ *
+ * Plans another home invited yours to show up here too (plan-invites.server.ts). The lists
+ * don't filter by home: row-level security returns exactly this home's plans and the ones it's
+ * invited to.
  */
 
 export type { PlanField, PlanFormValues, PlanInput };
 
 interface PlanRow {
 	id: string;
+	household_id: string;
 	title: string;
 	notes: string;
 	location: string;
@@ -38,20 +49,62 @@ interface PlanRow {
 	ends_at: string | null;
 	all_day: boolean;
 	post_id: string | null;
+	plan_invites: {
+		household_id: string;
+		guest_home: string;
+		host_home: string;
+		invited_by_name: string;
+	}[];
+	plan_responses: { profile_id: string; response: PlanResponse }[];
 }
 
-const COLUMNS = 'id, title, notes, location, starts_at, ends_at, all_day, post_id';
+const COLUMNS = `id, household_id, title, notes, location, starts_at, ends_at, all_day, post_id,
+	plan_invites ( household_id, guest_home, host_home, invited_by_name ),
+	plan_responses ( profile_id, response )`;
 
-const toPlan = (row: PlanRow): Plan => ({
-	id: row.id,
-	title: row.title,
-	notes: row.notes,
-	location: row.location,
-	startsAt: new Date(row.starts_at).toISOString(),
-	endsAt: row.ends_at ? new Date(row.ends_at).toISOString() : null,
-	allDay: row.all_day,
-	postId: row.post_id
-});
+/** Who you are and which home, to tell your plans from ones you're invited to. */
+async function viewer(locals: App.Locals) {
+	return { home: await getHouseholdId(locals), me: myId(locals) };
+}
+
+function toPlan(row: PlanRow, { home, me }: { home: string; me: string }): Plan {
+	const plan: Plan = {
+		id: row.id,
+		title: row.title,
+		notes: row.notes,
+		location: row.location,
+		startsAt: new Date(row.starts_at).toISOString(),
+		endsAt: row.ends_at ? new Date(row.ends_at).toISOString() : null,
+		allDay: row.all_day,
+		postId: row.post_id
+	};
+	const invites = row.plan_invites ?? [];
+	if (row.household_id !== home) {
+		// Another home's plan: the only invite row you can see is your own home's.
+		const yours = invites.find((invite) => invite.household_id === home);
+		plan.invitedBy = { name: yours?.invited_by_name ?? 'Someone', home: yours?.host_home ?? '' };
+	} else if (invites.length) {
+		plan.guestHomes = invites.map((invite) => ({
+			id: invite.household_id,
+			name: invite.guest_home
+		}));
+	}
+	if (plan.invitedBy || plan.guestHomes)
+		plan.myResponse =
+			(row.plan_responses ?? []).find((entry) => entry.profile_id === me)?.response ?? null;
+	return plan;
+}
+
+/** Sample mode: your answer, and which homes were invited, from the sample's own lists. */
+function withSampleGuests(plan: Plan, me: string): Plan {
+	const homes = sampleGuestHomes[plan.id];
+	if (!homes && !plan.invitedBy) return plan;
+	return {
+		...plan,
+		...(plan.invitedBy ? {} : { guestHomes: (homes ?? []).map((name) => ({ id: name, name })) }),
+		myResponse: sampleResponses.get(`${plan.id}:${me}`) ?? null
+	};
+}
 
 /** A plan as editable form values, in household time. */
 export function planToFormValues(plan: Plan): PlanFormValues {
@@ -155,21 +208,22 @@ export async function listUpcomingPlans(
 		return samplePlans
 			.filter((plan) => plan.startsAt >= startOfToday)
 			.sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-			.slice(offset, offset + limit);
+			.slice(offset, offset + limit)
+			.map((plan) => withSampleGuests(plan, myId(locals)));
 	}
 
-	const householdId = await getHouseholdId(locals);
+	const you = await viewer(locals);
+	// No home filter: row-level security gives this home's plans and the ones it's invited to.
 	const { data, error: readError } = await supabase
 		.from('plans')
 		.select(COLUMNS)
-		.eq('household_id', householdId)
 		.gte('starts_at', startOfToday)
 		.order('starts_at')
 		.order('id') // a steady order for plans at the same time, so pages never overlap
 		.range(offset, offset + limit - 1);
 
 	if (readError) dbError(readError);
-	return (data ?? []).map(toPlan);
+	return ((data ?? []) as unknown as PlanRow[]).map((row) => toPlan(row, you));
 }
 
 /**
@@ -187,21 +241,22 @@ export async function listPlansBetween(
 	if (!supabase) {
 		return samplePlans
 			.filter((plan) => plan.startsAt < until && (plan.endsAt ?? plan.startsAt) >= from)
-			.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+			.sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+			.map((plan) => withSampleGuests(plan, myId(locals)));
 	}
 
-	const householdId = await getHouseholdId(locals);
+	const you = await viewer(locals);
+	// No home filter: row-level security gives this home's plans and the ones it's invited to.
 	const { data, error: readError } = await supabase
 		.from('plans')
 		.select(COLUMNS)
-		.eq('household_id', householdId)
 		.lt('starts_at', until)
 		.or(`starts_at.gte.${from},ends_at.gte.${from}`)
 		.order('starts_at')
 		.limit(500);
 
 	if (readError) dbError(readError);
-	return (data ?? []).map(toPlan);
+	return ((data ?? []) as unknown as PlanRow[]).map((row) => toPlan(row, you));
 }
 
 /**
@@ -226,9 +281,10 @@ export async function getPlan(locals: App.Locals, id: string): Promise<Plan> {
 	if (!supabase) {
 		const plan = samplePlans.find((entry) => entry.id === id);
 		if (!plan) error(404, 'That plan doesn’t exist any more.');
-		return plan;
+		return withSampleGuests(plan, myId(locals));
 	}
 
+	const you = await viewer(locals);
 	const { data, error: readError } = await supabase
 		.from('plans')
 		.select(COLUMNS)
@@ -236,7 +292,7 @@ export async function getPlan(locals: App.Locals, id: string): Promise<Plan> {
 		.maybeSingle();
 	if (readError) dbError(readError);
 	if (!data) error(404, 'That plan doesn’t exist any more.');
-	return toPlan(data);
+	return toPlan(data as unknown as PlanRow, you);
 }
 
 const toRow = (input: PlanInput) => ({

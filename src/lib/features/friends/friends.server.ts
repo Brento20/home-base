@@ -27,6 +27,7 @@ interface FriendRow {
 	initials: string;
 	colour: string;
 	avatar_path: string | null;
+	bio: string | null;
 	home_name: string | null;
 	friends_since: string;
 }
@@ -37,6 +38,7 @@ const toFriend = (row: FriendRow): Friend => ({
 	initials: row.initials,
 	colour: row.colour,
 	avatarUrl: avatarUrl(row.id, row.avatar_path),
+	bio: row.bio ?? '',
 	homeName: row.home_name,
 	friendsSince: new Date(row.friends_since).toISOString()
 });

@@ -1,11 +1,15 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { blockPerson, getFriend, removeFriend } from '#lib/features/friends/friends.server.js';
+import { listPostcardsBetween } from '#lib/features/friends/postcards.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
-	const friend = await getFriend(locals, params.id);
+	const [friend, postcards] = await Promise.all([
+		getFriend(locals, params.id),
+		listPostcardsBetween(locals, params.id)
+	]);
 	if (!friend) error(404, 'They’re not on your friends list.');
-	return { friend, sent: url.searchParams.has('sent') };
+	return { friend, postcards, sent: url.searchParams.has('sent') };
 };
 
 export const actions: Actions = {

@@ -10,6 +10,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const plan = await getPlan(locals, params.id);
+	// Another home's plan: only they can change it.
+	if (plan.invitedBy) redirect(303, `/plans/${plan.id}`);
 	return { plan, values: planToFormValues(plan) };
 };
 

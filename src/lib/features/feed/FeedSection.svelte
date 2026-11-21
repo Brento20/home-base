@@ -115,7 +115,7 @@
 			{#each shown as post (post.id)}
 				<li in:arrive={{ y: -12 }} out:leave animate:glide>
 					{#if post.postcard}
-						<PostcardCard post={{ ...post, postcard: post.postcard }} />
+						<PostcardCard post={{ ...post, postcard: post.postcard }} {people} {me} />
 					{:else}
 						<PostCard {post} {people} {me} />
 					{/if}

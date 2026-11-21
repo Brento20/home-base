@@ -16,12 +16,17 @@ export const isReaction = (value: string): value is FeedReaction =>
  * accessible label ("Love: Chris and you").
  */
 export function summariseReactions(post: FeedPost, people: Profile[], me: string) {
-	const nameOf = (id: string) =>
-		id === me ? 'you' : (people.find((person) => person.id === id)?.displayName ?? 'Someone');
+	// Postcard reactions carry the giver's name: they may live in another home.
+	const nameOf = (entry: FeedPost['reactions'][number]) =>
+		entry.profileId === me
+			? 'you'
+			: (people.find((person) => person.id === entry.profileId)?.displayName ??
+				entry.name ??
+				'Someone');
 
 	return REACTIONS.map((reaction) => {
 		const givers = post.reactions.filter((entry) => entry.reaction === reaction.key);
-		const names = givers.map((entry) => nameOf(entry.profileId));
+		const names = givers.map(nameOf);
 		return {
 			...reaction,
 			count: givers.length,
