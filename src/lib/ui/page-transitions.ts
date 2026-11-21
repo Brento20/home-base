@@ -40,6 +40,8 @@ export function usePageTransitions() {
 
 		const root = document.documentElement;
 		root.dataset.nav = directionFor(from.url.pathname, to.url.pathname);
+		// Where the old screen sits in the window: above the top if you'd scrolled down.
+		const oldTop = document.querySelector('[data-page]')?.getBoundingClientRect().top ?? 0;
 
 		return new Promise<void>((resolve) => {
 			const transition = document.startViewTransition(async () => {
@@ -51,9 +53,17 @@ export function usePageTransitions() {
 				if (page) {
 					page.style.transition = '';
 					page.style.translate = '';
+					// The two screens only slide sideways. The page's box doesn't travel from the
+					// old screen's place to the new one's (base.css), so the old screen's picture is
+					// held where it was, however far down you'd scrolled.
+					const newTop = page.getBoundingClientRect().top;
+					root.style.setProperty('--page-shift', `${oldTop - newTop}px`);
 				}
 			});
-			transition.finished.finally(() => delete root.dataset.nav);
+			transition.finished.finally(() => {
+				delete root.dataset.nav;
+				root.style.removeProperty('--page-shift');
+			});
 		});
 	});
 
@@ -68,6 +78,19 @@ export function usePageTransitions() {
 	});
 }
 
+/**
+ * The parts of a screen that step in one by one. A main stack or form steps in by its children;
+ * a Reveal wrapper (display: contents, so it has no box to animate) by whatever it holds.
+ */
+function sectionsOf(element: Element): Element[] {
+	if (element.classList.contains('reveal')) return [...element.children].flatMap(sectionsOf);
+	if (element.matches('.stack, .form-stack, [data-view-content]'))
+		return [...element.children].flatMap((child) =>
+			child.classList.contains('reveal') ? [...child.children].flatMap(sectionsOf) : [child]
+		);
+	return [element];
+}
+
 const REVEAL_MS = 440;
 const REVEAL_STEP = 45;
 /** Sections after this many all come in together, so a long screen never makes you wait. */
@@ -76,15 +99,13 @@ const REVEAL_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 /**
  * Fades the screen's sections up into place, one after another, top to bottom. Also used when
- * a screen that arrived as placeholders gets its content, so it cascades in the same way. A section is a
- * direct child of the page, except the page's main stack or form, whose own children step in
- * one by one. Only sections you can see animate. Opacity and transform, on the compositor.
+ * a screen that arrived as placeholders gets its content, so it cascades in the same way.
+ * Sections are found by sectionsOf. Only sections you can see animate. Opacity and transform,
+ * on the compositor.
  */
 export function reveal(root: Element | null = document.querySelector('[data-page]')) {
 	if (!root) return;
-	const sections = [...root.children].flatMap((child) =>
-		child.matches('.stack, .form-stack, [data-view-content]') ? [...child.children] : [child]
-	);
+	const sections = [...root.children].flatMap(sectionsOf);
 	let step = 0;
 	for (const section of sections) {
 		if (!(section instanceof HTMLElement)) continue;

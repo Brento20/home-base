@@ -290,12 +290,18 @@ html[data-nav] [data-still='action-fade'] {
 	animation-duration: 200ms;
 }
 
+/*
+ * The page is the whole length of the screen, so the browser's own move of its box (from the
+ * old screen's place to the new one's) would slide everything up or down by however far you'd
+ * scrolled. Instead the box stays put and the old picture is held where it was
+ * (--page-shift, set by page-transitions.ts): both screens only move sideways.
+ */
 ::view-transition-group(page) {
-	animation-duration: 340ms;
-	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+	animation: none;
 }
 
 ::view-transition-old(page) {
+	translate: 0 var(--page-shift, 0px);
 	animation: page-out 170ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 
@@ -323,10 +329,18 @@ html[data-nav='pop'] {
 	--page-to: 32px;
 }
 
-/* No fade here: the screen's sections fade in one by one (the reveal in page-transitions.ts). */
+/*
+ * A quick fade as it starts, so the two screens are never both solid at once; the sections then
+ * settle in one by one (the reveal in page-transitions.ts).
+ */
 @keyframes page-in {
 	from {
+		opacity: 0;
 		transform: translateX(var(--page-from, 0));
+	}
+
+	40% {
+		opacity: 1;
 	}
 }
 

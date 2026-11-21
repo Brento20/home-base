@@ -8,7 +8,7 @@
 	 * change. It sets off the moment a navigation starts (tap or swipe) instead of waiting for
 	 * the next page's data, and goes back if that navigation doesn't happen.
 	 */
-	import type { Snippet } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 
 	interface Props {
@@ -30,14 +30,22 @@
 	let heading = $state<number | null>(null);
 	const shown = $derived(heading ?? current);
 
+	// The pill heads off when the navigation starts and holds there until the page's URL has
+	// caught up. (Letting go when the navigation completes was a frame too early: the URL still
+	// named the old tab, so the pill hopped back and set off a second time.)
+	$effect.pre(() => {
+		if (heading !== null && current === heading) heading = null;
+	});
+
 	beforeNavigate((navigation) => {
 		const next = navigation.to ? indexFor(navigation.to.url) : -1;
 		if (next < 0 || next === current) return;
 		heading = next;
-		navigation.complete.then(
-			() => (heading = null),
-			() => (heading = null)
-		);
+		const giveUp = () => {
+			if (heading === next) heading = null;
+		};
+		// It didn't happen, or it ended up somewhere else (a redirect): back to the real tab.
+		navigation.complete.then(() => tick().then(() => current !== next && giveUp()), giveUp);
 	});
 </script>
 
