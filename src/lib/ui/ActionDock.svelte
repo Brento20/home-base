@@ -4,6 +4,8 @@
 	 * bottom (a recipe's servings and actions, the cook view's Mark as cooked). It's styled as
 	 * the tab bar's twin, so the two read as one set. `above` shows a notice over it.
 	 * Give the page's content about 84px of bottom padding so its end clears the bar.
+	 * `lift` (px) raises it to sit just above the on-screen keyboard instead, like the toolbar
+	 * iOS shows over the keyboard (src/lib/ui/keyboard.svelte.ts measures it).
 	 */
 	import type { Snippet } from 'svelte';
 	import { drift } from './backdrop-drift.js';
@@ -11,14 +13,18 @@
 	interface Props {
 		children: Snippet;
 		above?: Snippet;
+		/** The keyboard's height, when it's up: the dock rides on top of it. */
+		lift?: number;
 	}
 
-	let { children, above }: Props = $props();
+	let { children, above, lift = 0 }: Props = $props();
 </script>
 
 <!-- The page melts away a little higher here, so nothing reads through the bar. -->
-<div class="dock-fade backdrop-paint" data-still="action-fade" aria-hidden="true" use:drift></div>
-<div class="action-dock" data-still="action-dock">
+{#if !lift}
+	<div class="dock-fade backdrop-paint" data-still="action-fade" aria-hidden="true" use:drift></div>
+{/if}
+<div class="action-dock" class:lifted={lift > 0} style:--lift="{lift}px" data-still="action-dock">
 	{@render above?.()}
 	<div class="action-bar">{@render children()}</div>
 </div>
@@ -37,6 +43,11 @@
 		gap: 8px;
 		padding: 0 var(--page-gutter);
 		pointer-events: none;
+	}
+
+	/* On the keyboard: 8px clear of its top edge, the tab bar hidden behind it. */
+	.action-dock.lifted {
+		bottom: calc(var(--lift) + 8px);
 	}
 
 	.action-dock > :global(*) {

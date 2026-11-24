@@ -19,6 +19,7 @@
 	}
 
 	let { plain, fingerprint, ai }: Props = $props();
+	let open = $state(false);
 
 	/** The newest AI line and the facts it was written for. */
 	let written = $state<{ key: string; line: string | null } | null>(null);
@@ -79,16 +80,18 @@
 	});
 </script>
 
-<p class="week" aria-live="polite">
+<!-- Two lines; if a line runs longer, a tap shows the rest (the words are all there to
+     VoiceOver either way). -->
+<p class="week" class:open aria-live="polite">
 	{#key friendly ?? plain}
-		<span class="line">
+		<button type="button" class="line" aria-expanded={open} onclick={() => (open = !open)}>
 			{#if friendly}
 				<!-- Marked as AI-written, as Apple's guidance asks. -->
 				<span class="mark"><Icon name="sparkle" size={13} /></span><span class="ai-said">
 					Written by AI:
 				</span>{friendly}
 			{:else}{plain}{/if}
-		</span>
+		</button>
 	{/key}
 </p>
 
@@ -107,8 +110,24 @@
 	}
 
 	.line {
-		display: block;
+		width: 100%;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		text-align: left;
+		display: -webkit-box;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		animation: fade-in 400ms var(--ease-out) both;
+	}
+
+	.open .line {
+		-webkit-line-clamp: unset;
+		line-clamp: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

@@ -50,13 +50,16 @@
 			{heading.primary}
 			<span class="month">{heading.secondary}</span>
 		</h1>
+		<ScoreAvatars people={data.household.members} scores={today?.scores ?? null} />
+	</div>
+	<!-- Its own row under the date and scores, wider than the space beside them: two lines. -->
+	<div class="summary">
 		{#if today}
 			<WeekSummary plain={today.week.plain} fingerprint={today.week.fingerprint} ai={data.ai} />
 		{:else}
-			<span class="line-waiting" aria-hidden="true"><span></span><span></span><span></span></span>
+			<span class="line-waiting" aria-hidden="true"><span></span><span></span></span>
 		{/if}
 	</div>
-	<ScoreAvatars people={data.household.members} scores={today?.scores ?? null} />
 </header>
 
 <div class="stack">
@@ -105,15 +108,20 @@
 {/if}
 
 <style>
-	.header {
+	.heading {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: var(--space-m);
 	}
 
-	.heading {
+	.heading > h1 {
 		min-width: 0;
+	}
+
+	/* About 80% of a phone's width (the cards' width), and never past the page column. */
+	.summary {
+		width: min(82vw, 100% - 7vw);
 	}
 
 	.month {
@@ -138,12 +146,8 @@
 		background: var(--colour-fill);
 	}
 
-	.line-waiting > span:nth-child(2) {
-		width: 95%;
-	}
-
 	.line-waiting > span:last-child {
-		width: 55%;
+		width: 60%;
 	}
 
 	.stack {

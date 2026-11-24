@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { numbersCheckOut, plainSummary, weekFacts } from './week-summary.js';
+import { numbersCheckOut, PLAIN_MAX, plainSummary, weekFacts } from './week-summary.js';
 
 const people = [
 	{ id: 'b', displayName: 'Brenton' },
@@ -27,6 +27,35 @@ describe('the line under the date', () => {
 		const line = plainSummary(facts);
 		expect(line).toContain('Clean the bathroom');
 		expect(line).toContain('Chris');
+	});
+
+	it('stays within two lines, dropping what won’t fit but keeping a short one after it', () => {
+		const busy = weekFacts(
+			[
+				{
+					id: 'p',
+					title: 'Dinner at home',
+					startsAt: `${today}T08:00:00Z`
+				} as never
+			],
+			[
+				task('Put the bins out', 'b', today),
+				{
+					...(task('Cook', 'b', today) as object),
+					recipeId: 'r',
+					recipe: { title: 'Spaghetti bolognese with garlic bread' }
+				} as never
+			],
+			new Map([['c', 113100]]),
+			people,
+			'b',
+			today
+		);
+		const line = plainSummary(busy);
+		expect(line.length).toBeLessThanOrEqual(PLAIN_MAX);
+		expect(line).toMatch(/^Today: Put the bins out\./);
+		expect(line).not.toContain('bolognese');
+		expect(line).toContain('Chris owes you $1,131.');
 	});
 
 	it('accepts an AI line whose numbers are all in the facts', () => {

@@ -1,14 +1,18 @@
 <script lang="ts">
 	/**
-	 * The add bar on Today, sitting on top of the Coming up row it feeds. Type, then Task adds it
-	 * straight away (for anyone, no date, like the quick bar on Tasks) and Plan carries the words
-	 * to New plan, where a day and time get set. Return adds it as a task. The buttons open on a
-	 * row under the field while something's typed, so the field keeps its full width.
+	 * The add bar on Today, sitting on top of the Coming up row it feeds and as wide as its
+	 * cards. Type, and the choices appear in a toolbar riding on the keyboard (the ActionDock,
+	 * above the tab bar once the keyboard's down), the way iOS puts actions over the keyboard,
+	 * so the field keeps its full width and nothing on the page moves:
+	 * - Add task (or Return): added straight away, for anyone, no date, with Undo.
+	 * - Make it a plan: the words go to New plan, where a day and time get set.
 	 */
 	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
+	import ActionDock from '#lib/ui/ActionDock.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
+	import { keyboardHeight } from '#lib/ui/keyboard.svelte.js';
 
 	interface Props {
 		/** What was typed and the problem with it, from a failed add. */
@@ -24,15 +28,23 @@
 	let saving = $state(false);
 	const typed = $derived(text.trim());
 	const planHref = $derived(`/plans/new?text=${encodeURIComponent(typed)}`);
+	const keyboard = keyboardHeight();
+
+	async function clear() {
+		text = '';
+		await tick();
+		input?.focus();
+	}
 </script>
 
 <form
+	id="add-bar-form"
 	class="add-bar"
 	class:cards
 	class:typed
 	method="POST"
 	action="?/addTask"
-	aria-label="Add a task or plan"
+	aria-label="New task or plan"
 	use:enhance={() => {
 		saving = true;
 		return async ({ result, update }) => {
@@ -48,12 +60,12 @@
 	<div class="bar">
 		<GlassSurface radius={18} />
 		<span class="lead" aria-hidden="true"><Icon name="plus" size={18} /></span>
-		<label class="visually-hidden" for="add-bar">Add a task or plan</label>
+		<label class="visually-hidden" for="add-bar">New task or plan</label>
 		<input
 			bind:this={input}
 			id="add-bar"
 			name="title"
-			placeholder="Add a task or plan"
+			placeholder="New task or plan"
 			autocomplete="off"
 			enterkeyhint="done"
 			maxlength="160"
@@ -62,20 +74,30 @@
 			aria-describedby={errors?.title ? 'add-bar-error' : undefined}
 			required
 		/>
-	</div>
-	<!-- Under the field, opening once something's typed; out of reach until then. -->
-	<div class="actions" inert={!typed}>
-		<div class="actions-row">
-			<button class="action task" aria-label="Add “{typed}” as a task" disabled={saving}
-				>Add task</button
+		{#if text}
+			<!-- iOS's clear button: there while there's something to clear. -->
+			<button type="button" class="clear" aria-label="Clear" onclick={clear}
+				><Icon name="close" size={14} /></button
 			>
-			<a class="action plan" href={planHref} aria-label="Make “{typed}” a plan"
-				><GlassSurface radius={16} /><span>Make it a plan</span></a
-			>
-		</div>
+		{/if}
 	</div>
 	{#if errors?.title}<p class="field-error" id="add-bar-error">{errors.title}</p>{/if}
 </form>
+
+{#if typed}
+	<!-- Outside the form (it's fixed to the screen), tied back to it by `form`. -->
+	<ActionDock lift={keyboard.current}>
+		<a class="button-secondary act add-bar-act" href={planHref} aria-label="Make “{typed}” a plan"
+			>Make it a plan</a
+		>
+		<button
+			class="button-primary act add-bar-act"
+			form="add-bar-form"
+			aria-label="Add “{typed}” as a task"
+			disabled={saving}>Add task</button
+		>
+	</ActionDock>
+{/if}
 
 <style>
 	.add-bar {
@@ -94,21 +116,22 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
 		height: 48px;
-		padding: 0 14px;
+		padding: 0 4px 0 14px;
 		border-radius: var(--radius-field);
 		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		transition: box-shadow var(--duration-quick) var(--ease-out);
 	}
 
+	/* Focus shows as the edge turning accent, as an iOS field does, without a halo. */
 	.bar:focus-within {
-		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
-			0 0 0 3px var(--colour-accent-soft);
+		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
 	}
 
 	.lead,
-	input {
+	input,
+	.clear {
 		position: relative;
 		z-index: 1;
 	}
@@ -139,70 +162,34 @@
 		color: var(--colour-text-faint);
 	}
 
-	/* Folded to nothing until something's typed, then opens: the cards below ease down 48px. */
-	.actions {
+	/* A small filled circle with a cross, in a full 44px target. */
+	.clear {
 		display: grid;
-		grid-template-rows: 0fr;
-		opacity: 0;
-		transition:
-			grid-template-rows var(--duration-settle) var(--ease-out),
-			opacity var(--duration-quick) var(--ease-out);
-	}
-
-	.typed .actions {
-		grid-template-rows: 1fr;
-		opacity: 1;
-	}
-
-	.actions-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 8px;
-		min-height: 0;
-		overflow: hidden;
-	}
-
-	.action {
-		position: relative;
-		display: grid;
+		flex: none;
 		place-items: center;
-		height: 40px;
-		margin-top: 8px;
+		width: var(--tap-target);
+		height: var(--tap-target);
+		padding: 0;
 		border: 0;
-		border-radius: 16px;
-		font-size: var(--text-small);
-		font-weight: var(--weight-medium);
+		background: none;
+		color: var(--colour-on-ring);
+	}
+
+	.clear > :global(svg) {
+		box-sizing: content-box;
+		padding: 3px;
+		border-radius: 50%;
+		background: var(--colour-text-faint);
+	}
+
+	/* Two even halves in the dock. */
+	:global(.add-bar-act) {
+		flex: 1;
+		justify-content: center;
 		text-decoration: none;
-		transition: transform var(--duration-release) var(--spring-gentle);
-	}
-
-	.task {
-		background: var(--colour-accent);
-		color: var(--colour-on-accent);
-	}
-
-	.plan {
-		color: var(--colour-text);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
-	}
-
-	.plan > span {
-		position: relative;
-		z-index: 1;
-	}
-
-	.action:global([data-pressed]) {
-		transform: scale(0.96);
-		transition-duration: var(--duration-press);
 	}
 
 	.field-error {
 		margin: 6px 0 0 14px;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.actions {
-			transition: none;
-		}
 	}
 </style>

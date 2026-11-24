@@ -45,13 +45,21 @@ test('Today: the add bar adds a task (with Undo) or starts a plan', async ({ pag
 	await open(page, '/');
 	const bar = page.locator('#add-bar');
 	await expect(bar).toBeVisible();
-	// The buttons are folded away, out of reach, until something's typed.
-	const actions = page.locator('.add-bar .actions');
-	await expect(actions).toHaveAttribute('inert', '');
+	// The choices only appear, in the dock above the tab bar, once something's typed.
+	const dock = page.locator('.action-dock');
+	await expect(dock).toHaveCount(0);
 
 	// Return adds it as a task, for anyone, with no date, and stays on Today.
 	await bar.fill(`Oil the gate ${run}`);
-	await expect(actions).not.toHaveAttribute('inert');
+	await expect(
+		dock.getByRole('button', { name: `Add “Oil the gate ${run}” as a task` })
+	).toBeVisible();
+	await expect(dock.getByRole('link', { name: `Make “Oil the gate ${run}” a plan` })).toBeVisible();
+	// The clear button empties the field (and the dock goes), then it's typed again.
+	await page.getByRole('button', { name: 'Clear' }).click();
+	await expect(bar).toHaveValue('');
+	await expect(dock).toHaveCount(0);
+	await bar.fill(`Oil the gate ${run}`);
 	await bar.press('Enter');
 	await expect(page).toHaveURL(/\/$/);
 	const toast = page.locator('.undo-toast');

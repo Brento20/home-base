@@ -118,9 +118,13 @@ const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? on
 const joinAnd = (parts: string[]) =>
 	parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : (parts[0] ?? '');
 
+/** About two lines of Today's summary on a phone. */
+export const PLAIN_MAX = 90;
+
 /**
  * The plain version, always there: "Today: Clean the bathroom and 2 more tasks. Chris is
- * cooking chicken biryani. You owe Chris $595."
+ * cooking chicken biryani. You owe Chris $595." It shows on two lines, so after the first
+ * sentence, any that would run past PLAIN_MAX are left out (a shorter one after can still fit).
  */
 export function plainSummary(facts: WeekFacts): string {
 	const sentences: string[] = [];
@@ -156,7 +160,12 @@ export function plainSummary(facts: WeekFacts): string {
 	const owed = money.owedToYou.map((line) => `${line.name} owes you ${line.amount}`);
 	if (owe.length) sentences.push(`You owe ${joinAnd(owe)}.`);
 	if (owed.length) sentences.push(`${joinAnd(owed)}.`);
-	return sentences.join(' ');
+
+	let line = sentences[0] ?? '';
+	for (const sentence of sentences.slice(1)) {
+		if (line.length + 1 + sentence.length <= PLAIN_MAX) line += ` ${sentence}`;
+	}
+	return line;
 }
 
 /** A short fingerprint of the day and its facts: the friendly line is kept until it changes. */
