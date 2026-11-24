@@ -66,7 +66,8 @@ export async function getPublicProfile(
 		initials: row.initials,
 		colour: row.colour,
 		avatarUrl: avatarUrl(row.id, row.avatar_path),
-		pronouns: row.pronouns,
+		// Only yours and your housemates' come back (pronouns are private for now).
+		pronouns: row.pronouns ?? '',
 		bio: row.bio,
 		homeName: row.home_name,
 		fields: fieldsFrom(row as unknown as Record<string, unknown>),

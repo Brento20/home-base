@@ -25,8 +25,8 @@
 
 <SoloScreen title={heading}>
 	{#snippet top()}
-		<a class="button-quiet back" href={fromProfile ? '/home/profile' : '/'}
-			><Icon name="back" size={18} /> {fromProfile ? 'Profile' : 'Today'}</a
+		<a class="button-quiet back" href={fromProfile ? '/profile/details' : '/'}
+			><Icon name="back" size={18} /> {fromProfile ? 'Details and account' : 'Today'}</a
 		>
 	{/snippet}
 	<GlassCard>

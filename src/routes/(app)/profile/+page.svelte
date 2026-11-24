@@ -1,10 +1,13 @@
 <script lang="ts">
 	/**
-	 * Your profile as friends see it (your colour, photo, name and the line about you), then your
-	 * friends, then your home's latest postcards, sent and received. Friend requests waiting on
-	 * you come first. Add a friend three ways: type their friend code, share yours, or (for people
-	 * not on home base yet) send a friend link. Requests and links you've sent can be cancelled;
-	 * people you've blocked can be unblocked.
+	 * You & friends, laid out like the iPhone's account page: who you are at the top, a few clear
+	 * rows, then the social part.
+	 * - Your card (photo, name, the line about you, your public answers) and Edit profile, which
+	 *   edits everything other people see.
+	 * - Preferences (how the app looks to you) and Details and account (the private part).
+	 * - Friend requests waiting on you, your friends, postcards, and Add a friend three ways: type
+	 *   their code, share yours, or send a friend link.
+	 * - Manage friends: requests and links you've sent, and people you've blocked.
 	 */
 	import { enhance } from '$app/forms';
 	import PostcardList from '#lib/features/friends/PostcardList.svelte';
@@ -16,7 +19,6 @@
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import ShareLink from '#lib/ui/ShareLink.svelte';
-	import { formatDayLabel, todayISO } from '#lib/time.js';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -24,7 +26,16 @@
 	let copied = $state(false);
 
 	const incoming = $derived(data.requests.filter((request) => request.incoming));
-	const outgoing = $derived(data.requests.filter((request) => !request.incoming));
+	// For the Manage friends row: what's in there, so it's worth a look.
+	const waiting = $derived(
+		[
+			data.manage.sent && `${data.manage.sent} sent`,
+			data.manage.links && `${data.manage.links} ${data.manage.links === 1 ? 'link' : 'links'}`,
+			data.manage.blocked && `${data.manage.blocked} blocked`
+		]
+			.filter(Boolean)
+			.join(' · ')
+	);
 
 	async function copyCode() {
 		try {
@@ -47,36 +58,24 @@
 		avatarUrl: account.avatarUrl
 	});
 
-	const facts = $derived([
-		{ icon: 'home' as const, text: data.household.name },
-		...(account.pronouns ? [{ text: account.pronouns }] : [])
-	]);
+	// As friends see it: pronouns are private for now, so they're not on the card.
+	const facts = $derived([{ icon: 'home' as const, text: data.household.name }]);
 	const nameOf = (id: string | null) =>
 		data.friends.find((friend) => friend.id === id)?.name ?? null;
-
-	// "Expires Saturday", "Expires Sat 29 Nov".
-	const expires = (instant: string) => {
-		const label = formatDayLabel(todayISO(new Date(instant)));
-		return label === 'Today' || label === 'Tomorrow' ? label.toLowerCase() : label;
-	};
 </script>
 
 <svelte:head>
 	<title>{shownName} · home base</title>
 </svelte:head>
 
-<PageHeader title="You">
+<PageHeader title="You &amp; friends">
 	{#snippet lead()}
 		<a class="button-quiet" href="/home"><Icon name="back" size={18} /> Home</a>
-	{/snippet}
-	{#snippet trailing()}
-		<a class="button-quiet" href="/home/profile">Edit details</a>
 	{/snippet}
 </PageHeader>
 
 <div class="stack">
-	<ProfileHeader person={me} name={shownName} bio={data.publicProfile.bio} {facts} />
-
+	<!-- Requests waiting on you come first: they're the thing to act on. -->
 	{#if incoming.length}
 		<section aria-labelledby="requests-heading">
 			<h2 id="requests-heading" class="section-heading">
@@ -112,21 +111,38 @@
 		</section>
 	{/if}
 
-	<section aria-labelledby="public-heading">
-		<div class="section-heading-row">
-			<h2 id="public-heading" class="section-heading">Public profile</h2>
-			<a class="section-heading-link" href="/profile/public">Edit</a>
-		</div>
+	<!-- Your card, as other people see it, and the one way to change it. -->
+	<section class="card" aria-label="Your profile">
+		<ProfileHeader person={me} name={shownName} bio={data.publicProfile.bio} {facts} />
 		{#if filledFields(data.publicProfile.fields).length}
 			<PublicFieldsCard fields={data.publicProfile.fields} label="Your public profile" />
-			<p class="group-note">Anyone on home base can see these, friends or not.</p>
 		{:else}
 			<p class="empty">
 				Add a few things people can see before they’re your friends, like what you’re known for or
-				your favourite local spot. <a href="/profile/public">Fill it in</a>
+				your favourite local spot.
 			</p>
 		{/if}
+		<a class="button-secondary edit" href="/profile/edit">Edit profile</a>
 	</section>
+
+	<ul class="grouped" aria-label="Settings for you">
+		<li>
+			<a class="grouped-row" href="/profile/preferences"
+				><span class="grouped-label"
+					>Preferences<span class="grouped-sub">How home base looks to you</span></span
+				><span class="grouped-chevron"><Icon name="chevron" size={16} /></span></a
+			>
+		</li>
+		<li>
+			<a class="grouped-row" href="/profile/details"
+				><span class="grouped-label"
+					>Details and account<span class="grouped-sub"
+						>Name, pronouns, birthday, email, password</span
+					></span
+				><span class="grouped-chevron"><Icon name="chevron" size={16} /></span></a
+			>
+		</li>
+	</ul>
 
 	<section aria-labelledby="friends-heading">
 		<div class="section-heading-row">
@@ -252,65 +268,17 @@
 		</GlassCard>
 	</section>
 
-	{#if outgoing.length}
-		<section aria-labelledby="sent-heading">
-			<h2 id="sent-heading" class="group-title">Requests you’ve sent</h2>
-			<ul class="grouped">
-				{#each outgoing as request (request.id)}
-					<li class="grouped-row">
-						<span class="grouped-label">
-							{request.name}
-							<span class="grouped-sub">Waiting for them to answer</span>
-						</span>
-						<form method="POST" action="?/cancel" use:enhance>
-							<input type="hidden" name="person" value={request.id} />
-							<button class="button-quiet danger">Cancel</button>
-						</form>
-					</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
-
-	{#if data.links.length}
-		<section aria-labelledby="waiting-heading">
-			<h2 id="waiting-heading" class="group-title">Links waiting to be opened</h2>
-			<ul class="grouped">
-				{#each data.links as link (link.id)}
-					<li class="grouped-row">
-						<span class="grouped-label">
-							Friend link
-							<span class="grouped-sub">Expires {expires(link.expiresAt)}</span>
-						</span>
-						<form method="POST" action="?/revoke" use:enhance>
-							<input type="hidden" name="id" value={link.id} />
-							<button class="button-quiet danger">Cancel</button>
-						</form>
-					</li>
-				{/each}
-			</ul>
-		</section>
-	{/if}
-
-	{#if data.blocked.length}
-		<section aria-labelledby="blocked-heading">
-			<h2 id="blocked-heading" class="group-title">Blocked</h2>
-			<ul class="grouped">
-				{#each data.blocked as person (person.id)}
-					<li class="grouped-row">
-						<span class="grouped-label">{person.name}</span>
-						<form method="POST" action="?/unblock" use:enhance>
-							<input type="hidden" name="id" value={person.id} />
-							<button class="button-quiet">Unblock</button>
-						</form>
-					</li>
-				{/each}
-			</ul>
-			<p class="group-note">
-				Blocked people can’t add you or send postcards. Unblocking doesn’t make you friends again.
-			</p>
-		</section>
-	{/if}
+	<ul class="grouped" aria-label="More about friends">
+		<li>
+			<a class="grouped-row" href="/profile/manage"
+				><span class="grouped-label"
+					>Manage friends<span class="grouped-sub"
+						>{waiting || 'Requests you’ve sent, friend links and blocked people'}</span
+					></span
+				><span class="grouped-chevron"><Icon name="chevron" size={16} /></span></a
+			>
+		</li>
+	</ul>
 </div>
 
 <style>
@@ -441,7 +409,15 @@
 		color: var(--colour-text-muted);
 	}
 
-	.danger {
-		color: var(--colour-danger);
+	/* Your card, then its one button, full width as on an iPhone contact card. */
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-m);
+	}
+
+	.edit {
+		justify-content: center;
+		text-decoration: none;
 	}
 </style>

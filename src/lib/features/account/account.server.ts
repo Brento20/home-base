@@ -57,6 +57,25 @@ export async function getAccountDetails(locals: App.Locals): Promise<AccountDeta
 	};
 }
 
+/**
+ * A form that edits one half of your profile (Edit profile, or Details and account) gets the
+ * other half's fields filled in from what's saved, so parseProfileForm and saveProfile see the
+ * whole profile and nothing is wiped. The photo stays unless the form changes it.
+ */
+export function withSavedDetails(form: FormData, saved: AccountDetails): FormData {
+	const fields: Record<string, string> = {
+		firstName: saved.firstName,
+		lastName: saved.lastName,
+		nickname: saved.nickname,
+		pronouns: saved.pronouns,
+		dateOfBirth: saved.dateOfBirth
+	};
+	for (const [name, value] of Object.entries(fields)) {
+		if (!form.has(name)) form.set(name, value ?? '');
+	}
+	return form;
+}
+
 export function parseProfileForm(form: FormData) {
 	const text = (name: string) => String(form.get(name) ?? '').trim();
 	const values: ProfileValues = {
@@ -104,12 +123,20 @@ export function parseProfileForm(form: FormData) {
 
 const firstLetter = (name: string) => (Array.from(name)[0] ?? '').toUpperCase();
 
-/** Saves the profile, swaps the photo if there's a new one, and marks onboarding done. */
+/** The profile's two halves, for pages that edit one (ProfileForm's `part`). */
+export const PRIVATE_FIELDS = ['firstName', 'lastName', 'pronouns', 'dateOfBirth'] as const;
+
+/**
+ * Saves the profile, swaps the photo if there's a new one, and marks onboarding done. `part`
+ * limits it to one half: 'profile' (photo, nickname, colour, the line about you) leaves the
+ * private columns alone, so a missing birthday can't block it; 'details' leaves the photo.
+ */
 export async function saveProfile(
 	locals: App.Locals,
 	values: ProfileValues,
 	photo: File | null,
-	removePhoto: boolean
+	removePhoto: boolean,
+	part: 'all' | 'profile' | 'details' = 'all'
 ): Promise<{ photoError?: string }> {
 	const { supabase, user } = locals;
 	if (!supabase || !user) {
@@ -119,7 +146,15 @@ export async function saveProfile(
 			: removePhoto
 				? null
 				: sampleProfiles[0].avatarUrl;
-		Object.assign(sampleAccount, values, { avatarUrl: sampleAvatar });
+		const kept =
+			part === 'profile'
+				? Object.fromEntries(
+						Object.entries(values).filter(
+							([key]) => !(PRIVATE_FIELDS as readonly string[]).includes(key)
+						)
+					)
+				: values;
+		Object.assign(sampleAccount, kept, { avatarUrl: sampleAvatar });
 		Object.assign(sampleProfiles[0], {
 			...(values.accentColour ? { accentColour: values.accentColour } : {}),
 			displayName: values.nickname,
@@ -152,11 +187,15 @@ export async function saveProfile(
 	const { error: saveError } = await supabase
 		.from('profiles')
 		.update({
-			first_name: values.firstName,
-			last_name: values.lastName,
+			...(part !== 'profile'
+				? {
+						first_name: values.firstName,
+						last_name: values.lastName,
+						pronouns: values.pronouns,
+						date_of_birth: values.dateOfBirth
+					}
+				: {}),
 			nickname: values.nickname,
-			pronouns: values.pronouns,
-			date_of_birth: values.dateOfBirth,
 			display_name: values.nickname,
 			initials: firstLetter(values.nickname),
 			avatar_path: avatarPath,

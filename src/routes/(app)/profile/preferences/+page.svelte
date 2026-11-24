@@ -1,0 +1,30 @@
+<script lang="ts">
+	/**
+	 * Preferences: how home base looks to you, and only you (your housemates keep their own).
+	 * Everything here saves as you tap.
+	 */
+	import AppearanceSettings from '#lib/features/account/AppearanceSettings.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+</script>
+
+<svelte:head>
+	<title>Preferences · home base</title>
+</svelte:head>
+
+<PageHeader title="Preferences">
+	{#snippet lead()}
+		<a class="button-quiet" href="/profile"><Icon name="back" size={18} /> You &amp; friends</a>
+	{/snippet}
+</PageHeader>
+
+<p class="explain">Just for you: your housemates keep their own. Changes save as you tap.</p>
+
+<AppearanceSettings />
+
+<style>
+	.explain {
+		margin: 0 0 var(--space-l);
+		color: var(--colour-text-muted);
+	}
+</style>

@@ -46,7 +46,7 @@ export function redirectFor(stage: Stage, routeId: string | null): string | null
 	if (routeId.startsWith('/account/') || routeId.startsWith('/avatars/')) return null;
 
 	if (routeId === '/(setup)/setup/profile') {
-		if (stage === 'ready') return '/home/profile';
+		if (stage === 'ready') return '/profile/details';
 		return null;
 	}
 

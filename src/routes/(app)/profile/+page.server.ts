@@ -5,15 +5,12 @@ import {
 	createFriendLink,
 	listBlocked,
 	listFriendLinks,
-	listFriends,
-	revokeFriendLink,
-	unblockPerson
+	listFriends
 } from '#lib/features/friends/friends.server.js';
 import { listRecentPostcards } from '#lib/features/friends/postcards.server.js';
 import { getMyPublicProfile } from '#lib/features/friends/public-profile.server.js';
 import {
 	answerRequest,
-	cancelRequest,
 	getFriendCode,
 	listRequests,
 	resetFriendCode,
@@ -33,7 +30,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 			listRequests(locals),
 			getFriendCode(locals)
 		]);
-	return { account, friends, links, blocked, postcards, publicProfile, requests, code };
+	// What's waiting in Manage friends, for its row (the lists themselves live there).
+	const manage = {
+		sent: requests.filter((request) => !request.incoming).length,
+		links: links.length,
+		blocked: blocked.length
+	};
+	return { account, friends, manage, postcards, publicProfile, requests, code };
 };
 
 const field = async (request: Request, name: string) =>
@@ -61,11 +64,6 @@ export const actions: Actions = {
 		if (message) return fail(400, { answer: { message } });
 	},
 
-	cancel: async ({ request, locals }) => {
-		const { message } = await cancelRequest(locals, await field(request, 'person'));
-		if (message) return fail(400, { answer: { message } });
-	},
-
 	/** A new friend code; the old one stops working at once. */
 	newCode: async ({ locals }) => {
 		await resetFriendCode(locals);
@@ -77,21 +75,5 @@ export const actions: Actions = {
 		const { token, message } = await createFriendLink(locals);
 		if (!token) return fail(400, { link: { url: null, message } });
 		return { link: { url: friendLink(url.origin, token), message: null } };
-	},
-
-	revoke: async ({ request, locals }) => {
-		const { message } = await revokeFriendLink(
-			locals,
-			String((await request.formData()).get('id') ?? '')
-		);
-		if (message) return fail(400, { revoke: { message } });
-	},
-
-	unblock: async ({ request, locals }) => {
-		const { message } = await unblockPerson(
-			locals,
-			String((await request.formData()).get('id') ?? '')
-		);
-		if (message) return fail(400, { unblock: { message } });
 	}
 };

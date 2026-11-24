@@ -1,6 +1,9 @@
 <script lang="ts">
 	/**
-	 * The profile form, used during sign-up and from Home › Edit your profile.
+	 * The profile form: all of it while signing up, and in two halves afterwards. `part`
+	 * "profile" is what others see (photo, nickname, colour: You & friends › Edit profile);
+	 * "details" is what's private (names, pronouns, birthday: Details and account). The page
+	 * saving a half fills in the other from what's saved (`withSavedDetails`).
 	 * The chosen photo is shrunk in the browser before it's sent.
 	 */
 	import { enhance } from '$app/forms';
@@ -29,6 +32,8 @@
 		 * (colour → nickname). Off while signing up: a colour is given on joining a home.
 		 */
 		housemateColours?: Record<string, string> | null;
+		/** Which fields: everything (signing up), what others see, or the private ones. */
+		part?: 'all' | 'profile' | 'details';
 	}
 
 	let {
@@ -41,8 +46,12 @@
 		showActions = true,
 		showEmail = true,
 		saving = $bindable(false),
-		housemateColours = null
+		housemateColours = null,
+		part = 'all'
 	}: Props = $props();
+
+	const showProfile = $derived(part !== 'details');
+	const showDetails = $derived(part !== 'profile');
 
 	const start = $derived(values ?? account);
 	let photo = $state<File | null>(null);
@@ -98,148 +107,163 @@
 		};
 	}}
 >
-	<div class="photo">
-		<Avatar
-			person={{
-				displayName: nickname,
-				initials: initial,
-				accentColour: housemateColours ? colour : 'var(--colour-accent)',
-				avatarUrl: shownAvatar
-			}}
-			size={88}
-		/>
-		<div class="photo-actions">
-			<label class="button-secondary photo-pick">
-				{shownAvatar ? 'Change photo' : 'Add a photo'}
-				<input
-					bind:this={fileInput}
-					type="file"
-					name="photo"
-					accept="image/jpeg,image/png,image/webp,image/heic"
-					onchange={choose}
-				/>
-			</label>
-			{#if shownAvatar}
-				<button type="button" class="button-quiet" onclick={clearPhoto}>Remove</button>
+	{#if showProfile}
+		<div class="photo">
+			<Avatar
+				person={{
+					displayName: nickname,
+					initials: initial,
+					accentColour: housemateColours ? colour : 'var(--colour-accent)',
+					avatarUrl: shownAvatar
+				}}
+				size={88}
+			/>
+			<div class="photo-actions">
+				<label class="button-secondary photo-pick">
+					{shownAvatar ? 'Change photo' : 'Add a photo'}
+					<input
+						bind:this={fileInput}
+						type="file"
+						name="photo"
+						accept="image/jpeg,image/png,image/webp,image/heic"
+						onchange={choose}
+					/>
+				</label>
+				{#if shownAvatar}
+					<button type="button" class="button-quiet" onclick={clearPhoto}>Remove</button>
+				{/if}
+			</div>
+			{#if removePhoto}<input type="hidden" name="removePhoto" value="on" />{/if}
+			{#if photoProblem ?? errors.photo}
+				<span class="field-error">{photoProblem ?? errors.photo}</span>
 			{/if}
 		</div>
-		{#if removePhoto}<input type="hidden" name="removePhoto" value="on" />{/if}
-		{#if photoProblem ?? errors.photo}
-			<span class="field-error">{photoProblem ?? errors.photo}</span>
-		{/if}
-	</div>
-
-	<div class="field-row">
-		<label class="field">
-			<span class="field-label">First name</span>
-			<input
-				class="field-input"
-				name="firstName"
-				autocomplete="given-name"
-				value={start.firstName}
-				maxlength="40"
-				required
-				aria-invalid={errors.firstName ? 'true' : undefined}
-			/>
-			{#if errors.firstName}<span class="field-error">{errors.firstName}</span>{/if}
-		</label>
-		<label class="field">
-			<span class="field-label">Last name</span>
-			<input
-				class="field-input"
-				name="lastName"
-				autocomplete="family-name"
-				value={start.lastName}
-				maxlength="40"
-				required
-				aria-invalid={errors.lastName ? 'true' : undefined}
-			/>
-			{#if errors.lastName}<span class="field-error">{errors.lastName}</span>{/if}
-		</label>
-	</div>
-
-	<label class="field">
-		<span class="field-label">Nickname</span>
-		<input
-			class="field-input"
-			name="nickname"
-			autocomplete="nickname"
-			bind:value={nickname}
-			maxlength="24"
-			required
-			aria-invalid={errors.nickname ? 'true' : undefined}
-		/>
-		{#if errors.nickname}<span class="field-error">{errors.nickname}</span>
-		{:else}<span class="field-hint">What everyone in your home sees.</span>{/if}
-	</label>
-
-	{#if housemateColours}
-		<fieldset class="field colours">
-			<legend class="field-label">Your colour</legend>
-			<div class="swatches">
-				{#each AVATAR_COLOURS as option (option.hex)}
-					{@const wornBy = housemateColours[option.hex]}
-					<label class="swatch" class:on={colour === option.hex}>
-						<input
-							class="hidden-input"
-							type="radio"
-							name="accentColour"
-							value={option.hex}
-							checked={colour === option.hex}
-							onchange={() => (colour = option.hex)}
-							aria-label="{option.name}{wornBy ? `, ${wornBy}'s colour` : ''}"
-						/>
-						<span class="swatch-colour" style:--swatch={option.hex}
-							>{#if colour === option.hex}<Icon name="check" size={16} />{/if}</span
-						>
-						<span class="swatch-name">{wornBy ?? option.name}</span>
-					</label>
-				{/each}
-			</div>
-			{#if errors.accentColour}<span class="field-error">{errors.accentColour}</span>
-			{:else}<span class="field-hint"
-					>Your avatar, your rings on tasks and lists, and your score. Under a colour is who already
-					wears it.</span
-				>{/if}
-		</fieldset>
 	{/if}
 
-	<div class="field-row">
+	{#if showDetails}
+		<div class="field-row">
+			<label class="field">
+				<span class="field-label">First name</span>
+				<input
+					class="field-input"
+					name="firstName"
+					autocomplete="given-name"
+					value={start.firstName}
+					maxlength="40"
+					required
+					aria-invalid={errors.firstName ? 'true' : undefined}
+				/>
+				{#if errors.firstName}<span class="field-error">{errors.firstName}</span>{/if}
+			</label>
+			<label class="field">
+				<span class="field-label">Last name</span>
+				<input
+					class="field-input"
+					name="lastName"
+					autocomplete="family-name"
+					value={start.lastName}
+					maxlength="40"
+					required
+					aria-invalid={errors.lastName ? 'true' : undefined}
+				/>
+				{#if errors.lastName}<span class="field-error">{errors.lastName}</span>{/if}
+			</label>
+		</div>
+	{/if}
+
+	{#if showProfile}
 		<label class="field">
-			<span class="field-label">Pronouns</span>
+			<span class="field-label">Nickname</span>
 			<input
 				class="field-input"
-				name="pronouns"
-				list="pronoun-options"
-				value={start.pronouns}
+				name="nickname"
+				autocomplete="nickname"
+				bind:value={nickname}
 				maxlength="24"
-				placeholder="Optional"
-				autocapitalize="off"
-				aria-invalid={errors.pronouns ? 'true' : undefined}
-			/>
-			<datalist id="pronoun-options">
-				<option value="she/her"></option>
-				<option value="he/him"></option>
-				<option value="they/them"></option>
-			</datalist>
-			{#if errors.pronouns}<span class="field-error">{errors.pronouns}</span>{/if}
-		</label>
-		<label class="field">
-			<span class="field-label">Date of birth</span>
-			<input
-				class="field-input"
-				name="dateOfBirth"
-				type="date"
-				autocomplete="bday"
-				value={start.dateOfBirth}
-				min="1900-01-01"
-				max={today}
 				required
-				aria-invalid={errors.dateOfBirth ? 'true' : undefined}
+				aria-invalid={errors.nickname ? 'true' : undefined}
 			/>
-			{#if errors.dateOfBirth}<span class="field-error">{errors.dateOfBirth}</span>{/if}
+			{#if errors.nickname}<span class="field-error">{errors.nickname}</span>
+			{:else}<span class="field-hint"
+					>{part === 'profile'
+						? 'The name everyone sees: your home, your friends and people on a plan with you.'
+						: 'What everyone in your home sees.'}</span
+				>{/if}
 		</label>
-	</div>
+
+		{#if housemateColours}
+			<fieldset class="field colours">
+				<legend class="field-label">Your colour</legend>
+				<div class="swatches">
+					{#each AVATAR_COLOURS as option (option.hex)}
+						{@const wornBy = housemateColours[option.hex]}
+						<label class="swatch" class:on={colour === option.hex}>
+							<input
+								class="hidden-input"
+								type="radio"
+								name="accentColour"
+								value={option.hex}
+								checked={colour === option.hex}
+								onchange={() => (colour = option.hex)}
+								aria-label="{option.name}{wornBy ? `, ${wornBy}'s colour` : ''}"
+							/>
+							<span class="swatch-colour" style:--swatch={option.hex}
+								>{#if colour === option.hex}<Icon name="check" size={16} />{/if}</span
+							>
+							<span class="swatch-name">{wornBy ?? option.name}</span>
+						</label>
+					{/each}
+				</div>
+				{#if errors.accentColour}<span class="field-error">{errors.accentColour}</span>
+				{:else}<span class="field-hint"
+						>Your avatar, your rings on tasks and lists, and your score. Under a colour is who
+						already wears it.</span
+					>{/if}
+			</fieldset>
+		{/if}
+	{/if}
+
+	{#if showDetails}
+		<div class="field-row">
+			<label class="field">
+				<span class="field-label">Pronouns</span>
+				<input
+					class="field-input"
+					name="pronouns"
+					list="pronoun-options"
+					value={start.pronouns}
+					maxlength="24"
+					placeholder="Optional"
+					autocapitalize="off"
+					aria-invalid={errors.pronouns ? 'true' : undefined}
+				/>
+				<datalist id="pronoun-options">
+					<option value="she/her"></option>
+					<option value="he/him"></option>
+					<option value="they/them"></option>
+				</datalist>
+				{#if errors.pronouns}<span class="field-error">{errors.pronouns}</span>{/if}
+			</label>
+			<label class="field">
+				<span class="field-label">Date of birth</span>
+				<input
+					class="field-input"
+					name="dateOfBirth"
+					type="date"
+					autocomplete="bday"
+					value={start.dateOfBirth}
+					min="1900-01-01"
+					max={today}
+					required
+					aria-invalid={errors.dateOfBirth ? 'true' : undefined}
+				/>
+				{#if errors.dateOfBirth}<span class="field-error">{errors.dateOfBirth}</span>{/if}
+			</label>
+		</div>
+		{#if part === 'details'}
+			<p class="field-hint private">Only you and your home see these.</p>
+		{/if}
+	{/if}
 
 	{#if showEmail}<p class="email">Signed up as {account.email}</p>{/if}
 

@@ -437,11 +437,14 @@ test('Friends and postcards: profile, friends, a friend link, a postcard and a r
 	await open(page, '/home');
 	await page.getByRole('link', { name: 'You: your profile and friends' }).click();
 	await expect(page).toHaveURL(/\/profile$/);
-	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You');
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You & friends');
 	await expect(page.locator('.friend', { hasText: 'Sam' })).toContainText('The Terrace');
 
-	// Your public profile: a line about you and a few answers, shown at the top of your profile.
-	await page.locator('a[href="/profile/public"]').first().click();
+	// Edit profile: what others see, the public answers included, shown on your card.
+	await page.getByRole('link', { name: 'Edit profile' }).click();
+	await expect(page.getByLabel('Nickname')).toBeVisible();
+	await expect(page.getByLabel('First name')).toHaveCount(0); // private: under Details
+	await expect(page.getByLabel('Pronouns')).toHaveCount(0);
 	await page.getByLabel('About you').fill(`Waters plants ${run}`);
 	await page.getByLabel('Known for').fill(`Lasagne ${run}`);
 	await page.getByRole('button', { name: 'Save', exact: true }).click();
@@ -457,11 +460,16 @@ test('Friends and postcards: profile, friends, a friend link, a postcard and a r
 	const other = await context.newPage();
 	await open(other, new URL(link).pathname);
 	await expect(other.getByRole('heading', { level: 1 })).toHaveText('This is your friend link');
+	// Links waiting to be opened are under Manage friends.
+	await page.getByRole('link', { name: /Manage friends/ }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Manage friends');
 	await page.getByRole('button', { name: 'Cancel' }).first().click();
+	await expect(page.getByText('Links waiting to be opened')).toHaveCount(0);
 	await open(other, new URL(link).pathname);
 	await expect(other.getByRole('heading', { level: 1 })).toHaveText('This friend link has run out');
 
 	// A friend's page, and a postcard to their home.
+	await open(page, '/profile');
 	await page.locator('.friend', { hasText: 'Sam' }).click();
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sam');
 	await expect(page.locator('.profile-header')).toContainText('Fig tree custodian');
@@ -610,6 +618,44 @@ test('Plan invites: answer for yourself, see who is going, invite a friend, add 
 	expect(errors).toEqual([]);
 });
 
+test('You & friends: Edit profile, Preferences, Details and account, and old links', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/profile');
+	await expect(page.getByRole('link', { name: 'Edit details' })).toHaveCount(0);
+
+	// Preferences: Appearance, which saves as you tap.
+	await page.getByRole('link', { name: /Preferences/ }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Preferences');
+	await expect(page.getByRole('radiogroup', { name: 'Light or dark' })).toBeVisible();
+	await page.getByRole('link', { name: 'You & friends' }).click();
+
+	// Details and account: the private half saves without touching the nickname.
+	await page.getByRole('link', { name: /Details and account/ }).click();
+	await expect(page.getByLabel('Nickname')).toHaveCount(0);
+	await page.getByLabel('Pronouns').fill('he/him');
+	await page.getByLabel('Date of birth').fill('1990-05-14');
+	await page.getByRole('button', { name: 'Save', exact: true }).click();
+	await expect(page).toHaveURL(/\/profile$/);
+	const nickname = await page
+		.locator('.profile-header h1, .profile-header .name')
+		.first()
+		.textContent();
+	expect(nickname?.trim()).toBeTruthy();
+	// Pronouns are private: not on your card.
+	await expect(page.locator('.profile-header')).not.toContainText('he/him');
+	await page.getByRole('link', { name: /Details and account/ }).click();
+	await expect(page.getByLabel('Pronouns')).toHaveValue('he/him');
+
+	// Old addresses land on the new pages.
+	await open(page, '/home/profile');
+	await expect(page).toHaveURL(/\/profile\/details$/);
+	await open(page, '/profile/public');
+	await expect(page).toHaveURL(/\/profile\/edit$/);
+	expect(errors).toEqual([]);
+});
+
 test('Friend requests: a dot on Home, accept one, send by code, send from a profile, cancel', async ({
 	page
 }) => {
@@ -638,6 +684,8 @@ test('Friend requests: a dot on Home, accept one, send by code, send from a prof
 	const status = page.getByRole('status');
 	await expect(status).toContainText(/Request sent to Alex|You and Alex are friends now/);
 	if ((await status.textContent())?.includes('Request sent')) {
+		// Requests you've sent are under Manage friends.
+		await page.getByRole('link', { name: /Manage friends/ }).click();
 		const sent = page.locator('.grouped-row', { hasText: 'Waiting for them to answer' });
 		await expect(sent).toContainText('Alex');
 		await sent.getByRole('button', { name: 'Cancel' }).click();
