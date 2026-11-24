@@ -51,7 +51,7 @@
 	use:drift
 ></div>
 
-<TabBar />
+<TabBar homeDot={data.requestsWaiting} />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->
 <AppGestures />
 

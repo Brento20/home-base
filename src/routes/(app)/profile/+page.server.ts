@@ -11,21 +11,67 @@ import {
 } from '#lib/features/friends/friends.server.js';
 import { listRecentPostcards } from '#lib/features/friends/postcards.server.js';
 import { getMyPublicProfile } from '#lib/features/friends/public-profile.server.js';
+import {
+	answerRequest,
+	cancelRequest,
+	getFriendCode,
+	listRequests,
+	resetFriendCode,
+	sendRequestByCode
+} from '#lib/features/friends/requests.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const [account, friends, links, blocked, postcards, publicProfile] = await Promise.all([
-		getAccountDetails(locals),
-		listFriends(locals),
-		listFriendLinks(locals),
-		listBlocked(locals),
-		listRecentPostcards(locals, 5),
-		getMyPublicProfile(locals)
-	]);
-	return { account, friends, links, blocked, postcards, publicProfile };
+	const [account, friends, links, blocked, postcards, publicProfile, requests, code] =
+		await Promise.all([
+			getAccountDetails(locals),
+			listFriends(locals),
+			listFriendLinks(locals),
+			listBlocked(locals),
+			listRecentPostcards(locals, 5),
+			getMyPublicProfile(locals),
+			listRequests(locals),
+			getFriendCode(locals)
+		]);
+	return { account, friends, links, blocked, postcards, publicProfile, requests, code };
 };
 
+const field = async (request: Request, name: string) =>
+	String((await request.formData()).get(name) ?? '');
+
 export const actions: Actions = {
+	/** A request to whoever has the code typed in. */
+	requestCode: async ({ request, locals }) => {
+		const code = await field(request, 'code');
+		const { result, name, message } = await sendRequestByCode(locals, code);
+		if (!result) return fail(400, { byCode: { code, message, done: null } });
+		const done =
+			result === 'friends' ? `You and ${name} are friends now.` : `Request sent to ${name}.`;
+		return { byCode: { code: '', message: null, done } };
+	},
+
+	/** Yes or no to a request waiting on you. */
+	answer: async ({ request, locals }) => {
+		const form = await request.formData();
+		const { message } = await answerRequest(
+			locals,
+			String(form.get('person') ?? ''),
+			form.get('accept') === 'yes'
+		);
+		if (message) return fail(400, { answer: { message } });
+	},
+
+	cancel: async ({ request, locals }) => {
+		const { message } = await cancelRequest(locals, await field(request, 'person'));
+		if (message) return fail(400, { answer: { message } });
+	},
+
+	/** A new friend code; the old one stops working at once. */
+	newCode: async ({ locals }) => {
+		await resetFriendCode(locals);
+		return { newCode: true };
+	},
+
 	/** A new friend link. Its token is shown once, here; the database keeps only a hash. */
 	link: async ({ locals, url }) => {
 		const { token, message } = await createFriendLink(locals);

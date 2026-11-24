@@ -93,9 +93,21 @@
 			</form>
 
 			{#each homes as home (home.name)}
-				<h3 class="group-title home-title">
-					{home.name}{home.host ? (plan.invitedBy ? ' · their plan' : ' · your plan') : ''}
-				</h3>
+				<div class="home-row">
+					<h3 class="group-title home-title">
+						{home.name}{home.host ? (plan.invitedBy ? ' · their plan' : ' · your plan') : ''}
+					</h3>
+					{#if !plan.invitedBy && !home.host}
+						<form method="POST" action="?/uninvite" use:enhance>
+							<input
+								type="hidden"
+								name="home"
+								value={plan.guestHomes?.find((each) => each.name === home.name)?.id}
+							/>
+							<button class="button-quiet uninvite">Uninvite</button>
+						</form>
+					{/if}
+				</div>
 				<ul class="grouped">
 					{#each home.people as person (person.id)}
 						<li class="grouped-row guest">
@@ -120,15 +132,6 @@
 								<form method="POST" action="?/addFriend" use:enhance>
 									<input type="hidden" name="person" value={person.id} />
 									<button class="button-quiet add">Add friend</button>
-								</form>
-							{:else if !plan.invitedBy && !home.host && person === home.people[0]}
-								<form method="POST" action="?/uninvite" use:enhance>
-									<input
-										type="hidden"
-										name="home"
-										value={plan.guestHomes?.find((each) => each.name === home.name)?.id}
-									/>
-									<button class="button-quiet uninvite">Uninvite home</button>
 								</form>
 							{/if}
 						</li>
@@ -182,7 +185,7 @@
 		</section>
 	{/if}
 
-	{#if plan.postId}
+	{#if plan.postId && !plan.invitedBy}
 		<a class="from-post" href="/feed/{plan.postId}">
 			<Icon name="compose" size={20} />
 			<span class="from-post-text">
@@ -355,8 +358,15 @@
 		box-shadow: none;
 	}
 
-	.home-title {
+	.home-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
 		margin-top: var(--space-m);
+	}
+
+	.home-title {
+		margin-bottom: 8px;
 	}
 
 	.guest {

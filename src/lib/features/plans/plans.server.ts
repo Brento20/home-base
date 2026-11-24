@@ -259,6 +259,10 @@ export async function listPlansBetween(
 	return ((data ?? []) as unknown as PlanRow[]).map((row) => toPlan(row, you));
 }
 
+/** Leaves out plans another home invited you to that you've said you're not going to. */
+export const plansYoureIn = (plans: Plan[]) =>
+	plans.filter((plan) => !(plan.invitedBy && plan.myResponse === 'not_going'));
+
 /**
  * What's still on, soonest first: an all-day plan counts for its whole day, a timed plan
  * until it ends (or 30 minutes after it starts when it has no end time).

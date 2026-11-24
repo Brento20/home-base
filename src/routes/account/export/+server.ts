@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { getAccountDetails } from '#lib/features/account/account.server.js';
 import { listBlocked, listFriends } from '#lib/features/friends/friends.server.js';
+import { getMyPublicProfile } from '#lib/features/friends/public-profile.server.js';
+import { getFriendCode, listRequests } from '#lib/features/friends/requests.server.js';
 import { getHousehold } from '#lib/features/household/household.server.js';
 import { listNotes } from '#lib/features/notes/notes.server.js';
 import { todayISO } from '#lib/time.js';
@@ -31,18 +33,28 @@ const TABLES = [
 	'feed_replies',
 	'feed_reactions',
 	'postcards',
+	'postcard_reactions',
+	'postcard_replies',
+	'plan_invites',
+	'plan_responses',
 	'sitter_links'
 ] as const;
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user && !locals.sampleMode) error(401, 'Sign in to download your data.');
 
-	const [account, notes, friends, blocked] = await Promise.all([
-		getAccountDetails(locals),
-		locals.householdId || locals.sampleMode ? listNotes(locals) : [],
-		listFriends(locals),
-		listBlocked(locals)
-	]);
+	const [account, publicProfile, notes, friends, blocked, requests, friendCode] = await Promise.all(
+		[
+			getAccountDetails(locals),
+			getMyPublicProfile(locals),
+			locals.householdId || locals.sampleMode ? listNotes(locals) : [],
+			listFriends(locals),
+			listBlocked(locals),
+			listRequests(locals),
+			// No code yet for someone who hasn't finished their profile.
+			getFriendCode(locals).catch(() => null)
+		]
+	);
 
 	const home =
 		locals.householdId || locals.sampleMode
@@ -71,9 +83,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const body = {
 		exportedAt: new Date().toISOString(),
 		account,
+		publicProfile,
 		home,
 		friends: friends.map(({ name, homeName, friendsSince }) => ({ name, homeName, friendsSince })),
 		blocked: blocked.map(({ name }) => name),
+		friendCode,
+		friendRequests: requests.map(({ name, incoming, createdAt }) => ({
+			name,
+			direction: incoming ? 'received' : 'sent',
+			createdAt
+		})),
 		notes: notes.map(({ title, body, isSecret, updatedAt, locked }) => ({
 			title,
 			body: locked ? null : body,

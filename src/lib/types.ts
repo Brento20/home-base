@@ -334,4 +334,21 @@ export interface PublicProfile {
 	isYou: boolean;
 	isFriend: boolean;
 	sharesHome: boolean;
+	/** You've asked them to be friends, and they haven't answered. */
+	requestSent: boolean;
+	/** They've asked you. */
+	requestReceived: boolean;
+}
+
+/** A friend request, sent or received (src/lib/features/friends/requests.server.ts). */
+export interface FriendRequest {
+	/** The other person. */
+	id: string;
+	name: string;
+	initials: string;
+	colour: string;
+	homeName: string | null;
+	/** True when it's waiting on you. */
+	incoming: boolean;
+	createdAt: string;
 }

@@ -502,7 +502,9 @@ test('Plan invites: answer for yourself, see who is going, invite a friend, add 
 		await alex.locator('.guest-link').click();
 		await expect(page).toHaveURL(/\/people\/sample-alex$/);
 		await expect(page.locator('.public-fields')).toContainText('Pub trivia');
-		await expect(page.getByText('You’re not friends yet')).toBeVisible();
+		await expect(
+			page.getByRole('button', { name: /Send friend request|Cancel request|Accept/ })
+		).toBeVisible();
 		await page.goBack();
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Trivia night');
 	}
@@ -513,5 +515,56 @@ test('Plan invites: answer for yourself, see who is going, invite a friend, add 
 		await open(page, '/profile');
 		await expect(page.locator('.friend', { hasText: 'Alex' })).toBeVisible();
 	}
+	expect(errors).toEqual([]);
+});
+
+test('Friend requests: a dot on Home, accept one, send by code, send from a profile, cancel', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+
+	// Jo asked to be friends: a dot on the Home tab, and the request at the top of your profile.
+	await open(page, '/home');
+	const jo = page.locator('.request', { hasText: 'Jo' });
+	if (await page.getByRole('img', { name: /friend request/ }).count()) {
+		await page.getByRole('link', { name: 'You: your profile and friends' }).click();
+		await expect(jo).toContainText('The Terrace');
+		await jo.getByRole('button', { name: 'Accept' }).click();
+		await expect(page.locator('.friend', { hasText: 'Jo' })).toBeVisible();
+		await expect(page.getByRole('img', { name: /friend request/ })).toHaveCount(0);
+	}
+
+	// Their code, typed loosely: lower case, no dash.
+	await open(page, '/profile');
+	await expect(page.locator('.code')).toHaveText(/^[A-Z2-9]{3}-[A-Z2-9]{3}$/);
+	await page.getByLabel('Their friend code').fill('nope');
+	await page.getByRole('button', { name: 'Send request' }).click();
+	await expect(page.getByRole('alert')).toContainText('six letters and numbers');
+	await page.getByLabel('Their friend code').fill('alx7kp');
+	await page.getByRole('button', { name: 'Send request' }).click();
+	// Alex may be a friend already (the plan invites journey can add him): then it says so.
+	const status = page.getByRole('status');
+	await expect(status).toContainText(/Request sent to Alex|You and Alex are friends now/);
+	if ((await status.textContent())?.includes('Request sent')) {
+		const sent = page.locator('.grouped-row', { hasText: 'Waiting for them to answer' });
+		await expect(sent).toContainText('Alex');
+		await sent.getByRole('button', { name: 'Cancel' }).click();
+		await expect(sent).toHaveCount(0);
+
+		// From Alex's public profile: send, then cancel.
+		await open(page, '/people/sample-alex');
+		await page.getByRole('button', { name: 'Send friend request' }).click();
+		await expect(
+			page.getByText('Request sent. You’ll be friends once Alex accepts.')
+		).toBeVisible();
+		await page.getByRole('button', { name: 'Cancel request' }).click();
+		await expect(page.getByRole('button', { name: 'Send friend request' })).toBeVisible();
+	}
+
+	// A new code replaces the old one.
+	await open(page, '/profile');
+	const before = await page.locator('.code').textContent();
+	await page.getByRole('button', { name: 'New code' }).click();
+	await expect(page.locator('.code')).not.toHaveText(before ?? '');
 	expect(errors).toEqual([]);
 });

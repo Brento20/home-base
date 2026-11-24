@@ -1,15 +1,16 @@
 <script lang="ts">
 	/**
 	 * Someone's public profile, for people who aren't friends yet: what they've chosen to share
-	 * with anyone. Becoming friends takes a friend link, or going to a plan together.
+	 * with anyone, and a friend request: send one, or answer theirs.
 	 */
+	import { enhance } from '$app/forms';
 	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	const person = $derived(data.person);
 	const facts = $derived([
 		...(person.homeName ? [{ icon: 'home' as const, text: person.homeName }] : []),
@@ -43,10 +44,28 @@
 	/>
 	<PublicFieldsCard fields={person.fields} label="About {person.name}" />
 	{#if !person.sharesHome}
-		<p class="explain">
-			You’re not friends yet. Ask {person.name} for a friend link, or go to a plan together and add each
-			other afterwards.
-		</p>
+		<section class="friendship" aria-label="Friend request">
+			{#if person.requestReceived}
+				<p class="explain">{person.name} wants to be friends.</p>
+				<form class="answer" method="POST" action="?/answer" use:enhance>
+					<button class="button-secondary" name="accept" value="no">Decline</button>
+					<button class="button-primary" name="accept" value="yes">Accept</button>
+				</form>
+			{:else if person.requestSent}
+				<p class="explain">Request sent. You’ll be friends once {person.name} accepts.</p>
+				<form method="POST" action="?/cancel" use:enhance>
+					<button class="button-quiet danger">Cancel request</button>
+				</form>
+			{:else}
+				<form method="POST" action="?/request" use:enhance>
+					<button class="button-primary button-block">Send friend request</button>
+				</form>
+				<p class="hint">
+					Friends see your photo, can send postcards to your home, and can invite you to plans.
+				</p>
+			{/if}
+			{#if form?.message}<p class="field-error" role="alert">{form.message}</p>{/if}
+		</section>
 	{/if}
 </div>
 
@@ -57,7 +76,30 @@
 		gap: var(--space-l);
 	}
 
+	.friendship {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-s);
+	}
+
+	.answer {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+	}
+
 	.explain {
 		color: var(--colour-text-muted);
+	}
+
+	.hint {
+		font-size: var(--text-caption);
+		color: var(--colour-text-faint);
+	}
+
+	.danger {
+		align-self: flex-start;
+		padding-left: 0;
+		color: var(--colour-danger);
 	}
 </style>

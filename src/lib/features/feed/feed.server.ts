@@ -67,8 +67,6 @@ const toPost = (row: PostRow): FeedPost => ({
 	}))
 });
 
-/** The signed-in person's id (sample mode: the first sample person). */
-
 /**
  * The newest `limit` items (or the `limit` before the `before` time), and whether there are
  * older ones still. Postcards from friends (src/lib/features/friends/postcards.server.ts) are

@@ -37,6 +37,10 @@
 	full
 />
 
+{#if !data.mine && from.profileId}
+	<a class="sender" href="/people/{from.profileId}">See {from.name}’s profile</a>
+{/if}
+
 {#if data.canSendBack}
 	<a class="button-secondary button-block send-back" href="/postcards/new?to={from.profileId}">
 		<Icon name="compose" size={18} /> Send one back
@@ -68,6 +72,13 @@
 {/if}
 
 <style>
+	.sender {
+		display: inline-block;
+		margin-top: var(--space-s);
+		font-size: var(--text-small);
+		color: var(--colour-accent);
+	}
+
 	.send-back {
 		display: flex;
 		align-items: center;

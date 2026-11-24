@@ -2,7 +2,7 @@ import { fail, type Cookies } from '@sveltejs/kit';
 import { listGroups } from '#lib/features/expenses/expenses.server.js';
 import { FEED_PAGE, hasAnyPost, listFeed } from '#lib/features/feed/feed.server.js';
 import { listActiveLists } from '#lib/features/lists/lists.server.js';
-import { listUpcomingPlans, pickComingUp } from '#lib/features/plans/plans.server.js';
+import { listUpcomingPlans, pickComingUp, plansYoureIn } from '#lib/features/plans/plans.server.js';
 import { getScores } from '#lib/features/points/points.server.js';
 import { completeTask, listTasksComingUp, reopenTask } from '#lib/features/tasks/tasks.server.js';
 import { mergeComingUp } from '#lib/features/today/coming-up.js';
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, parent, cookies, depends, i
 
 	const starting = !cookies.get(START_COOKIE);
 	const screen = (async () => {
-		const [plans, tasks, lists, scores, groups, posted, { household }] = await Promise.all([
+		const [allPlans, tasks, lists, scores, groups, posted, { household }] = await Promise.all([
 			listUpcomingPlans(locals, 20),
 			listTasksComingUp(locals),
 			listActiveLists(locals),
@@ -34,6 +34,8 @@ export const load: PageServerLoad = async ({ locals, parent, cookies, depends, i
 			starting ? hasAnyPost(locals) : true,
 			parent()
 		]);
+		// Invites you've said no to stay in Plans, but not on Today or in the line under the date.
+		const plans = plansYoureIn(allPlans);
 		const week = weekSummary(locals, plans, tasks, groups, household.members);
 
 		// First things for a new home, from what's already loaded. Once they're done (or the

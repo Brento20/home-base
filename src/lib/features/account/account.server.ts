@@ -3,14 +3,15 @@ import { avatarUrl } from '#lib/features/household/household.server.js';
 import { sampleAccount, sampleProfiles } from '#lib/server/sample-data.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
 import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
+import { photoExtension, PHOTO_TYPES, toBase64 } from '#lib/features/feed/photo-rules.js';
 import { BIO_MAX } from '#lib/features/friends/public-profile.js';
 import { isAvatarColour } from './colours.js';
 
 /** Sign-up, sign-in and profile details for the signed-in person. */
 
 export const PASSWORD_MIN = 10;
+/** Profile photos are smaller than post photos: they're only ever shown as a circle. */
 const PHOTO_MAX_BYTES = 1024 * 1024;
-const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 /** Shown for every sign-up outcome, so the form can't reveal who already has an account. */
 export const CHECK_EMAIL = 'Check your email for a link to confirm your account.';
@@ -101,13 +102,6 @@ export function parseProfileForm(form: FormData) {
 	return { values, photo, removePhoto, errors, valid: Object.keys(errors).length === 0 };
 }
 
-function toBase64(bytes: Uint8Array) {
-	let binary = '';
-	for (let i = 0; i < bytes.length; i += 0x8000)
-		binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-	return btoa(binary);
-}
-
 const firstLetter = (name: string) => (Array.from(name)[0] ?? '').toUpperCase();
 
 /** Saves the profile, swaps the photo if there's a new one, and marks onboarding done. */
@@ -146,10 +140,8 @@ export async function saveProfile(
 	let photoError: string | undefined;
 
 	if (photo) {
-		const extension =
-			photo.type === 'image/png' ? 'png' : photo.type === 'image/webp' ? 'webp' : 'jpg';
 		// A new name every time, so phones don't keep showing the old photo.
-		const path = `${user.id}/avatar-${Date.now()}.${extension}`;
+		const path = `${user.id}/avatar-${Date.now()}.${photoExtension(photo.type)}`;
 		const { error: uploadError } = await supabase.storage
 			.from('avatars')
 			.upload(path, photo, { contentType: photo.type, upsert: false });

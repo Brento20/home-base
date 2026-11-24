@@ -30,8 +30,8 @@
 
 <p class="explain">
 	People who aren’t your friends yet can see these, like someone opening your friend link or a guest
-	on a plan you share. Fill in as much or as little as you like. Your photo only shows to your home
-	and your friends.
+	on a plan you share, along with your name, pronouns and your home’s name. Fill in as much or as
+	little as you like. Your photo only shows to your home and your friends.
 </p>
 
 <form

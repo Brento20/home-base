@@ -1,9 +1,10 @@
 <script lang="ts">
 	/**
 	 * Your profile as friends see it (your colour, photo, name and the line about you), then your
-	 * friends, then your home's latest postcards, sent and received. Friends are added by link:
-	 * make one here, send it, and whoever opens it becomes your friend (src/routes/friend/[token]).
-	 * Links nobody has used yet can be cancelled; people you've blocked can be unblocked.
+	 * friends, then your home's latest postcards, sent and received. Friend requests waiting on
+	 * you come first. Add a friend three ways: type their friend code, share yours, or (for people
+	 * not on home base yet) send a friend link. Requests and links you've sent can be cancelled;
+	 * people you've blocked can be unblocked.
 	 */
 	import { enhance } from '$app/forms';
 	import PostcardList from '#lib/features/friends/PostcardList.svelte';
@@ -20,6 +21,19 @@
 
 	let { data, form }: PageProps = $props();
 	let making = $state(false);
+	let copied = $state(false);
+
+	const incoming = $derived(data.requests.filter((request) => request.incoming));
+	const outgoing = $derived(data.requests.filter((request) => !request.incoming));
+
+	async function copyCode() {
+		try {
+			await navigator.clipboard.writeText(data.code);
+			copied = true;
+		} catch {
+			// Clipboard refused: the code is on screen to read out.
+		}
+	}
 
 	const account = $derived(data.account);
 	const fullName = $derived(
@@ -56,12 +70,47 @@
 		<a class="button-quiet" href="/home"><Icon name="back" size={18} /> Home</a>
 	{/snippet}
 	{#snippet trailing()}
-		<a class="button-quiet" href="/home/profile">Edit</a>
+		<a class="button-quiet" href="/home/profile">Edit details</a>
 	{/snippet}
 </PageHeader>
 
 <div class="stack">
 	<ProfileHeader person={me} name={shownName} bio={data.publicProfile.bio} {facts} />
+
+	{#if incoming.length}
+		<section aria-labelledby="requests-heading">
+			<h2 id="requests-heading" class="section-heading">
+				Friend requests<span class="count">{incoming.length}</span>
+			</h2>
+			<ul class="grouped">
+				{#each incoming as request (request.id)}
+					<li class="grouped-row request">
+						<a class="request-who" href="/people/{request.id}">
+							<Avatar
+								person={{
+									displayName: request.name,
+									initials: request.initials,
+									accentColour: request.colour,
+									avatarUrl: null
+								}}
+								size={36}
+							/>
+							<span class="grouped-label">
+								{request.name}
+								<span class="grouped-sub">{request.homeName ?? 'Not in a home yet'}</span>
+							</span>
+						</a>
+						<form class="request-answer" method="POST" action="?/answer" use:enhance>
+							<input type="hidden" name="person" value={request.id} />
+							<button class="button-quiet" name="accept" value="no">Decline</button>
+							<button class="button-primary small" name="accept" value="yes">Accept</button>
+						</form>
+					</li>
+				{/each}
+			</ul>
+			{#if form?.answer?.message}<p class="field-error" role="alert">{form.answer.message}</p>{/if}
+		</section>
+	{/if}
 
 	<section aria-labelledby="public-heading">
 		<div class="section-heading-row">
@@ -124,31 +173,104 @@
 	<section aria-labelledby="add-heading">
 		<h2 id="add-heading" class="group-title">Add a friend</h2>
 		<GlassCard>
-			<form
-				method="POST"
-				action="?/link"
-				class="form-stack"
-				use:enhance={() => {
-					making = true;
-					return async ({ update }) => {
-						await update({ reset: false });
-						making = false;
-					};
-				}}
-			>
-				<p class="explain">
-					A friend link works for one person and lasts two weeks. They’ll need a home base account.
-				</p>
-				{#if form?.link?.message}<p class="field-error" role="alert">{form.link.message}</p>{/if}
-				<button class="button-primary" disabled={making}>
-					{making ? 'Making a link…' : 'Make a friend link'}
-				</button>
-			</form>
+			<div class="form-stack">
+				<form method="POST" action="?/requestCode" class="code-form" use:enhance>
+					<label class="field">
+						<span class="field-label">Their friend code</span>
+						<span class="code-row">
+							<input
+								class="field-input code-input"
+								name="code"
+								placeholder="FIG-42Q"
+								autocomplete="off"
+								autocapitalize="characters"
+								spellcheck="false"
+								maxlength="8"
+								value={form?.byCode?.code ?? ''}
+							/>
+							<button class="button-primary">Send request</button>
+						</span>
+					</label>
+					{#if form?.byCode?.message}
+						<p class="field-error" role="alert">{form.byCode.message}</p>
+					{:else if form?.byCode?.done}
+						<p class="done" role="status">{form.byCode.done}</p>
+					{/if}
+				</form>
+
+				<div class="your-code">
+					<span class="field-label">Your friend code</span>
+					<span class="code-row">
+						<span class="code" aria-label="Your friend code: {data.code.split('').join(' ')}"
+							>{data.code}</span
+						>
+						<button class="button-quiet" type="button" onclick={copyCode}
+							>{copied ? 'Copied' : 'Copy'}</button
+						>
+						<form
+							method="POST"
+							action="?/newCode"
+							use:enhance={() =>
+								async ({ update }) => {
+									copied = false;
+									await update();
+								}}
+						>
+							<button class="button-quiet">New code</button>
+						</form>
+					</span>
+					<span class="field-hint">
+						Give it to a friend to type in here. Get a new one any time; the old one stops working.
+					</span>
+				</div>
+
+				<form
+					method="POST"
+					action="?/link"
+					class="link-form"
+					use:enhance={() => {
+						making = true;
+						return async ({ update }) => {
+							await update({ reset: false });
+							making = false;
+						};
+					}}
+				>
+					<span class="field-label">Not on home base yet?</span>
+					<p class="explain">
+						Send them a friend link. It works for one person and lasts two weeks.
+					</p>
+					{#if form?.link?.message}<p class="field-error" role="alert">{form.link.message}</p>{/if}
+					<button class="button-secondary" disabled={making}>
+						{making ? 'Making a link…' : 'Make a friend link'}
+					</button>
+				</form>
+			</div>
 			{#if form?.link?.url}
 				<ShareLink link={form.link.url} title="Be my friend on home base" label="Friend link" />
 			{/if}
 		</GlassCard>
 	</section>
+
+	{#if outgoing.length}
+		<section aria-labelledby="sent-heading">
+			<h2 id="sent-heading" class="group-title">Requests you’ve sent</h2>
+			<ul class="grouped">
+				{#each outgoing as request (request.id)}
+					<li class="grouped-row">
+						<span class="grouped-label">
+							{request.name}
+							<span class="grouped-sub">Waiting for them to answer</span>
+						</span>
+						<form method="POST" action="?/cancel" use:enhance>
+							<input type="hidden" name="person" value={request.id} />
+							<button class="button-quiet danger">Cancel</button>
+						</form>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
 
 	{#if data.links.length}
 		<section aria-labelledby="waiting-heading">
@@ -243,6 +365,71 @@
 		white-space: nowrap;
 		font-size: var(--text-caption);
 		color: var(--colour-text-faint);
+	}
+
+	.request {
+		gap: 10px;
+	}
+
+	.request-who {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		gap: 12px;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.request-answer {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.small {
+		min-height: 36px;
+		padding: 0 14px;
+	}
+
+	.code-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.code-input {
+		flex: 1;
+		min-width: 0;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.your-code,
+	.link-form {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding-top: var(--space-m);
+		border-top: 1px solid var(--colour-hairline);
+	}
+
+	.code {
+		flex: 1;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: var(--text-headline);
+		font-weight: var(--weight-strong);
+		letter-spacing: 0.08em;
+	}
+
+	.link-form .button-secondary {
+		align-self: flex-start;
+	}
+
+	.done {
+		color: var(--colour-accent);
 	}
 
 	.explain {

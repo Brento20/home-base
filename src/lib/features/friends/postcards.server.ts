@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { isReaction } from '#lib/features/feed/reactions.js';
 import { getHouseholdId, myId } from '#lib/features/household/household.server.js';
-import { dbError, friendlyMessage } from '#lib/server/db.js';
+import { dbError, friendlyMessage, isUuid } from '#lib/server/db.js';
 import {
 	sampleAccount,
 	sampleFriends,
@@ -148,6 +148,8 @@ export async function listPostcardsBetween(
 			.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 			.slice(0, limit);
 
+	// The friend's id comes from the address and goes into a filter string: only a real id may.
+	if (!isUuid(friendId)) return [];
 	const home = await getHouseholdId(locals);
 	const { data, error: readError } = await locals.supabase
 		.from('postcards')

@@ -17,7 +17,15 @@ export function friendlyMessage(problem: Problem) {
 	return 'Something went wrong on our side. Try again in a moment.';
 }
 
-/** Stops the request with a friendly error page for a database problem. */
+/**
+ * Stops the request with a friendly error page for a database problem. An address with a
+ * mangled id in it (Postgres 22P02, not a valid uuid) is a page that doesn't exist, not our fault.
+ */
 export function dbError(problem: Problem): never {
+	if (problem.code === '22P02') error(404, 'That page doesn’t exist.');
 	error(500, friendlyMessage(problem));
 }
+
+/** A database id (uuid). Checked before an id from an address goes into a filter string. */
+export const isUuid = (value: string) =>
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);

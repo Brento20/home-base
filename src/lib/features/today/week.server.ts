@@ -1,6 +1,6 @@
 import { listGroups } from '#lib/features/expenses/expenses.server.js';
 import { getHousehold, myId } from '#lib/features/household/household.server.js';
-import { listUpcomingPlans } from '#lib/features/plans/plans.server.js';
+import { listUpcomingPlans, plansYoureIn } from '#lib/features/plans/plans.server.js';
 import { listTasksComingUp } from '#lib/features/tasks/tasks.server.js';
 import { askForJson } from '#lib/server/ai.js';
 import { todayISO } from '#lib/time.js';
@@ -49,7 +49,7 @@ export async function loadWeekSummary(locals: App.Locals) {
 		listGroups(locals),
 		getHousehold(locals)
 	]);
-	return weekSummary(locals, plans, tasks, groups, household.members);
+	return weekSummary(locals, plansYoureIn(plans), tasks, groups, household.members);
 }
 
 const SYSTEM = `You write the one line under the date on a household app's Today screen. You're the cheeky housemate who's read the fridge whiteboard: Australian, warm, a bit of a stirrer, never mean. Speak to the reader as "you".

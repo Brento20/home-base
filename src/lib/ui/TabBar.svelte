@@ -14,6 +14,12 @@
 	import PillNav from './PillNav.svelte';
 	import { TABS, tabIndexFor } from './tabs.js';
 
+	interface Props {
+		/** Friend requests waiting: a dot on the Home tab. */
+		homeDot?: number;
+	}
+
+	let { homeDot = 0 }: Props = $props();
 	const current = $derived(tabIndexFor(page.url.pathname));
 </script>
 
@@ -27,7 +33,16 @@
 			variant="tabs"
 		>
 			{#snippet item(tab)}
-				<Icon name={tab.icon} />
+				<span class="icon">
+					<Icon name={tab.icon} />
+					{#if tab.href === '/home' && homeDot}
+						<span
+							class="dot"
+							role="img"
+							aria-label="{homeDot} friend request{homeDot === 1 ? '' : 's'} waiting"
+						></span>
+					{/if}
+				</span>
 				<span>{tab.label}</span>
 			{/snippet}
 		</PillNav>
@@ -35,6 +50,22 @@
 </div>
 
 <style>
+	.icon {
+		position: relative;
+		display: inline-flex;
+	}
+
+	.dot {
+		position: absolute;
+		top: -1px;
+		right: -4px;
+		width: 9px;
+		height: 9px;
+		border-radius: 50%;
+		background: var(--colour-accent);
+		box-shadow: 0 0 0 2px var(--surface-raised);
+	}
+
 	.tab-bar-dock {
 		position: fixed;
 		left: 0;

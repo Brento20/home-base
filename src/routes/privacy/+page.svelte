@@ -59,8 +59,20 @@
 				recipes, money, posts, photos and notes.
 			</li>
 			<li>
-				<strong>Friends and postcards:</strong> who your friends are, anyone you’ve blocked, and the postcards
-				you send. A postcard keeps your name and your home’s name as they were when you sent it.
+				<strong>Friends and postcards:</strong> who your friends are, anyone you’ve blocked, the postcards
+				you send, and your reactions and replies on postcards. A postcard keeps your name and your home’s
+				name as they were when you sent it.
+			</li>
+			<li>
+				<strong>Friend requests and your friend code:</strong> requests you’ve sent and received until
+				they’re answered, your code, and a day’s record of codes you’ve tried (so codes can’t be guessed).
+			</li>
+			<li>
+				<strong>Your public profile:</strong> the line about you and the answers you choose to add, like
+				your neighbourhood or what you’re known for.
+			</li>
+			<li>
+				<strong>Plan invites:</strong> which homes a plan was shared with, and each person’s answer.
 			</li>
 			<li>
 				<strong>Links:</strong> for invite, friend and house-sitter links, only a scrambled fingerprint
@@ -78,9 +90,18 @@
 			be read from the database alone.
 		</p>
 		<p>
-			Friends see your name, colour, photo and your home’s name, and nothing in your home. A
-			postcard is seen by everyone in the home it’s sent to; anyone there can take it down or block
-			you.
+			Anyone signed in to home base can see your public profile: your name, colour, pronouns, your
+			home’s name, the line about you and the answers you’ve added. Not your photo. Someone you’ve
+			blocked, or who has blocked you, sees nothing.
+		</p>
+		<p>
+			Friends also see your photo, and nothing in your home. A postcard is seen by everyone in the
+			home it’s sent to and by you; both sides can react and reply, and anyone there can take it
+			down or block you.
+		</p>
+		<p>
+			When your home is invited to a plan, everyone in both homes sees the plan, who’s on it and
+			each person’s answer. Only the home that made the plan can change it.
 		</p>
 		<p>
 			A house-sitter link shows whoever has it a single page with only what the person who made it

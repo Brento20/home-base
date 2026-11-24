@@ -10,6 +10,7 @@ import type {
 	Blocked,
 	FeedPost,
 	Friend,
+	FriendRequest,
 	HomeNote,
 	Household,
 	Plan,
@@ -257,8 +258,28 @@ export const samplePlans: Plan[] = [
 /** People in Sam's home, The Terrace, for plans with guests in sample mode. */
 export const sampleTerrace = [
 	{ id: 'sample-sam', name: 'Sam', initials: 'S', colour: '#8fb7a5' },
-	{ id: 'sample-alex', name: 'Alex', initials: 'A', colour: '#c79ad6' }
+	{ id: 'sample-alex', name: 'Alex', initials: 'A', colour: '#c79ad6' },
+	{ id: 'sample-jo', name: 'Jo', initials: 'J', colour: '#e3b75c' }
 ];
+
+/** Friend requests in sample mode: Jo from The Terrace has asked you. */
+export const sampleFriendRequests: FriendRequest[] = [
+	{
+		id: 'sample-jo',
+		name: 'Jo',
+		initials: 'J',
+		colour: '#e3b75c',
+		homeName: 'The Terrace',
+		incoming: true,
+		createdAt: new Date(Date.now() - 2 * 3_600_000).toISOString()
+	}
+];
+
+/** Friend codes in sample mode: yours, and Alex's to try. */
+export const sampleFriendCodes: Record<string, string> = {
+	'sample-brenton': 'FIG-42Q',
+	'sample-alex': 'ALX-7KP'
+};
 
 /** Homes invited to each sample plan, and everyone's answers ("plan:person" → answer). */
 export const sampleGuestHomes: Record<string, string[]> = {
@@ -546,6 +567,13 @@ export const samplePublicFields: Record<string, PublicFields> = {
 		happyTo: 'Lend a ladder',
 		localSpot: 'The Terrace garden',
 		askMeAbout: 'Bees'
+	},
+	'sample-jo': {
+		suburb: 'Enmore',
+		knownFor: 'Lemon tart',
+		happyTo: 'Feed your cat',
+		localSpot: 'Enmore Theatre',
+		askMeAbout: 'Gigs'
 	},
 	'sample-alex': {
 		suburb: 'Newtown',

@@ -2,6 +2,7 @@ import { avatarUrl, myId } from '#lib/features/household/household.server.js';
 import { dbError } from '#lib/server/db.js';
 import {
 	sampleAccount,
+	sampleFriendRequests,
 	sampleFriends,
 	sampleHousehold,
 	samplePublicFields,
@@ -39,6 +40,8 @@ interface ProfileRow {
 	is_you: boolean;
 	is_friend: boolean;
 	shares_home: boolean;
+	request_sent: boolean;
+	request_received: boolean;
 }
 
 const fieldsFrom = (row: Record<string, unknown>): PublicFields => {
@@ -69,7 +72,9 @@ export async function getPublicProfile(
 		fields: fieldsFrom(row as unknown as Record<string, unknown>),
 		isYou: row.is_you,
 		isFriend: row.is_friend,
-		sharesHome: row.shares_home
+		sharesHome: row.shares_home,
+		requestSent: row.request_sent,
+		requestReceived: row.request_received
 	};
 }
 
@@ -141,6 +146,8 @@ function samplePublicProfile(id: string, me: string): PublicProfile | null {
 		fields: { ...(samplePublicFields[id] ?? emptyPublicFields()) },
 		isYou: id === me,
 		isFriend: Boolean(friend),
-		sharesHome: Boolean(housemate)
+		sharesHome: Boolean(housemate),
+		requestSent: sampleFriendRequests.some((request) => request.id === id && !request.incoming),
+		requestReceived: sampleFriendRequests.some((request) => request.id === id && request.incoming)
 	};
 }
