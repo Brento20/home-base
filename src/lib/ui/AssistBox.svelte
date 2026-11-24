@@ -14,7 +14,7 @@
 	 * a photo button, 'only' is a single "Scan a receipt" style button that sends as soon as a
 	 * photo is chosen.
 	 */
-	import { tick } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -47,6 +47,10 @@
 		filledNote?: string;
 		/** Where to send the focus when the helper gives up: the form's first field. */
 		focusOnFail?: string;
+		/** Words to start with, e.g. what was typed on Today's add bar. */
+		initial?: string;
+		/** Read `initial` as soon as the page opens, without waiting for a tap. */
+		autostart?: boolean;
 	}
 
 	let {
@@ -62,10 +66,12 @@
 		linkBusyLabel = 'Reading the page…',
 		outcome = null,
 		filledNote = 'Filled in with AI.',
-		focusOnFail
+		focusOnFail,
+		initial = '',
+		autostart = false
 	}: Props = $props();
 
-	let text = $state('');
+	let text = $state(untrack(() => initial));
 	let chosen = $state<File | null>(null);
 	let busy = $state(false);
 	let photoProblem = $state(false);
@@ -92,6 +98,11 @@
 		}
 		if (photo === 'only') form?.requestSubmit();
 	}
+
+	// Once, on opening: a page that brings words with it reads them straight away.
+	onMount(() => {
+		if (autostart && text.trim()) form?.requestSubmit();
+	});
 
 	/** Back to how the form was before the fill: the page drops the result, then the snapshot. */
 	async function undo() {

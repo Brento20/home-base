@@ -5,6 +5,7 @@
 	import ComingUp from '#lib/features/today/ComingUp.svelte';
 	import GettingStarted from '#lib/features/today/GettingStarted.svelte';
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
+	import AddBar from '#lib/features/today/AddBar.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { formatTodayHeading } from '#lib/time.js';
 	import { kept } from '#lib/ui/kept.svelte.js';
@@ -12,8 +13,9 @@
 	import UndoToast from '#lib/ui/UndoToast.svelte';
 	import type { PageProps } from './$types';
 
-	// The real sections' heights, so placeholders hold their place exactly.
-	const COMING_UP_HEIGHT = 214;
+	// The real sections' heights, so placeholders hold their place exactly. Coming up includes
+	// the add bar on top of it (48px, then a 12px gap).
+	const COMING_UP_HEIGHT = 274;
 	const LISTS_HEIGHT = 219;
 
 	let { data, form }: PageProps = $props();
@@ -61,7 +63,15 @@
 	<Reveal of={screen} placeholder={[COMING_UP_HEIGHT, LISTS_HEIGHT]} gap={24} label="Loading today">
 		{#snippet children(today)}
 			{#if today.start}<GettingStarted steps={today.start} />{/if}
-			<ComingUp items={today.comingUp} people={data.household.members} today={data.today} />
+			<!-- The add bar sits on the row it adds to, closer than the sections around them. -->
+			<div class="coming">
+				<AddBar
+					values={form && 'addBar' in form ? form.addBar : undefined}
+					errors={form && 'addBarErrors' in form ? form.addBarErrors : undefined}
+					cards={today.comingUp.length > 0}
+				/>
+				<ComingUp items={today.comingUp} people={data.household.members} today={data.today} />
+			</div>
 			<ListsGlance lists={today.lists} />
 		{/snippet}
 	</Reveal>
@@ -75,6 +85,15 @@
 		me={data.me.id}
 	/>
 </div>
+
+{#if form && 'added' in form && form.added}
+	<UndoToast
+		key={form.added.id}
+		message="Added to Tasks: {form.added.title}"
+		action="?/undoAdd"
+		fields={{ taskId: form.added.id }}
+	/>
+{/if}
 
 {#if form && 'ticked' in form && form.ticked}
 	<UndoToast
@@ -132,5 +151,11 @@
 		flex-direction: column;
 		gap: 24px;
 		margin-top: 24px;
+	}
+
+	.coming {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
 	}
 </style>

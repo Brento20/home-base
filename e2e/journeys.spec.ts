@@ -40,6 +40,44 @@ test('Today: hero cards, quick add to Shopping, and the feed pages in', async ({
 	expect(errors).toEqual([]);
 });
 
+test('Today: the add bar adds a task (with Undo) or starts a plan', async ({ page }) => {
+	const errors = watchErrors(page);
+	await open(page, '/');
+	const bar = page.locator('#add-bar');
+	await expect(bar).toBeVisible();
+	// The buttons are folded away, out of reach, until something's typed.
+	const actions = page.locator('.add-bar .actions');
+	await expect(actions).toHaveAttribute('inert', '');
+
+	// Return adds it as a task, for anyone, with no date, and stays on Today.
+	await bar.fill(`Oil the gate ${run}`);
+	await expect(actions).not.toHaveAttribute('inert');
+	await bar.press('Enter');
+	await expect(page).toHaveURL(/\/$/);
+	const toast = page.locator('.undo-toast');
+	await expect(toast).toContainText(`Added to Tasks: Oil the gate ${run}`);
+	await expect(bar).toHaveValue('');
+	await open(page, '/lists/tasks');
+	await expect(page.getByText(`Oil the gate ${run}`)).toBeVisible();
+
+	// Undo takes it away again.
+	await open(page, '/');
+	await bar.fill(`Wash the car ${run}`);
+	await page.getByRole('button', { name: `Add “Wash the car ${run}” as a task` }).click();
+	await page.locator('.undo-toast').getByRole('button', { name: 'Undo' }).click();
+	await open(page, '/lists/tasks');
+	await expect(page.getByText(`Oil the gate ${run}`)).toBeVisible();
+	await expect(page.getByText(`Wash the car ${run}`)).toHaveCount(0);
+
+	// Plan carries the words to New plan.
+	await open(page, '/');
+	await bar.fill(`Picnic ${run}`);
+	await page.getByRole('link', { name: `Make “Picnic ${run}” a plan` }).click();
+	await expect(page).toHaveURL(/\/plans\/new\?text=/);
+	await expect(page.locator('#plan-title')).toHaveValue(`Picnic ${run}`);
+	expect(errors).toEqual([]);
+});
+
 test('Lists: make a list, add, tick, clear; the Shopping list stays', async ({ page }) => {
 	const errors = watchErrors(page);
 	await open(page, '/lists');
@@ -136,6 +174,9 @@ test('New task: the full form, like a new plan, then the same form to edit it', 
 	// The header + on Tasks opens it too, and an empty form says what's missing.
 	await open(page, '/lists/tasks');
 	await page.getByRole('link', { name: 'New task' }).click();
+	// Tasks' quick bar has an "Add task" button too, so wait for the form first.
+	await expect(page).toHaveURL(/\/lists\/tasks\/new/);
+	await expect(page.locator('#task-form-title')).toBeVisible();
 	await page.getByRole('button', { name: 'Add task' }).click();
 	await expect(page.getByText('Give the task a name.')).toBeVisible();
 	expect(errors).toEqual([]);

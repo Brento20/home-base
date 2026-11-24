@@ -4,7 +4,15 @@ import { FEED_PAGE, hasAnyPost, listFeed } from '#lib/features/feed/feed.server.
 import { listActiveLists } from '#lib/features/lists/lists.server.js';
 import { listUpcomingPlans, pickComingUp, plansYoureIn } from '#lib/features/plans/plans.server.js';
 import { getScores } from '#lib/features/points/points.server.js';
-import { completeTask, listTasksComingUp, reopenTask } from '#lib/features/tasks/tasks.server.js';
+import { getHousehold } from '#lib/features/household/household.server.js';
+import {
+	completeTask,
+	createTask,
+	deleteTask,
+	listTasksComingUp,
+	parseTaskForm,
+	reopenTask
+} from '#lib/features/tasks/tasks.server.js';
 import { mergeComingUp } from '#lib/features/today/coming-up.js';
 import { allDone, START_COOKIE, startSteps } from '#lib/features/today/getting-started.js';
 import { weekSummary } from '#lib/features/today/week.server.js';
@@ -86,6 +94,27 @@ export const actions: Actions = {
 	dismissStart: async ({ cookies }) => {
 		rememberStarted(cookies);
 		return { dismissed: true };
+	},
+
+	/** Task on the add bar: just the name, for anyone, no date. */
+	addTask: async ({ request, locals }) => {
+		const { household } = await getHousehold(locals);
+		const form = await request.formData();
+		// Only the name comes from this bar, whatever else is posted.
+		const only = new FormData();
+		only.set('title', String(form.get('title') ?? ''));
+		const { input, errors, values, valid } = parseTaskForm(only, household.members);
+		if (!valid) return fail(400, { addBar: { title: values.title }, addBarErrors: errors });
+		const id = await createTask(locals, input);
+		// For the "Added to Tasks · Undo" toast.
+		return { added: { id, title: input.title } };
+	},
+
+	/** The Undo in the toast straight after adding: the task goes again. */
+	undoAdd: async ({ request, locals }) => {
+		const taskId = String((await request.formData()).get('taskId') ?? '');
+		if (!taskId) return fail(400, { message: 'Missing task.' });
+		await deleteTask(locals, taskId);
 	},
 
 	completeTask: async ({ request, locals }) => {

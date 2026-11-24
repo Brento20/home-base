@@ -10,12 +10,14 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ url, locals }) => {
 	const requested = url.searchParams.get('date') ?? '';
 	const date = isValidDateISO(requested) ? requested : todayISO();
+	// "Plan" on Today's add bar: what was typed there, as said.
+	const text = (url.searchParams.get('text') ?? '').trim().slice(0, 300);
 
 	// "Create event" on a feed post: start from the post, and keep the link when it's saved.
 	const postId = url.searchParams.get('post');
-	if (!postId) return { date, fromPost: null };
+	if (!postId) return { date, text, fromPost: null };
 	const post = await getPost(locals, postId);
-	return { date, fromPost: { id: post.id, ...draftFromPost(post.body) } };
+	return { date, text: '', fromPost: { id: post.id, ...draftFromPost(post.body) } };
 };
 
 export const actions: Actions = {

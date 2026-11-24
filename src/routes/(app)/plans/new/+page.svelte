@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import PlanForm from '#lib/features/plans/PlanForm.svelte';
+	import { PLAN_TITLE_MAX } from '#lib/features/plans/plan-input.js';
 	import AssistBox from '#lib/ui/AssistBox.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -15,7 +16,7 @@
 	const postId = $derived(form?.postId ?? data.fromPost?.id ?? null);
 	const values = $derived(
 		(form && 'values' in form ? form.values : null) ?? {
-			title: data.fromPost?.title ?? '',
+			title: data.fromPost?.title ?? data.text.slice(0, PLAN_TITLE_MAX),
 			notes: data.fromPost?.notes ?? '',
 			location: '',
 			date: data.date,
@@ -54,6 +55,8 @@
 		busyLabel="Working out when and where…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		focusOnFail="#plan-title"
+		initial={data.text}
+		autostart={Boolean(data.text) && !form}
 	/>
 {/if}
 

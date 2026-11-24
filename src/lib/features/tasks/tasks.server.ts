@@ -211,11 +211,13 @@ export async function getTask(locals: App.Locals, id: string): Promise<Task> {
 	return toTask(data);
 }
 
-export async function createTask(locals: App.Locals, input: TaskInput) {
+/** Adds a task and gives back its id (for an Undo straight after). */
+export async function createTask(locals: App.Locals, input: TaskInput): Promise<string> {
 	const { supabase } = locals;
 	if (!supabase) {
+		const id = crypto.randomUUID();
 		sampleTasks.push({
-			id: crypto.randomUUID(),
+			id,
 			...input,
 			completedAt: null,
 			completedBy: null,
@@ -225,19 +227,24 @@ export async function createTask(locals: App.Locals, input: TaskInput) {
 			servings: null,
 			recipe: null
 		});
-		return;
+		return id;
 	}
 
 	const householdId = await getHouseholdId(locals);
-	const { error: insertError } = await supabase.from('tasks').insert({
-		household_id: householdId,
-		title: input.title,
-		notes: input.notes,
-		assignee_id: input.assigneeId,
-		due_on: input.dueOn,
-		repeat: input.repeat
-	});
+	const { data, error: insertError } = await supabase
+		.from('tasks')
+		.insert({
+			household_id: householdId,
+			title: input.title,
+			notes: input.notes,
+			assignee_id: input.assigneeId,
+			due_on: input.dueOn,
+			repeat: input.repeat
+		})
+		.select('id')
+		.single();
 	if (insertError) dbError(insertError);
+	return data!.id;
 }
 
 export async function updateTask(locals: App.Locals, id: string, input: TaskInput) {
