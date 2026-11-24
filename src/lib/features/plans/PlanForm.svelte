@@ -6,10 +6,11 @@
 	 * the form opens on one question. A chip is the label of a hidden checkbox and CSS shows the
 	 * field, so it works before any script loads. A plan that already has one shows it open.
 	 * Optional fields keep a still placeholder; only "What's happening?" gets the moving reel.
+	 * The frame (spacing, save button) is FormShell, shared with the task form.
 	 */
-	import { enhance } from '$app/forms';
 	import { pick } from '#lib/copy/pick.js';
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
+	import FormShell from '#lib/ui/FormShell.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import type { PlanField, PlanFormValues } from './plan-input.js';
@@ -19,13 +20,11 @@
 		errors?: Partial<Record<PlanField, string>>;
 		action: string;
 		submitLabel: string;
-		/** Shows a Cancel link back to where you came from. */
 		/** The feed post this plan is being made from, kept with the plan when it's saved. */
 		postId?: string | null;
 	}
 
 	let { values, errors = {}, action, submitLabel, postId = null }: Props = $props();
-	let saving = $state(false);
 
 	const wherePlaceholder = pick(PLACEHOLDERS.planWhere);
 	const notesPlaceholder = pick(PLACEHOLDERS.planNotes);
@@ -41,19 +40,7 @@
 	}
 </script>
 
-<form
-	novalidate
-	method="POST"
-	{action}
-	class="form-stack plan-form"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
->
+<FormShell {action} {submitLabel} class="plan-form">
 	{#if postId}<input type="hidden" name="postId" value={postId} />{/if}
 
 	<label class="field">
@@ -162,25 +149,21 @@
 		/>
 		<label class="extra-chip" for="plan-add-notes"><Icon name="plus" size={16} /> Note</label>
 	</div>
-
-	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
-	</div>
-</form>
+</FormShell>
 
 <style>
 	.date {
 		max-width: 220px;
 	}
 
-	.plan-form:has(input[name='allDay']:checked) .times {
+	:global(.plan-form:has(input[name='allDay']:checked) .times) {
 		display: none;
 	}
 
 	/* Optional fields stay tucked away until their chip is tapped (chip styles: forms.css). */
-	.plan-form:has(#plan-add-where:not(:checked)) .where,
-	.plan-form:has(#plan-add-notes:not(:checked)) .notes,
-	.plan-form:has(#plan-add-where:checked):has(#plan-add-notes:checked) .extras {
+	:global(.plan-form:has(#plan-add-where:not(:checked)) .where),
+	:global(.plan-form:has(#plan-add-notes:not(:checked)) .notes),
+	:global(.plan-form:has(#plan-add-where:checked):has(#plan-add-notes:checked) .extras) {
 		display: none;
 	}
 

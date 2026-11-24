@@ -98,6 +98,49 @@ test('Tasks: add one, tick it off, undo, and filter to mine', async ({ page }) =
 	expect(errors).toEqual([]);
 });
 
+test('New task: the full form, like a new plan, then the same form to edit it', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/lists/tasks');
+
+	// What's typed in the quick bar carries over to the full form.
+	await page.fill('#task-title', `Clean the gutters ${run}`);
+	await page.getByRole('link', { name: /Add who, when or a repeat/ }).click();
+	await expect(page).toHaveURL(/\/lists\/tasks\/new\?title=/);
+	await expect(page.locator('#task-form-title')).toHaveValue(`Clean the gutters ${run}`);
+
+	// Who, when, then the extras behind their chips.
+	await page.locator('fieldset', { hasText: 'Who’s on it?' }).getByText('Chris').click();
+	await page.getByText('Tomorrow', { exact: true }).click();
+	await expect(page.getByRole('group', { name: 'How often?' })).toBeHidden();
+	await page.locator('label[for="task-add-repeat"]').click();
+	await page.getByRole('group', { name: 'How often?' }).getByText('Weekly').click();
+	await page.locator('label[for="task-add-notes"]').click();
+	await page.getByLabel('Anything to add?').fill('Ladder is in the shed');
+	await page.getByRole('button', { name: 'Add task' }).click();
+
+	await expect(page).toHaveURL(/\/lists\/tasks$/);
+	const row = page.locator('.task-row').filter({ hasText: `Clean the gutters ${run}` });
+	await expect(row).toContainText('Chris');
+	await row.locator('a').first().click();
+	await expect(page.getByText('Ladder is in the shed')).toBeVisible();
+	await expect(page.locator('.details')).toContainText('Weekly');
+
+	// Editing opens the same form, with its extras already open.
+	await page.getByRole('link', { name: 'Edit' }).click();
+	await expect(page.locator('#task-form-title')).toHaveValue(`Clean the gutters ${run}`);
+	await expect(page.getByLabel('Anything to add?')).toHaveValue('Ladder is in the shed');
+	await expect(page.getByRole('group', { name: 'How often?' })).toBeVisible();
+
+	// The header + on Tasks opens it too, and an empty form says what's missing.
+	await open(page, '/lists/tasks');
+	await page.getByRole('link', { name: 'New task' }).click();
+	await page.getByRole('button', { name: 'Add task' }).click();
+	await expect(page.getByText('Give the task a name.')).toBeVisible();
+	expect(errors).toEqual([]);
+});
+
 test('Plans: list and calendar views', async ({ page }) => {
 	const errors = watchErrors(page);
 	await open(page, '/plans');

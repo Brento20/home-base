@@ -269,6 +269,9 @@
 					<a class="add" href="/plans/new?date={selected}">
 						<Icon name="plus" size={16} /> Add a plan
 					</a>
+					<a class="add" href="/lists/tasks/new?date={selected}">
+						<Icon name="plus" size={16} /> Add a task
+					</a>
 				{/if}
 			</p>
 		{/if}

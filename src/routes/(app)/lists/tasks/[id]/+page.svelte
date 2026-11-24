@@ -4,6 +4,7 @@
 	 * form; ticking it off and deleting are here, as everywhere else.
 	 */
 	import { enhance } from '$app/forms';
+	import LinkedText from '#lib/features/plans/LinkedText.svelte';
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
@@ -92,6 +93,13 @@
 			</div>
 		{/if}
 	</dl>
+
+	{#if task.notes}
+		<section class="note" aria-labelledby="note-heading">
+			<h2 id="note-heading" class="caption-label">Notes</h2>
+			<p class="note-text"><LinkedText text={task.notes} /></p>
+		</section>
+	{/if}
 
 	<form
 		method="POST"
@@ -198,6 +206,18 @@
 
 	dt {
 		color: var(--colour-text-muted);
+	}
+
+	.note {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 0 4px;
+	}
+
+	.note-text {
+		white-space: pre-line;
+		overflow-wrap: anywhere;
 	}
 
 	dd {

@@ -17,6 +17,8 @@
 export const HEADINGS = {
 	newPlan: ['What’s the plan?', 'What are we doing?', 'Ooh, what’s on?', 'Make it happen'],
 	editPlan: ['Change of plans?', 'Tweak the plan', 'Plot twist?'],
+	newTask: ['Another job?', 'Put it on the list', 'Something to do?', 'Add a job'],
+	editTask: ['Tweak the task', 'Change of plan?', 'Fix it up'],
 	importCalendar: ['Bring your calendar over', 'Move in your calendar'],
 	newNote: ['What should everyone know?', 'Jot it down', 'Pin it to the fridge'],
 	editNote: ['Update the note', 'Fix it up'],

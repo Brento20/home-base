@@ -20,9 +20,6 @@
 </svelte:head>
 
 <TaskAddForm
-	people={data.household.members}
-	ai={data.ai}
-	assist={form && 'assist' in form ? form.assist : null}
 	values={form && 'values' in form ? form.values : undefined}
 	errors={form && 'errors' in form ? form.errors : undefined}
 />

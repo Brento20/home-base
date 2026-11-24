@@ -7,8 +7,6 @@ import {
 	listOpenTasks,
 	parseTaskForm
 } from '#lib/features/tasks/tasks.server.js';
-import { readTask } from '#lib/features/tasks/quick.server.js';
-import { aiConfigured } from '#lib/server/ai.js';
 import { todayISO } from '#lib/time.js';
 import { graceFor, soonOrLater, unwrap } from '#lib/server/soon.js';
 import type { Actions, PageServerLoad } from './$types';
@@ -34,21 +32,6 @@ export const actions: Actions = {
 
 		await createTask(locals, input);
 		return { added: input.title };
-	},
-
-	/** ✨ in the add field: fills who, when and how often from the words typed. */
-	quick: async ({ request, locals }) => {
-		const text = String((await request.formData()).get('title') ?? '')
-			.trim()
-			.slice(0, 300);
-		if (!text)
-			return fail(400, { values: { title: '' }, errors: { title: 'Type the task first.' } });
-		if (!aiConfigured) return { assist: 'failed' as const, values: { title: text } };
-
-		const { household, me } = await getHousehold(locals);
-		const values = await readTask(text, household.members, me, todayISO());
-		if (!values) return { assist: 'failed' as const, values: { title: text } };
-		return { assist: 'filled' as const, values };
 	},
 
 	/** The Undo in the toast after ticking something off. */

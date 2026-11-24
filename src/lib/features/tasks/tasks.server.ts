@@ -20,9 +20,12 @@ export interface TaskInput {
 	assigneeId: string | null;
 	dueOn: string | null;
 	repeat: Task['repeat'];
+	notes: string;
 }
 
-type TaskField = 'title' | 'assigneeId' | 'dueOn';
+type TaskField = 'title' | 'assigneeId' | 'dueOn' | 'notes';
+
+export const TASK_NOTES_MAX = 2000;
 
 interface TaskRow {
 	id: string;
@@ -91,13 +94,17 @@ export function parseTaskForm(form: FormData, members: Profile[], today = todayI
 		assigneeId: String(form.get('assigneeId') ?? ''),
 		due: String(form.get('due') ?? (form.get('dueDate') ? 'date' : 'none')),
 		dueDate: String(form.get('dueDate') ?? ''),
-		repeat: repeatFromForm(form)
+		repeat: repeatFromForm(form),
+		notes: String(form.get('notes') ?? '').trim()
 	};
 	const errors: FieldErrors<TaskField> = {};
 
 	if (!values.title) errors.title = 'Give the task a name.';
 	else if (values.title.length > TASK_TITLE_MAX)
 		errors.title = `Keep it under ${TASK_TITLE_MAX} characters.`;
+
+	if (values.notes.length > TASK_NOTES_MAX)
+		errors.notes = `Keep the note under ${TASK_NOTES_MAX} characters.`;
 
 	const assigneeId = values.assigneeId || null;
 	if (assigneeId && !members.some((member) => member.id === assigneeId)) {
@@ -114,7 +121,7 @@ export function parseTaskForm(form: FormData, members: Profile[], today = todayI
 	const { repeat } = values;
 	if (repeat !== 'none' && !dueOn && !errors.dueOn) dueOn = today;
 
-	const input: TaskInput = { title: values.title, assigneeId, dueOn, repeat };
+	const input: TaskInput = { title: values.title, assigneeId, dueOn, repeat, notes: values.notes };
 	return { input, errors, values, valid: Object.keys(errors).length === 0 };
 }
 
@@ -209,7 +216,6 @@ export async function createTask(locals: App.Locals, input: TaskInput) {
 	if (!supabase) {
 		sampleTasks.push({
 			id: crypto.randomUUID(),
-			notes: '',
 			...input,
 			completedAt: null,
 			completedBy: null,
@@ -226,6 +232,7 @@ export async function createTask(locals: App.Locals, input: TaskInput) {
 	const { error: insertError } = await supabase.from('tasks').insert({
 		household_id: householdId,
 		title: input.title,
+		notes: input.notes,
 		assignee_id: input.assigneeId,
 		due_on: input.dueOn,
 		repeat: input.repeat
@@ -246,6 +253,7 @@ export async function updateTask(locals: App.Locals, id: string, input: TaskInpu
 		.from('tasks')
 		.update({
 			title: input.title,
+			notes: input.notes,
 			assignee_id: input.assigneeId,
 			due_on: input.dueOn,
 			repeat: input.repeat,

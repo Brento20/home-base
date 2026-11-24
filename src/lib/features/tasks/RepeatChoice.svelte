@@ -23,7 +23,7 @@
 </script>
 
 <fieldset class="field repeat-choice">
-	<legend class="field-label">Repeat</legend>
+	<legend class="field-label">How often?</legend>
 	<div class="choice-pills">
 		{#each REPEATS as option (option.key)}
 			<label class="choice-pill">
