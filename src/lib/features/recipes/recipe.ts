@@ -217,12 +217,6 @@ export function formatMinutes(minutes: number) {
 	return rest ? `${hours} hr ${rest} min` : `${hours} hr`;
 }
 
-/** "2,132 kJ · 38.8 g protein per serve", or null when there's no nutrition. */
-export function nutritionLine(energyKj: number | null, proteinG: number | null) {
-	if (energyKj === null || proteinG === null) return null;
-	return `${energyKj.toLocaleString('en-AU')} kJ · ${trim(proteinG, 1)} g protein per serve`;
-}
-
 /** "Italian-inspired" → "Italian". */
 export function cuisineLabel(cuisine: string | null) {
 	return cuisine ? cuisine.replace(/-inspired$/i, '').trim() : null;

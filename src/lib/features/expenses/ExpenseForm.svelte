@@ -15,7 +15,13 @@
 	import { nameOf } from './describe.js';
 	import type { ExpenseField, ExpenseFormValues } from './form.js';
 	import { currencySymbol, formatMoney, parseMoney } from './money.js';
-	import { computeShares, readSplitInput, SPLIT_METHODS, type SplitMethod } from './split.js';
+	import {
+		computeShares,
+		NO_AMOUNT,
+		readSplitInput,
+		SPLIT_METHODS,
+		type SplitMethod
+	} from './split.js';
 
 	interface Props {
 		values: ExpenseFormValues;
@@ -197,7 +203,10 @@
 
 		<div class="result" aria-live="polite">
 			{#if !preview.ok}
-				<p class="problem">{preview.message}</p>
+				<!-- No amount yet is where everyone starts: say so quietly, not as a problem. -->
+				<p class:problem={preview.message !== NO_AMOUNT} class:hint={preview.message === NO_AMOUNT}>
+					{preview.message}
+				</p>
 			{:else if result.length === 0}
 				<p>Nobody owes anything for this one.</p>
 			{:else}
@@ -390,6 +399,10 @@
 
 	.result .problem {
 		color: var(--colour-accent);
+	}
+
+	.result .hint {
+		color: var(--colour-text-muted);
 	}
 
 	.date {

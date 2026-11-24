@@ -135,7 +135,9 @@ export function plainSummary(facts: WeekFacts): string {
 		sentences.push(
 			`Today: ${mine[0]}${mine.length > 1 ? ` and ${count(mine.length - 1, 'more task')}` : ''}.`
 		);
-	if (today.plans.length) sentences.push(`On today: ${joinAnd(today.plans)}.`);
+	// "Today: Put the bins out. Also: Dinner at home." / "Today: Dinner at home."
+	if (today.plans.length)
+		sentences.push(`${mine.length ? 'Also' : 'Today'}: ${joinAnd(today.plans)}.`);
 	if (today.dinner)
 		sentences.push(
 			today.dinner.cook === 'you'

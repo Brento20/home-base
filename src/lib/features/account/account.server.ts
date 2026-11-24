@@ -2,6 +2,7 @@ import { dbError } from '#lib/server/db.js';
 import { avatarUrl } from '#lib/features/household/household.server.js';
 import { sampleAccount, sampleProfiles } from '#lib/server/sample-data.js';
 import { isValidDateISO, todayISO } from '#lib/time.js';
+import { isLocalPath } from '#lib/local-path.js';
 import type { AccountDetails, FieldErrors, ProfileField, ProfileValues } from '#lib/types.js';
 import { photoExtension, PHOTO_TYPES, toBase64 } from '#lib/features/feed/photo-rules.js';
 import { BIO_MAX } from '#lib/features/friends/public-profile.js';
@@ -27,7 +28,7 @@ export function parseCredentials(form: FormData) {
 
 /** Only same-site paths, so a link can't send someone off to another site after signing in. */
 export function safeNext(value: string | null, fallback = '/') {
-	return value && value.startsWith('/') && !value.startsWith('//') ? value : fallback;
+	return isLocalPath(value) ? value : fallback;
 }
 
 export async function getAccountDetails(locals: App.Locals): Promise<AccountDetails> {

@@ -37,9 +37,6 @@ function remember(key: string, value: unknown) {
 const isPromise = <T>(value: T | Promise<T>): value is Promise<T> =>
 	typeof (value as Promise<T>)?.then === 'function';
 
-/** Keys are short and dot-free, since they travel in a cookie. */
-export const keptKey = (...parts: string[]) => parts.join('-').replace(/[^\w-]/g, '');
-
 export function kept<T>(key: () => string, source: () => T | Promise<T>) {
 	const first = source();
 	const firstKey = key();

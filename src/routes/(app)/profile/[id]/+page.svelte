@@ -32,7 +32,7 @@
 
 <PageHeader title={friend.name}>
 	{#snippet lead()}
-		<a class="button-quiet" href="/profile"><Icon name="back" size={18} /> Friends</a>
+		<a class="button-quiet" href="/profile"><Icon name="back" size={18} /> You &amp; friends</a>
 	{/snippet}
 </PageHeader>
 

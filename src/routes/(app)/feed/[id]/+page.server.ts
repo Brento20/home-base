@@ -1,3 +1,4 @@
+import { isLocalPath } from '#lib/local-path.js';
 import { fail, redirect } from '@sveltejs/kit';
 import {
 	addReply,
@@ -42,6 +43,6 @@ export const actions: Actions = {
 		await deletePost(locals, params.id);
 		// From the post's own page there's nothing left to show, so go back to Today.
 		const then = url.searchParams.get('then');
-		if (then?.startsWith('/') && !then.startsWith('//')) redirect(303, then);
+		if (isLocalPath(then)) redirect(303, then);
 	}
 };

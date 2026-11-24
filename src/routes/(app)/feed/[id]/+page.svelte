@@ -28,6 +28,9 @@
 	<a class="button-quiet back" href="/"><Icon name="back" size={18} /> Today</a>
 </nav>
 
+<!-- The page's heading for VoiceOver; the card itself says who posted. -->
+<h1 class="visually-hidden">{nameFor(post.authorId)}’s post</h1>
+
 <PostCard {post} {people} me={data.me.id} full />
 
 <Conversation

@@ -56,6 +56,9 @@ function allocate(totalCents: number, weights: number[]): number[] {
 	return parts;
 }
 
+/** Before an amount's typed: a hint, not a problem (the form shows it quietly). */
+export const NO_AMOUNT = 'Type the amount to see who owes what.';
+
 export function computeShares(
 	totalCents: number,
 	method: SplitMethod,
@@ -64,7 +67,7 @@ export function computeShares(
 	const blank = entries.map((entry) => ({ profileId: entry.profileId, owedCents: 0, input: null }));
 	if (entries.length === 0)
 		return { ok: false, message: 'Include at least one person.', shares: [] };
-	if (totalCents <= 0) return { ok: false, message: 'Enter the amount first.', shares: blank };
+	if (totalCents <= 0) return { ok: false, message: NO_AMOUNT, shares: blank };
 
 	if (method === 'equal') {
 		const parts = allocate(

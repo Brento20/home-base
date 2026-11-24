@@ -149,11 +149,6 @@ export async function ensureShoppingList(locals: App.Locals) {
 	if (insertError && insertError.code !== '23505') dbError(insertError);
 }
 
-/** The Shopping list's id and what's still to get, for Today's quick add. */
-export async function getShoppingSummary(locals: App.Locals) {
-	const lists = await listActiveLists(locals);
-	return lists.find((list) => list.pinned) ?? null;
-}
 export const listPastLists = (locals: App.Locals) => readSummaries(locals, true);
 
 export async function getList(locals: App.Locals, id: string): Promise<ShoppingList> {
