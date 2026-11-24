@@ -6,9 +6,14 @@
 	import { drift } from '#lib/ui/backdrop-drift.js';
 	import { startLiveRefresh } from '#lib/ui/live-refresh.js';
 	import { setHomeSettings } from '#lib/home.js';
+	import { applyDisplay, displayPrefs } from '#lib/display.svelte.js';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
+
+	// Your display preferences on this phone: steady words, and the glow switch (the server has
+	// already drawn the first paint with them; src/lib/display.svelte.ts).
+	$effect(() => applyDisplay(displayPrefs(data.display)));
 
 	// Dates and money on this phone follow the home's time zone and currency, set before any
 	// page below renders (so hydration matches the server), and again if they're changed.

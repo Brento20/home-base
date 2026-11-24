@@ -52,7 +52,7 @@
 			</li>
 			<li>
 				<strong>Your profile:</strong> the name, nickname, pronouns, birthday, colour and photo you choose
-				to add.
+				to add, and your preferences (how the app looks to you, like light or dark and calmer screens).
 			</li>
 			<li>
 				<strong>Your home:</strong> what you and the people you live with put in it: tasks, lists, plans,
@@ -90,9 +90,10 @@
 			be read from the database alone.
 		</p>
 		<p>
-			Anyone signed in to home base can see your public profile: your name, colour, pronouns, your
-			home’s name, the line about you and the answers you’ve added. Not your photo. Someone you’ve
-			blocked, or who has blocked you, sees nothing.
+			Anyone signed in to home base can see your public profile: your name, colour, your home’s
+			name, the line about you and the answers you’ve added. Not your photo or your pronouns: those
+			are for you and the people you live with. Someone you’ve blocked, or who has blocked you, sees
+			nothing.
 		</p>
 		<p>
 			Friends also see your photo, and nothing in your home. A postcard is seen by everyone in the

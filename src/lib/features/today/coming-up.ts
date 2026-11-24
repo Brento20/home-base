@@ -1,5 +1,5 @@
 import { DEFAULT_DINNER_TIME } from '#lib/features/recipes/recipe.js';
-import { zonedParts } from '#lib/time.js';
+import { daysBetween, formatDayLabel, formatDinnerWhen, zonedParts } from '#lib/time.js';
 import type { Plan, Task } from '#lib/types.js';
 
 /**
@@ -47,3 +47,23 @@ export function mergeComingUp(plans: Plan[], tasks: Task[], limit = 8): ComingUp
 	}
 	return items.filter((item) => keep.has(item));
 }
+
+/**
+ * When a chore or dinner is due, as its card or row says it: "Today", "Overdue by 3 days",
+ * "Tonight, 6:30 pm". Shared by the cards and the compact list, so both say the same.
+ */
+export function taskWhen(task: Task, today: string): { label: string; late: boolean } {
+	if (task.recipe)
+		return { label: formatDinnerWhen(task.dueOn!, task.dueTime, today), late: false };
+	const daysLate = task.dueOn ? -daysBetween(today, task.dueOn) : 0;
+	if (daysLate > 0)
+		return {
+			label: daysLate === 1 ? 'Overdue since yesterday' : `Overdue by ${daysLate} days`,
+			late: true
+		};
+	return { label: formatDayLabel(task.dueOn!, today), late: false };
+}
+
+/** A dinner can only be marked cooked from its day on; a chore can be ticked off any time. */
+export const canFinish = (task: Task, today: string) =>
+	!task.recipe || (task.dueOn !== null && task.dueOn <= today);

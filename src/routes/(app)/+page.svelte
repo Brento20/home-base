@@ -7,6 +7,7 @@
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
 	import AddBar from '#lib/features/today/AddBar.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
+	import { displayPrefs } from '#lib/display.svelte.js';
 	import { formatTodayHeading } from '#lib/time.js';
 	import { kept } from '#lib/ui/kept.svelte.js';
 	import Reveal from '#lib/ui/Reveal.svelte';
@@ -31,6 +32,8 @@
 		() => data.feed
 	);
 	const today = $derived(screen.current);
+	// Your display preferences: the summary line, how many cards, cards or a list.
+	const display = $derived(displayPrefs(data.display));
 
 	const heading = $derived(formatTodayHeading(new Date(`${data.today}T12:00:00Z`)));
 	const tonight = $derived(
@@ -52,14 +55,17 @@
 		</h1>
 		<ScoreAvatars people={data.household.members} scores={today?.scores ?? null} />
 	</div>
-	<!-- Its own row under the date and scores, wider than the space beside them: two lines. -->
-	<div class="summary">
-		{#if today}
-			<WeekSummary plain={today.week.plain} fingerprint={today.week.fingerprint} ai={data.ai} />
-		{:else}
-			<span class="line-waiting" aria-hidden="true"><span></span><span></span></span>
-		{/if}
-	</div>
+	<!-- Its own row under the date and scores, wider than the space beside them: two lines.
+	     Gone entirely, gap and all, for anyone who's hidden it (display preferences). -->
+	{#if !display.hideDailySummary}
+		<div class="summary">
+			{#if today}
+				<WeekSummary plain={today.week.plain} fingerprint={today.week.fingerprint} ai={data.ai} />
+			{:else}
+				<span class="line-waiting" aria-hidden="true"><span></span><span></span></span>
+			{/if}
+		</div>
+	{/if}
 </header>
 
 <div class="stack">
@@ -71,9 +77,15 @@
 				<AddBar
 					values={form && 'addBar' in form ? form.addBar : undefined}
 					errors={form && 'addBarErrors' in form ? form.addBarErrors : undefined}
-					cards={today.comingUp.length > 0}
+					cards={today.comingUp.length > 0 && display.todayCardLayout === 'cards'}
 				/>
-				<ComingUp items={today.comingUp} people={data.household.members} today={data.today} />
+				<ComingUp
+					items={today.comingUp}
+					people={data.household.members}
+					today={data.today}
+					limit={display.todayCardLimit === 'all' ? null : display.todayCardLimit}
+					layout={display.todayCardLayout}
+				/>
 			</div>
 			<ListsGlance lists={today.lists} />
 		{/snippet}

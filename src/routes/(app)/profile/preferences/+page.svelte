@@ -1,11 +1,16 @@
 <script lang="ts">
 	/**
 	 * Preferences: how home base looks to you, and only you (your housemates keep their own).
-	 * Everything here saves as you tap.
+	 * Appearance (light or dark, the background through the day), then calmer screens and Today
+	 * (display preferences). Everything here saves as you tap.
 	 */
 	import AppearanceSettings from '#lib/features/account/AppearanceSettings.svelte';
+	import DisplaySettings from '#lib/features/account/DisplaySettings.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
@@ -21,6 +26,8 @@
 <p class="explain">Just for you: your housemates keep their own. Changes save as you tap.</p>
 
 <AppearanceSettings />
+
+<DisplaySettings saved={data.display} />
 
 <style>
 	.explain {

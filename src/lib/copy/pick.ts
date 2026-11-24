@@ -6,15 +6,28 @@
  */
 
 let hydrated = false;
+/** Display preference "Stop rotating placeholders": always the first line, and reels hold still. */
+let steady = false;
 
 /** Called once by the root layout when the app has hydrated. */
 export function markHydrated() {
 	hydrated = true;
 }
 
-/** One of `lines`: the first during the server render and hydration, a random one after. */
+/** Set from the person's display preferences (src/lib/display.svelte.ts). */
+export function setSteady(value: boolean) {
+	steady = value;
+}
+
+/** Placeholder reels check this each time they'd move (and every 600ms), so they settle at once. */
+export const isSteady = () => steady;
+
+/**
+ * One of `lines`: the first during the server render and hydration, a random one after (or
+ * always the first, for someone who's asked for steady words).
+ */
 export function pick<T>(lines: readonly T[]): T {
-	if (!hydrated || lines.length < 2) return lines[0];
+	if (!hydrated || steady || lines.length < 2) return lines[0];
 	return lines[Math.floor(Math.random() * lines.length)];
 }
 

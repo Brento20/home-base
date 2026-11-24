@@ -7,7 +7,8 @@
  * action dock) paint the same picture so the page melts into it, so they must move exactly
  * together. Each gets its own Web Animation, all set to the same wall-clock phase, so one
  * added later (the action dock on a form page) joins in step. It only moves background
- * position and size, in small steps (see STEPS), and stays still with Reduce Motion.
+ * position and size, in small steps (see STEPS), and stays still with Reduce Motion or with
+ * the glows turned down (`data-glow="low"`, a display preference).
  */
 
 /** Layer order matches `.backdrop-paint`: grain, then the three glows. */
@@ -85,7 +86,8 @@ export function drift(element: HTMLElement) {
 	function start() {
 		animation?.cancel();
 		animation = null;
-		if (still.matches) return;
+		// Still with Reduce Motion, and for anyone who's turned the glows down (display preferences).
+		if (still.matches || document.documentElement.dataset.glow === 'low') return;
 		const grain = getComputedStyle(element).getPropertyValue('--grain-size').trim() || '240px';
 		animation = element.animate(keyframes(grain), {
 			duration: DURATION_MS,
@@ -100,9 +102,12 @@ export function drift(element: HTMLElement) {
 
 	start();
 	still.addEventListener('change', start);
+	const glowSwitch = new MutationObserver(start);
+	glowSwitch.observe(document.documentElement, { attributeFilter: ['data-glow'] });
 	return {
 		destroy() {
 			still.removeEventListener('change', start);
+			glowSwitch.disconnect();
 			animation?.cancel();
 		}
 	};

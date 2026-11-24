@@ -11,6 +11,7 @@
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { Profile } from '#lib/types.js';
 	import type { ComingUpItem } from './coming-up.js';
+	import ComingUpList from './ComingUpList.svelte';
 	import PlanHeroCard from './PlanHeroCard.svelte';
 	import TaskCard from './TaskCard.svelte';
 
@@ -18,9 +19,17 @@
 		items: ComingUpItem[];
 		people: Profile[];
 		today: string;
+		/**
+		 * Display preferences: how many show before "Show N more" (null for all), and the big
+		 * swipeable cards or a compact list. The order and the actions never change.
+		 */
+		limit?: number | null;
+		layout?: 'cards' | 'list';
 	}
 
-	let { items, people, today }: Props = $props();
+	let { items, people, today, limit = null, layout = 'cards' }: Props = $props();
+	/** "Show N more" tapped: everything, until you leave Today. */
+	let expanded = $state(false);
 
 	// Said a little differently each visit (src/lib/copy/voice.ts).
 	const emptyTitle = pick(EMPTY.comingUpTitle);
@@ -35,10 +44,23 @@
 	const visible = $derived(
 		items.filter((item) => !(item.kind === 'task' && ticked.includes(item.task.id)))
 	);
+	// The first few (display preferences), the rest a tap away; nothing is dropped or reordered.
+	const shown = $derived(limit && !expanded ? visible.slice(0, limit) : visible);
+	const more = $derived(visible.length - shown.length);
 	// The next plan gets the countdown and the larger title.
 	const nextPlanId = $derived(visible.find((item) => item.kind === 'plan')?.id);
 	// One dot per card, plus the closing "All plans / All tasks" card.
-	const pageCount = $derived(visible.length + 1);
+	const pageCount = $derived(shown.length + 1);
+
+	async function showMore() {
+		const first = shown.length;
+		expanded = true;
+		await tick();
+		// Straight to the first card that was hidden.
+		if (layout === 'cards') goTo(first);
+		updateActive();
+		moveIndicator();
+	}
 
 	function updateActive() {
 		if (!track) return;
@@ -101,7 +123,7 @@
 	});
 
 	const labelFor = (item: ComingUpItem, index: number) => {
-		const position = `${index + 1} of ${visible.length}`;
+		const position = `${index + 1} of ${shown.length}`;
 		return item.kind === 'plan'
 			? `${position}, plan: ${item.plan.title}`
 			: `${position}, ${item.task.recipe ? 'dinner' : 'chore'}: ${item.task.title}`;
@@ -130,10 +152,21 @@
 		<span class="empty-title">{emptyTitle}</span>
 		<span class="empty-action">{emptyAction}</span>
 	</a>
+{:else if layout === 'list'}
+	<section class="coming-list-wrap" aria-label="Coming up">
+		<ComingUpList items={shown} {people} {today} ondone={onTaskDone} />
+		<div class="list-more">
+			{#if more}
+				<button type="button" class="button-quiet" onclick={showMore}>Show {more} more</button>
+			{/if}
+			<a class="button-quiet" href="/plans">All plans</a>
+			<a class="button-quiet" href="/lists/tasks">All tasks</a>
+		</div>
+	</section>
 {:else}
 	<section class="coming-up" aria-label="Coming up">
 		<ol class="track" bind:this={track} onscroll={onScroll}>
-			{#each visible as item, index (item.id)}
+			{#each shown as item, index (item.id)}
 				<li
 					class="slide"
 					class:active={index === active}
@@ -164,11 +197,14 @@
 					{/if}
 				</li>
 			{/each}
-			<li class="slide slide-more" class:active={active === visible.length}>
+			<li class="slide slide-more" class:active={active === shown.length}>
 				<span class="slide-glow" aria-hidden="true"></span>
 				<div class="more">
 					<GlassSurface radius={28} squish />
 					<span class="more-body">
+						{#if more}
+							<button type="button" class="show-more" onclick={showMore}>Show {more} more</button>
+						{/if}
 						<a href="/plans">All plans <Icon name="chevron" size={18} /></a>
 						<a href="/lists/tasks">All tasks <Icon name="chevron" size={18} /></a>
 					</span>
@@ -346,6 +382,31 @@
 
 	.more-body a:global([data-pressed]) {
 		background: var(--colour-fill);
+	}
+
+	/* The hidden cards (display preferences): the first thing on the closing card. */
+	.show-more {
+		min-height: var(--tap-target);
+		border: 0;
+		border-radius: 14px;
+		background: var(--colour-accent-soft);
+		font-size: var(--text-small);
+		font-weight: var(--weight-medium);
+		color: var(--colour-accent);
+	}
+
+	/* Under the compact list: Show N more, then the full lists. */
+	.list-more {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		margin-top: 6px;
+	}
+
+	.list-more .button-quiet {
+		min-height: var(--tap-target);
+		font-size: var(--text-small);
+		color: var(--colour-accent);
 	}
 
 	/*

@@ -656,6 +656,66 @@ test('You & friends: Edit profile, Preferences, Details and account, and old lin
 	expect(errors).toEqual([]);
 });
 
+test('Display preferences: glow, steady placeholders, summary, cards shown and a list', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	const reset = () =>
+		page.request.post('/account/display', { data: { prefs: {} } }).then((r) => r.ok());
+	expect(await reset()).toBe(true);
+
+	// As designed until you change something.
+	await open(page, '/');
+	await expect(page.locator('html')).toHaveAttribute('data-glow', 'full');
+	await expect(page.locator('.week')).toHaveCount(1);
+	const allCards = await page.locator('.coming-up .slide:not(.slide-more)').count();
+	expect(allCards).toBeGreaterThan(3);
+
+	// Each change shows at once, without a reload.
+	await open(page, '/profile/preferences');
+	// Taps where a person would: the row of a switch, the segment of a choice.
+	const row = (name: string) => page.locator('.switch-row', { hasText: name });
+	const segment = (name: string) => page.locator('.segmented label', { hasText: name });
+	await row('Reduce glow effects').click();
+	await expect(page.locator('html')).toHaveAttribute('data-glow', 'low');
+	await row('Steady placeholders').click();
+	await row('Daily summary').click();
+	await expect(page.getByRole('switch', { name: 'Daily summary' })).not.toBeChecked();
+	await segment('3').click();
+	await expect(page.getByRole('radio', { name: '3', exact: true })).toBeChecked();
+	await page.locator('.tab-bar a', { hasText: 'Today' }).first().click();
+	await expect(page.locator('.week')).toHaveCount(0);
+	await expect(page.locator('.coming-up .slide:not(.slide-more)')).toHaveCount(3);
+	const more = page.getByRole('button', { name: `Show ${allCards - 3} more` });
+	await expect(more).toBeVisible();
+
+	// Nothing is lost: Show N more brings back every card, in the same order.
+	await more.click();
+	await expect(page.locator('.coming-up .slide:not(.slide-more)')).toHaveCount(allCards);
+
+	// The compact list: the same items and their ticks; it stays after a full reload.
+	await open(page, '/profile/preferences');
+	await page.locator('.segmented label', { hasText: 'List' }).click();
+	await page.waitForTimeout(800); // the save waits a moment for more taps
+	await open(page, '/');
+	await expect(page.locator('html')).toHaveAttribute('data-glow', 'low');
+	await expect(page.locator('.coming-list > li')).toHaveCount(3);
+	await expect(page.locator('.coming-list')).toContainText('Put the bins out');
+	await expect(page.getByRole('button', { name: /Tick off Put the bins out/ })).toBeVisible();
+	await page.getByRole('button', { name: /^Show \d+ more$/ }).click();
+	await expect(page.locator('.coming-list > li')).toHaveCount(allCards);
+
+	// Steady placeholders: the hint on a new plan stays put.
+	await open(page, '/plans/new');
+	const reel = page.locator('.placeholder-reel').first();
+	const before = await reel.textContent();
+	await page.waitForTimeout(4500);
+	expect(await reel.textContent()).toBe(before);
+
+	expect(await reset()).toBe(true);
+	expect(errors).toEqual([]);
+});
+
 test('Friend requests: a dot on Home, accept one, send by code, send from a profile, cancel', async ({
 	page
 }) => {

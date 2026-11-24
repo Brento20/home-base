@@ -3,6 +3,7 @@ import { forgetFriendLink, savedFriendLink } from '#lib/features/friends/friend-
 import type { Handle } from '@sveltejs/kit/hooks';
 import { redirectFor, stageFor } from '#lib/features/account/stage.js';
 import { DEFAULT_HOME, homeFrom, setHomeSettingsSource, type HomeSettings } from '#lib/home.js';
+import { DEFAULT_DISPLAY, DISPLAY_COOKIE, parseDisplay, type DisplayPrefs } from '#lib/display.js';
 import { getRequestEvent } from '$app/server';
 import { sampleHome } from '#lib/server/sample-home.js';
 import { RequestTiming } from '#lib/server/timing.js';
@@ -45,9 +46,10 @@ setHomeSettingsSource(() => {
 
 /**
  * Writes this device's appearance into the page shell (app.html): the theme colours, the inline
- * script that picks the one for the time of day, light or dark, and the iPhone status bar to suit.
+ * script that picks the one for the time of day, light or dark, the iPhone status bar to suit,
+ * and whether this person has turned the glows down (display preferences).
  */
-function themed(theme: ThemeChoice, home: HomeSettings) {
+function themed(theme: ThemeChoice, home: HomeSettings, display: DisplayPrefs) {
 	const ground = paletteFor(theme, daypartAt())[theme.mode].ground;
 	return {
 		transformPageChunk: ({ html }: { html: string }) =>
@@ -58,6 +60,7 @@ function themed(theme: ThemeChoice, home: HomeSettings) {
 				.replaceAll('%hb.mode%', theme.mode)
 				.replace('%hb.ground%', ground)
 				.replace('%hb.statusbar%', theme.mode === 'light' ? 'default' : 'black-translucent')
+				.replace('%hb.glow%', display.reduceGlow ? 'low' : 'full')
 	};
 }
 
@@ -100,15 +103,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 	locals.user = null;
 	locals.householdId = null;
 	locals.home = DEFAULT_HOME;
+	locals.display = DEFAULT_DISPLAY;
 
 	if (!locals.supabase) {
 		// Sample data: everything is open, including the sign-up pages, so they can be designed.
 		locals.stage = 'ready';
 		locals.householdId = 'sample-household';
 		locals.home = sampleHome;
+		// No database to keep them in: sample mode keeps display preferences in a cookie.
+		locals.display = readDisplayCookie(event.cookies.get(DISPLAY_COOKIE));
 		const response = await resolve(
 			event,
-			themed(parseTheme(event.cookies.get(THEME_COOKIE)), locals.home)
+			themed(parseTheme(event.cookies.get(THEME_COOKIE)), locals.home, locals.display)
 		);
 		response.headers.set('server-timing', timing.header());
 		return secure(response);
@@ -134,13 +140,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 			supabase
 				.from('profiles')
 				.select(
-					'onboarded_at, household_members ( household_id, households ( time_zone, currency ) )'
+					'onboarded_at, display_prefs, household_members ( household_id, households ( time_zone, currency ) )'
 				)
 				.eq('id', userId)
 				.maybeSingle()
 		);
 
 		onboarded = Boolean(profile?.onboarded_at);
+		locals.display = parseDisplay(profile?.display_prefs);
 		const membership = (profile?.household_members as unknown as Membership[] | undefined)?.[0];
 		locals.householdId = membership?.household_id ?? null;
 		if (membership?.households) locals.home = homeFrom(membership.households);
@@ -164,13 +171,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	const response = await resolve(event, {
-		...themed(await deviceTheme(event), locals.home),
+		...themed(await deviceTheme(event), locals.home, locals.display),
 		filterSerializedResponseHeaders: (name) =>
 			name === 'content-range' || name === 'x-supabase-api-version'
 	});
 	response.headers.set('server-timing', timing.header());
 	return secure(response);
 };
+
+function readDisplayCookie(value: string | undefined): DisplayPrefs {
+	try {
+		return parseDisplay(value ? JSON.parse(value) : null);
+	} catch {
+		return DEFAULT_DISPLAY;
+	}
+}
 
 interface Membership {
 	household_id: string;

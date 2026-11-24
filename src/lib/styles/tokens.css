@@ -302,6 +302,32 @@
 	--duration-settle: 280ms;
 }
 
+/*
+ * Display preference "Reduce glow effects" (src/lib/display.ts): the backdrop's three glows at
+ * about a third of their strength and still (backdrop-drift.ts), and no glow under the next plan
+ * or other glowing cards. Card edges, the selected card's warm tint, focus rings and the AI ring
+ * stay, so what's selected or working is as clear as ever. `html:root` outranks the light-mode
+ * and palette rules, so it holds in every theme.
+ */
+html:root[data-glow='low'] {
+	--glow-event: 0 0 0 transparent;
+	--mesh-one: radial-gradient(
+		var(--mesh-one-shape),
+		color-mix(in srgb, var(--glow-one) 35%, transparent),
+		transparent 72%
+	);
+	--mesh-two: radial-gradient(
+		var(--mesh-two-shape),
+		color-mix(in srgb, var(--glow-two) 35%, transparent),
+		transparent 70%
+	);
+	--mesh-three: radial-gradient(
+		var(--mesh-three-shape),
+		color-mix(in srgb, var(--glow-three) 35%, transparent),
+		transparent 72%
+	);
+}
+
 :root[data-daypart='morning'] {
 	--mesh-one-shape: 50% 30% at 20% 14.3%;
 	--mesh-two-shape: 39.3% 28.6% at 85.7% 38.6%;

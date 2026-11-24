@@ -11,12 +11,14 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	// `ai`: whether the AI helpers show. Without a key they hide and forms work by hand.
 	// `home`: its time zone and currency, so the phone shows dates and money as the server does.
 	// `requestsWaiting`: friend requests waiting on you, a dot on the Home tab.
+	// `display`: your display preferences (src/lib/display.ts).
 	return {
 		household,
 		me,
 		home: locals.home,
 		sampleMode: locals.sampleMode,
 		ai: aiConfigured,
-		requestsWaiting
+		requestsWaiting,
+		display: locals.display
 	};
 };

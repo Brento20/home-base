@@ -6,7 +6,7 @@
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
-	import { daysBetween, formatDayLabel, formatDinnerWhen } from '#lib/time.js';
+	import { canFinish as finishable, taskWhen } from './coming-up.js';
 	import type { Profile, Task } from '#lib/types.js';
 
 	interface Props {
@@ -25,19 +25,10 @@
 	let pops = $state(0);
 
 	const assignee = $derived(people.find((person) => person.id === task.assigneeId));
-	const daysLate = $derived(task.dueOn ? -daysBetween(today, task.dueOn) : 0);
 	const dinner = $derived(Boolean(task.recipe));
-	// A dinner can only be marked cooked from its day on; a chore can be ticked off any time.
-	const canFinish = $derived(!dinner || (task.dueOn !== null && task.dueOn <= today));
-	const when = $derived(
-		dinner
-			? formatDinnerWhen(task.dueOn!, task.dueTime, today)
-			: daysLate > 0
-				? daysLate === 1
-					? 'Overdue since yesterday'
-					: `Overdue by ${daysLate} days`
-				: formatDayLabel(task.dueOn!, today)
-	);
+	const canFinish = $derived(finishable(task, today));
+	const due = $derived(taskWhen(task, today));
+	const when = $derived(due.label);
 </script>
 
 <div class="task-card" class:highlighted class:done>
@@ -48,7 +39,7 @@
 		aria-label={label ?? task.title}
 	></a>
 	<div class="body">
-		<span class="when caption-label" class:late={!dinner && daysLate > 0}>
+		<span class="when caption-label" class:late={due.late}>
 			{dinner ? 'Dinner' : 'Chore'} · {when}
 			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
 					><Icon name="repeat" size={13} /></span

@@ -16,6 +16,8 @@ declare global {
 			householdId: string | null;
 			/** That home's time zone and currency (src/lib/home.ts); the defaults before one. */
 			home: import('#lib/home.js').HomeSettings;
+			/** The signed-in person's display preferences (src/lib/display.ts); the defaults otherwise. */
+			display: import('#lib/display.js').DisplayPrefs;
 		}
 		// interface Error {}
 		// interface PageData {}

@@ -5,7 +5,8 @@
  * every few seconds ("Shucking oysters on the beach?" → "Brunch with Gaga?"), starting from the
  * field's own placeholder and then a shuffled order, so it's different each visit. Focusing the
  * field stops the reel on whatever it's showing; typing hides it; clearing the field brings it
- * back. With reduced motion it shows one suggestion and stays still.
+ * back. With reduced motion, or the display preference for steady placeholders, it shows its
+ * first suggestion (the field's own placeholder) and stays still.
  *
  * Only one reel moves at a time, so a screen with several fields never has hints moving all
  * over it. The lead is the first field on the page that is empty, on screen and not yet touched.
@@ -17,7 +18,7 @@
  * readers hear. The field's own `placeholder` is the no-JavaScript fallback and the first line.
  */
 
-import { shuffled } from '#lib/copy/pick.js';
+import { isSteady, shuffled } from '#lib/copy/pick.js';
 
 type Field = HTMLInputElement | HTMLTextAreaElement;
 
@@ -159,7 +160,7 @@ export function placeholderReel(field: Field, lines: readonly string[]) {
 		inLine: () => field.isConnected && field.value === '' && onScreen && !touched,
 		run() {
 			const free = document.activeElement !== field && !document.hidden;
-			if (!free || reduced || steps >= MAX_STEPS) return stop();
+			if (!free || reduced || isSteady() || steps >= MAX_STEPS) return stop();
 			if (!timer) schedule(steps === 0 ? FIRST_STEP_MS : STEP_MS);
 		},
 		hold: stop
