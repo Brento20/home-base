@@ -11,8 +11,10 @@
  * orientation's front-back tilt (whose sign every platform agrees on) settles which way is
  * down. A shake is a sharp spike in `acceleration` (gravity removed).
  *
- * Kind to the battery: full frame rate only while the snow is lively, about 30 frames a
- * second when it's calm, and nothing at all while the app is in the background.
+ * Smooth, and still kind to the battery: up to 60 frames a second, evenly paced (every other
+ * frame on a 120Hz screen), at no more than twice standard resolution, and nothing at all while
+ * the app is in the background. The tilt is smoothed and a still hand's tremble ignored, and
+ * scrolling's push is spread over a few frames, so nothing jolts the flakes.
  */
 
 interface Flake {
@@ -26,6 +28,9 @@ interface Flake {
 	radius: number;
 	alpha: number;
 	phase: number;
+	/** Its own sway: how far (0.6–1.3) and how fast (0.7–1.2) it drifts side to side. */
+	sway: number;
+	swayRate: number;
 	/** Seconds left resting on the floor; 0 while it's moving. */
 	rest: number;
 	/** Fades in after a respawn, out at the end of a rest. */
@@ -73,6 +78,8 @@ export class SnowGlobe {
 	private sign = 0;
 	private lastBeta: number | null = null;
 	private swirl = 0;
+	/** Scrolling not yet passed on to the snow. */
+	private scrollKick = 0;
 	private swirlTurn = 1;
 	private frame = 0;
 	private last = 0;
@@ -185,9 +192,10 @@ export class SnowGlobe {
 	}
 
 	private resize() {
-		// Soft, blurry flakes look the same at standard resolution, at a quarter of the pixels a
-		// retina canvas would draw every frame.
-		this.ratio = 1;
+		// Twice standard resolution at most: enough for a small flake to glide between pixels
+		// instead of stepping, at under half the pixels of a 3x screen.
+		this.ratio = Math.min(2, window.devicePixelRatio || 1);
+		this.sprites.clear();
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
 		this.canvas.width = Math.round(this.width * this.ratio);
@@ -203,18 +211,30 @@ export class SnowGlobe {
 	}
 
 	private newFlake(anywhere: boolean): Flake {
-		// About one in twenty is a big, soft, out-of-focus flake close to the glass.
-		const bokeh = Math.random() < 0.05;
-		const depth = bokeh ? rand(1.15, 1.35) : rand(0.35, 1) ** 1.4 * 0.65 + 0.35;
+		// Four layers for depth: many tiny faint ones far back, fewer and brighter ones nearer,
+		// and about one in twenty a big, soft, out-of-focus flake right against the glass. Each
+		// flake varies within its layer, so no two rows look alike.
+		const roll = Math.random();
+		const layer =
+			roll < 0.42
+				? { depth: [0.32, 0.52], radius: [0.6, 1.2], alpha: [0.14, 0.34] }
+				: roll < 0.78
+					? { depth: [0.52, 0.8], radius: [1.3, 2.3], alpha: [0.36, 0.66] }
+					: roll < 0.95
+						? { depth: [0.8, 1], radius: [2.4, 3.5], alpha: [0.66, 0.94] }
+						: { depth: [1.15, 1.35], radius: [5, 8.5], alpha: [0.05, 0.13] };
+		const depth = rand(layer.depth[0], layer.depth[1]);
 		const flake: Flake = {
 			x: 0,
 			y: 0,
 			vx: rand(-8, 8),
 			vy: rand(0, 20) * depth,
 			depth,
-			radius: bokeh ? rand(4.5, 7) : 1 + depth * 2.3,
-			alpha: bokeh ? rand(0.09, 0.16) : 0.3 + depth * 0.6,
+			radius: rand(layer.radius[0], layer.radius[1]),
+			alpha: rand(layer.alpha[0], layer.alpha[1]),
 			phase: Math.random() * Math.PI * 2,
+			sway: rand(0.6, 1.3),
+			swayRate: rand(0.7, 1.2),
 			rest: 0,
 			fade: anywhere ? 1 : 0
 		};
@@ -273,7 +293,11 @@ export class SnowGlobe {
 			];
 		const length = Math.hypot(x, y);
 		if (length > 1) [x, y] = [x / length, y / length];
-		this.target = { x, y };
+		// Readings come in faster than they matter: smooth them, and ignore the tremble of a
+		// hand holding the phone still.
+		const nx = this.target.x + (x - this.target.x) * 0.25;
+		const ny = this.target.y + (y - this.target.y) * 0.25;
+		if (Math.hypot(nx - this.target.x, ny - this.target.y) > 0.004) this.target = { x: nx, y: ny };
 
 		const jolt = event.acceleration;
 		if (jolt && jolt.x !== null && jolt.y !== null) {
@@ -292,7 +316,8 @@ export class SnowGlobe {
 		const delta = window.scrollY - this.scrollY;
 		this.scrollY = window.scrollY;
 		if (Math.abs(delta) > 200) return;
-		for (const flake of this.flakes) flake.vy -= delta * flake.depth * 0.35;
+		// Spread over the next few frames: scroll events come in bursts, which made the snow jump.
+		this.scrollKick += delta;
 	}
 
 	/** A mouse or finger passing through stirs the flakes near it. */
@@ -340,14 +365,10 @@ export class SnowGlobe {
 			const dt = this.last ? Math.min(MAX_DT, (now - this.last) / 1000) : 1 / 60;
 			this.last = now;
 			this.step(dt);
-			// Calm snow draws at about 30 frames a second; a swirl, a tilt or a fade at full rate.
+			// Every frame up to 60 a second, evenly: on a 120Hz screen, every other one. Drawing calm
+			// snow at 30 made it step visibly.
 			this.sinceDraw += dt;
-			const lively =
-				this.swirl > 0.05 ||
-				this.opacity < 1 ||
-				this.stopping !== null ||
-				Math.hypot(this.target.x - this.gravity.x, this.target.y - this.gravity.y) > 0.02;
-			if (lively || this.sinceDraw >= 1 / 31) {
+			if (this.sinceDraw >= 1 / 62) {
 				this.draw();
 				this.sinceDraw = 0;
 			}
@@ -364,10 +385,13 @@ export class SnowGlobe {
 		this.opacity = this.stopping
 			? Math.max(0, this.opacity - dt / 0.7)
 			: Math.min(1, this.opacity + dt / 1.4);
-		const ease = 1 - Math.exp(-dt * 7);
+		// The accelerometer is noisy: follow it slowly enough that the noise never reaches the snow.
+		const ease = 1 - Math.exp(-dt * 3);
 		this.gravity.x += (this.target.x - this.gravity.x) * ease;
 		this.gravity.y += (this.target.y - this.gravity.y) * ease;
 		this.swirl *= Math.exp(-dt / 1.6);
+		const kick = this.scrollKick * (1 - Math.exp(-dt * 10));
+		this.scrollKick -= kick;
 
 		const { x: gx, y: gy } = this.gravity;
 		const tilt = Math.hypot(gx, gy);
@@ -395,8 +419,11 @@ export class SnowGlobe {
 			}
 			const depth = Math.min(1, flake.depth);
 			// Gravity, a lazy side-to-side sway, and the swirl's turn around the centre.
-			let ax = gx * FALL * depth + Math.sin(this.time * 0.9 + flake.phase) * 9;
-			let ay = gy * FALL * depth + Math.cos(this.time * 0.7 + flake.phase) * 4;
+			const sway = flake.sway * (0.5 + depth * 0.5);
+			let ax =
+				gx * FALL * depth + Math.sin(this.time * 0.9 * flake.swayRate + flake.phase) * 9 * sway;
+			let ay =
+				gy * FALL * depth + Math.cos(this.time * 0.7 * flake.swayRate + flake.phase) * 4 * sway;
 			if (tilt < 0.2) {
 				// Lying flat: no "down", just a slow drift.
 				ax += Math.sin(this.time * 0.3 + flake.phase * 2) * 6;
@@ -411,7 +438,7 @@ export class SnowGlobe {
 				ay += (rx / distance) * spin * pull - (ry / distance) * spin * 0.12;
 			}
 			flake.vx = (flake.vx + ax * dt) * drag;
-			flake.vy = (flake.vy + ay * dt) * drag;
+			flake.vy = (flake.vy + ay * dt) * drag - kick * flake.depth * 0.35;
 			flake.x += flake.vx * dt;
 			flake.y += flake.vy * dt;
 			if (flake.fade < 1) flake.fade = Math.min(1, flake.fade + dt * 1.5);

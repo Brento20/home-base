@@ -59,16 +59,23 @@
 	 * A backdrop fade from just above the bar down to the tab bar's own, the same trick as the
 	 * app layout's edge fade, so the bar can stay see-through like the tab bar without a blur.
 	 */
+	/* Full-screen and masked to the bottom band, so its glows line up with the backdrop's. */
 	.dock-fade {
+		--fade-height: calc(env(safe-area-inset-bottom) + 12px + 62px + 10px + 62px + 36px);
 		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		inset: 0;
 		z-index: 26;
-		height: calc(env(safe-area-inset-bottom) + 12px + 62px + 10px + 62px + 36px);
 		pointer-events: none;
-		-webkit-mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.85) 30%);
-		mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.85) 30%);
+		-webkit-mask-image: linear-gradient(
+			to bottom,
+			transparent calc(100% - var(--fade-height)),
+			rgb(0 0 0 / 0.85) calc(100% - var(--fade-height) * 0.7)
+		);
+		mask-image: linear-gradient(
+			to bottom,
+			transparent calc(100% - var(--fade-height)),
+			rgb(0 0 0 / 0.85) calc(100% - var(--fade-height) * 0.7)
+		);
 	}
 
 	/* The tab bar's twin: same height, fill, lit rim and shadow (TabBar.svelte). */

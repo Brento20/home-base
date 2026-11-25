@@ -93,23 +93,29 @@
 	 * From a little above the tab bar down to the bottom edge, nearly solid by the time it's
 	 * behind the bar. iOS Safari sometimes drops a fixed element's blur for a frame; with this
 	 * under the bar, there's nothing sharp left to show through when it does.
+	 *
+	 * The layer itself covers the whole screen and the mask shows only the bottom band, so its
+	 * glows line up with the backdrop's exactly: background positions count from an element's
+	 * own top, so a band-sized layer painted the glows a screen-height out of step, which
+	 * showed as a lighter or darker strip along the bottom.
 	 */
 	.bottom {
+		--fade-height: calc(env(safe-area-inset-bottom) + 136px);
+		top: 0;
 		bottom: 0;
 		z-index: 25;
-		height: calc(env(safe-area-inset-bottom) + 136px);
-		background-position:
-			0 0,
-			left bottom,
-			left bottom,
-			left bottom;
 		-webkit-mask-image: linear-gradient(
 			to bottom,
-			transparent,
-			rgb(0 0 0 / 0.92) 42%,
+			transparent calc(100% - var(--fade-height)),
+			rgb(0 0 0 / 0.92) calc(100% - var(--fade-height) * 0.58),
 			rgb(0 0 0 / 0.97)
 		);
-		mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.92) 42%, rgb(0 0 0 / 0.97));
+		mask-image: linear-gradient(
+			to bottom,
+			transparent calc(100% - var(--fade-height)),
+			rgb(0 0 0 / 0.92) calc(100% - var(--fade-height) * 0.58),
+			rgb(0 0 0 / 0.97)
+		);
 	}
 
 	.screen {

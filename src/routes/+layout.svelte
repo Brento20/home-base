@@ -89,9 +89,14 @@
 		isolation: isolate;
 	}
 
+	/*
+	 * Overhangs the bottom edge: some iOS versions stop a fixed layer's bottom short of the
+	 * screen's (under the home indicator, or as Safari's toolbar slides away), which left a
+	 * plain strip there. The glows count from the top, so the overhang changes nothing else.
+	 */
 	.app-backdrop {
 		position: fixed;
-		inset: 0;
+		inset: 0 0 -160px;
 		z-index: -1;
 		transition: background-color var(--duration-settle) var(--ease-out);
 	}

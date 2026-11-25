@@ -211,6 +211,7 @@ const phrase = (text: string) => words(text).map(stem);
 interface Prepared extends IconMeaning {
 	entityStems: string[][];
 	subjectStems: string[][];
+	kindSubjectStems: Partial<Record<IconKind, string[][]>>;
 	verbStems: string[][];
 	actionStems: string[][];
 	contextStems: string[][];
@@ -220,6 +221,9 @@ const PREPARED: Prepared[] = MEANINGS.map((meaning) => ({
 	...meaning,
 	entityStems: (meaning.entities ?? []).map(phrase),
 	subjectStems: (meaning.subjects ?? []).map(phrase),
+	kindSubjectStems: Object.fromEntries(
+		Object.entries(meaning.kindSubjects ?? {}).map(([kind, words]) => [kind, words.map(phrase)])
+	),
 	verbStems: (meaning.verbs ?? []).map(phrase),
 	actionStems: (meaning.actions ?? []).map(phrase),
 	contextStems: (meaning.contexts ?? []).map(phrase)
@@ -227,7 +231,13 @@ const PREPARED: Prepared[] = MEANINGS.map((meaning) => ({
 
 /** Every word of every subject and named thing. */
 const KNOWN = new Set(
-	PREPARED.flatMap((meaning) => [...meaning.subjectStems, ...meaning.entityStems].flat())
+	PREPARED.flatMap((meaning) =>
+		[
+			...meaning.subjectStems,
+			...meaning.entityStems,
+			...Object.values(meaning.kindSubjectStems).flat()
+		].flat()
+	)
 );
 
 /** Every verb anyone uses, as stem phrases, longest first so "pick up" beats "pick". */
@@ -325,7 +335,10 @@ function score(meaning: Prepared, reading: Reading, kind: IconKind | undefined) 
 	}
 	let best = 0;
 	let bestReason = '';
-	for (const subject of meaning.subjectStems) {
+	const subjects = kind
+		? [...meaning.subjectStems, ...(meaning.kindSubjectStems[kind] ?? [])]
+		: meaning.subjectStems;
+	for (const subject of subjects) {
 		const value =
 			find(reading.subject, subject) >= 0
 				? SUBJECT

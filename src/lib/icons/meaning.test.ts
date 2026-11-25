@@ -78,7 +78,10 @@ describe('pickIcon', () => {
 		['Dinner at Nobu', 'utensils'],
 		['Road trip to Byron', 'car'],
 		['Pack for Bali', 'suitcase'],
-		['Trip to Japan', 'plane'],
+		['Trip to Japan', null],
+		['Trip to the shops', 'shopping-cart'],
+		['Shopping trip', 'shopping-cart'],
+		['Flights to Japan', 'plane'],
 		['Read a book', 'bookmark'],
 		['Quarterly review', 'chart'],
 		['Settlement day', 'household'],
@@ -143,6 +146,15 @@ describe('planIcon and taskIcon', () => {
 			taskIcon({ title: 'Dinner', recipe: { title: 'Lemon and herb chicken tray bake' } })
 		).toBe('cooking-pot');
 		expect(taskIcon({ title: 'Bake', recipe: null })).toBe('cake');
+	});
+
+	it('reads “trip” by what it’s on: a chore trip is a shopping run, a plan’s is anyone’s guess', () => {
+		expect(taskIcon({ title: 'Bunnings trip' })).toBe('shopping-cart');
+		expect(taskIcon({ title: 'Trip' })).toBe('shopping-cart');
+		expect(taskIcon({ title: 'Hardware run' })).toBe('shopping-cart');
+		expect(planIcon({ title: 'Trip to Mudgee' })).toBeNull();
+		expect(planIcon({ title: 'School trip' })).toBeNull();
+		expect(planIcon({ title: 'Road trip to Byron' })).toBe('car');
 	});
 
 	it('leaves a chore it doesn’t understand plain', () => {

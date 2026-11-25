@@ -14,6 +14,9 @@
  *   "Vacuum the lounge" is vacuuming, not a sofa; "Ring the plumber" is a call.
  * - `contexts`: words around it that lean its way ("at the pub", "for the trip"). Weak.
  * - `kinds`: what it's usually on: plans, chores or dinners. A nudge, not a rule.
+ * - `kindSubjects`: subjects that only mean it on one kind of thing. "Trip" on a chore is a
+ *   shopping trip (to the shops, the hardware store); on a plan it could be anything, so it
+ *   means nothing there by itself.
  *
  * Words are written in their plain form; meaning.ts reduces both these and the text to stems, so
  * "dog" also matches "dogs" and "walking" matches "walk". Phrases match as whole words in order.
@@ -45,6 +48,7 @@ export interface IconMeaning {
 	actions?: string[];
 	contexts?: string[];
 	kinds?: IconKind[];
+	kindSubjects?: Partial<Record<IconKind, string[]>>;
 	/** Whole-text patterns that mean it outright, like an age for a birthday ("70th"). */
 	patterns?: RegExp[];
 }
@@ -606,6 +610,11 @@ export const MEANINGS: IconMeaning[] = [
 		id: 'shopping-cart',
 		category: 'food',
 		entities: [
+			'shopping trip',
+			'trip to the shops',
+			'shopping run',
+			'supply run',
+			'hardware run',
 			'online order',
 			'click and collect',
 			'kmart',
@@ -615,8 +624,22 @@ export const MEANINGS: IconMeaning[] = [
 			'amazon',
 			'officeworks'
 		],
-		subjects: ['shopping', 'shop', 'order', 'mall', 'cart', 'trolley', 'return'],
+		subjects: [
+			'shops',
+			'hardware',
+			'hardware store',
+			'supplies',
+			'cleaning supplies',
+			'shopping',
+			'shop',
+			'order',
+			'mall',
+			'cart',
+			'trolley',
+			'return'
+		],
 		verbs: ['order', 'shop', 'return'],
+		kindSubjects: { chore: ['trip', 'run'] },
 		kinds: ['chore', 'plan']
 	},
 	{
@@ -850,8 +873,6 @@ export const MEANINGS: IconMeaning[] = [
 			'plane',
 			'overseas',
 			'holiday',
-			'trip',
-			'travel',
 			'vacation',
 			'abroad',
 			'layover',
