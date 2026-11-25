@@ -101,6 +101,60 @@
 		<script nonce="%sveltekit.nonce%">
 			%hb.themescript%
 		</script>
+		<style>
+			/* The launch overlay (in <body>): styled before its markup, so no frame ever shows it bare. */
+			.launch {
+				position: fixed;
+				inset: 0;
+				z-index: 1000;
+				pointer-events: none;
+			}
+			.launch-ground {
+				position: absolute;
+				inset: 0;
+				background-color: #0b0807;
+				background-image:
+					url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0 0 0 -0.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+					radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%),
+					radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%),
+					radial-gradient(70% 36% at 60% 104%, rgb(160 72 30 / 0.28), transparent 72%);
+				background-size:
+					240px 240px,
+					100% 100%,
+					100% 100%,
+					100% 100%;
+				background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+				transition: opacity 900ms cubic-bezier(0.4, 0, 0.2, 1);
+				/* Its own layer from the first frame, painted once while it holds still. Promoted only
+				   when the fade began, iOS repainted the grain right then and flashed. */
+				will-change: opacity;
+			}
+			/* Inline outlines (tools/make_launch.py), so it's there on the very first frame. */
+			.launch-logo {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 30vw;
+				height: auto;
+				transform: translate(-50%, -50%);
+				will-change: opacity, transform;
+				transition:
+					opacity 800ms cubic-bezier(0.4, 0, 0.2, 1) 550ms,
+					transform 1300ms cubic-bezier(0.2, 0.8, 0.2, 1) 550ms;
+			}
+			.launch.out .launch-ground {
+				opacity: 0;
+			}
+			.launch.out .launch-logo {
+				opacity: 0;
+				transform: translate(-50%, -50%) scale(1.04);
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.launch.out .launch-logo {
+					transform: translate(-50%, -50%);
+				}
+			}
+		</style>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
@@ -129,55 +183,6 @@
 				/></svg
 			><!-- /launch-lockup -->
 		</div>
-		<style>
-			.launch {
-				position: fixed;
-				inset: 0;
-				z-index: 1000;
-				pointer-events: none;
-			}
-			.launch-ground {
-				position: absolute;
-				inset: 0;
-				background-color: #0b0807;
-				background-image:
-					url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0 0 0 -0.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-					radial-gradient(65% 42% at 92% 6%, rgb(218 100 36 / 0.6), transparent 72%),
-					radial-gradient(60% 42% at 0% 68%, rgb(112 26 40 / 0.55), transparent 70%),
-					radial-gradient(70% 36% at 60% 104%, rgb(160 72 30 / 0.28), transparent 72%);
-				background-size:
-					240px 240px,
-					100% 100%,
-					100% 100%,
-					100% 100%;
-				background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-				transition: opacity 900ms cubic-bezier(0.4, 0, 0.2, 1);
-			}
-			/* Inline outlines (tools/make_launch.py), so it's there on the very first frame. */
-			.launch-logo {
-				position: absolute;
-				left: 50%;
-				top: 50%;
-				width: 30vw;
-				height: auto;
-				transform: translate(-50%, -50%);
-				transition:
-					opacity 800ms cubic-bezier(0.4, 0, 0.2, 1) 550ms,
-					transform 1300ms cubic-bezier(0.2, 0.8, 0.2, 1) 550ms;
-			}
-			.launch.out .launch-ground {
-				opacity: 0;
-			}
-			.launch.out .launch-logo {
-				opacity: 0;
-				transform: translate(-50%, -50%) scale(1.04);
-			}
-			@media (prefers-reduced-motion: reduce) {
-				.launch.out .launch-logo {
-					transform: translate(-50%, -50%);
-				}
-			}
-		</style>
 		<script nonce="%sveltekit.nonce%">
 			(function () {
 				var launch = document.getElementById('launch');
@@ -199,6 +204,8 @@
 							launch.classList.add('out');
 							setTimeout(function () {
 								launch.remove();
+								// The app holds back work that restyles the page until now (preloadTabs).
+								dispatchEvent(new Event('hb-launch-done'));
 							}, 1500);
 						},
 						Math.max(0, 1500 - (Date.now() - shown))

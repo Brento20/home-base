@@ -138,8 +138,14 @@ export function preloadTabs() {
 				.then((route) => route && preloadCode(route.id))
 				.catch(() => {})
 		);
-	if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 3000 });
-	else setTimeout(load, 1500);
+	const later = () => {
+		if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 3000 });
+		else setTimeout(load, 1500);
+	};
+	// Each tab's code brings its stylesheets, and adding them restyles the whole page. Under the
+	// launch screen's fade (app.html) that flashed it, so wait until it has gone.
+	if (document.getElementById('launch')) addEventListener('hb-launch-done', later, { once: true });
+	else later();
 }
 
 const depth = (pathname: string) => pathname.split('/').filter(Boolean).length;

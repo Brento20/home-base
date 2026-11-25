@@ -77,6 +77,11 @@
 	--colour-well: rgb(0 0 0 / 0.28);
 	/* Bars that float over the page (the tab bar, the action dock). */
 	--surface-bar: rgb(20 15 13 / 0.68);
+	/* What the tab bar's frost shows through, as one solid colour: the ground tinted by the
+	   theme's first glow, about as it comes out blurred. Stands in for the frost while a page
+	   slides (a snapshot can't blur), so the bar keeps its colour on every theme. */
+	--bar-backing:
+		linear-gradient(color-mix(in srgb, var(--glow-one) 27%, transparent) 0 0), var(--colour-ground);
 	/* Solid things that pop up: toasts, menus, the status bead. */
 	--surface-raised: rgb(36 30 26 / 0.98);
 	--surface-sheet: linear-gradient(180deg, rgb(34 27 23), rgb(20 16 13));

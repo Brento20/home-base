@@ -270,11 +270,12 @@ html[data-nav] [data-still='action-fade'] {
 
 /*
  * A snapshot can't blur what's behind it, so while the page slides, the tab bar's frost is
- * stood in for by a solid backing the shape of the bar.
+ * stood in for by a solid backing the shape of the bar, in the theme's colours (--bar-backing),
+ * so the bar doesn't change colour as you tap it.
  */
 ::view-transition-group(tab-bar) {
 	border-radius: var(--radius-pill);
-	background: var(--surface-raised);
+	background: var(--bar-backing);
 }
 
 /* Same screen both sides: just show the new one. */
