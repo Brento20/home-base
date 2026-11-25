@@ -85,10 +85,22 @@
 </div>
 
 <style>
+	/* One grouped card, like House info and the lists below it, each person a block inside. */
 	.roster {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-s);
+		padding: 4px 16px;
+		border-radius: 16px;
+		background: var(--colour-fill);
+		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+	}
+
+	.group {
+		padding: 10px 0;
+	}
+
+	.group + .group {
+		box-shadow: inset 0 1px var(--colour-hairline);
 	}
 
 	header {

@@ -9,7 +9,6 @@
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
-	import RoundButton from '#lib/ui/RoundButton.svelte';
 	import { kept } from '#lib/ui/kept.svelte.js';
 	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
 	import Reveal from '#lib/ui/Reveal.svelte';
@@ -33,35 +32,39 @@
 	const notes = $derived(otherNotes(allNotes, wifi, contacts));
 
 	const FEEDBACK = 'brenton.weaver@gmail.com';
+
+	// You, for the account button (top right, as in the App Store and Photos).
+	const me = $derived(
+		data.household.members.find((member) => member.id === data.me.id) ?? data.household.members[0]
+	);
+	const requests = $derived(data.requestsWaiting ?? 0);
 </script>
 
 <svelte:head>
 	<title>{data.household.name} · home base</title>
 </svelte:head>
 
+<!--
+	Your face, top right, opens You & friends (your profile, friends and preferences), with a dot
+	when a friend request is waiting: the iOS account button. Who lives here shows in the jobs
+	below, so there's no separate row of faces.
+-->
 <PageHeader title={data.household.name}>
 	{#snippet action()}
-		<RoundButton icon="plus" label="New note" href="/home/notes/new" />
+		<a
+			class="me"
+			href="/profile"
+			aria-label={requests
+				? `You & friends: ${requests} friend ${requests === 1 ? 'request' : 'requests'} waiting`
+				: 'You & friends'}
+		>
+			<Avatar person={me} size={36} ring />
+			{#if requests}<span class="dot" aria-hidden="true"></span>{/if}
+		</a>
 	{/snippet}
 </PageHeader>
 
-<!-- Your face opens your profile and friends; everyone else's opens the home's settings. -->
-<div class="people" role="group" aria-label="Everyone in {data.household.name}">
-	{#each data.household.members as person (person.id)}
-		<a
-			class="person"
-			href={person.id === data.me.id ? '/profile' : '/home/settings'}
-			aria-label={person.id === data.me.id
-				? 'You: your profile and friends'
-				: `${person.displayName}: home settings`}
-		>
-			<Avatar {person} size={52} ring />
-			<span class="name">{person.id === data.me.id ? 'You' : person.displayName}</span>
-		</a>
-	{/each}
-</div>
-
-<Reveal of={screen} placeholder={[354, 282, 184]} gap={40} label="Loading home">
+<Reveal of={screen} placeholder={[374, 282, 184]} gap={40} label="Loading home">
 	{#snippet children(home)}
 		<section aria-labelledby="jobs-heading">
 			<div class="section-heading-row">
@@ -107,7 +110,10 @@
 		</section>
 
 		<section aria-labelledby="notes-heading">
-			<h2 id="notes-heading" class="section-label section-heading">Notes</h2>
+			<div class="section-heading-row">
+				<h2 id="notes-heading" class="section-label section-heading">Notes</h2>
+				{#if notes.length}<a class="section-heading-link" href="/home/notes/new">New note</a>{/if}
+			</div>
 			{#if notes.length === 0}
 				<p class="empty">{emptyLine}</p>
 				<a class="button-secondary" href="/home/notes/new">Add a note</a>
@@ -199,34 +205,32 @@
 </ul>
 
 <style>
-	.people {
-		display: flex;
-		gap: var(--space-m);
-		margin: calc(var(--space-s) * -1) -6px 0;
-		padding: 6px;
-		overflow-x: auto;
-		color: inherit;
-		text-decoration: none;
-		scrollbar-width: none;
+	/* The account button: a 44px target around your 36px face, with the request dot. */
+	.me {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: var(--tap-target);
+		height: var(--tap-target);
+		margin-right: -4px;
+		border-radius: 50%;
+		transition: transform var(--duration-release) var(--spring-gentle);
 	}
 
-	.person {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 8px;
-		min-width: 60px;
-		color: inherit;
-		text-decoration: none;
+	.me:global([data-pressed]) {
+		transform: scale(0.92);
+		transition-duration: var(--duration-press);
 	}
 
-	.name {
-		max-width: 64px;
-		overflow: hidden;
-		font-size: var(--text-caption);
-		color: var(--colour-text-muted);
-		text-overflow: ellipsis;
-		white-space: nowrap;
+	.dot {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: var(--colour-accent);
+		box-shadow: 0 0 0 2px var(--colour-ground);
 	}
 
 	section {

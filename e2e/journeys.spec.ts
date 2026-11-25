@@ -433,9 +433,12 @@ test('Friends and postcards: profile, friends, a friend link, a postcard and a r
 	context
 }) => {
 	const errors = watchErrors(page);
-	// Your face on the Home tab opens your profile and friends.
+	// Your face, top right on the Home tab, opens You & friends.
 	await open(page, '/home');
-	await page.getByRole('link', { name: 'You: your profile and friends' }).click();
+	await page
+		.getByRole('link', { name: /^You & friends/ })
+		.first()
+		.click();
 	await expect(page).toHaveURL(/\/profile$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('You & friends');
 	await expect(page.locator('.friend', { hasText: 'Sam' })).toContainText('The Terrace');
@@ -725,7 +728,10 @@ test('Friend requests: a dot on Home, accept one, send by code, send from a prof
 	await open(page, '/home');
 	const jo = page.locator('.request', { hasText: 'Jo' });
 	if (await page.getByRole('img', { name: /friend request/ }).count()) {
-		await page.getByRole('link', { name: 'You: your profile and friends' }).click();
+		await page
+			.getByRole('link', { name: /^You & friends/ })
+			.first()
+			.click();
 		await expect(jo).toContainText('The Terrace');
 		await jo.getByRole('button', { name: 'Accept' }).click();
 		await expect(page.locator('.friend', { hasText: 'Jo' })).toBeVisible();
