@@ -206,6 +206,9 @@ sampleTasks.push(
 /** Recipes added at home (the library itself ships with the app). */
 export const sampleHomeRecipes: Recipe[] = [];
 
+/** Recipe photos added in sample mode: recipe id → data URL. */
+export const sampleRecipePhotos = new Map<string, string>();
+
 export const sampleRatings: { recipeId: string; profileId: string; stars: number }[] = [
 	{ recipeId: 'recipe_008', profileId: brenton.id, stars: 5 },
 	{ recipeId: 'recipe_008', profileId: chris.id, stars: 4 },

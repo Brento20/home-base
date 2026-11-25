@@ -45,6 +45,8 @@
 		outcome?: 'filled' | 'failed' | null;
 		/** Shown after a fill, e.g. "Filled in from the link." */
 		filledNote?: string;
+		/** Said when it gives up, in place of the usual line, when the page knows why. */
+		failedNote?: string;
 		/** Where to send the focus when the helper gives up: the form's first field. */
 		focusOnFail?: string;
 		/** Words to start with, e.g. what was typed on Today's add bar. */
@@ -66,6 +68,7 @@
 		linkBusyLabel = 'Reading the page…',
 		outcome = null,
 		filledNote = 'Filled in with AI.',
+		failedNote,
 		focusOnFail,
 		initial = '',
 		autostart = false
@@ -206,7 +209,7 @@
 		{#if photoProblem}
 			<p>That photo couldn’t be read. Try another, or fill it in below.</p>
 		{:else if outcome === 'failed' && !busy}
-			<p>{oops}</p>
+			<p>{failedNote ?? oops}</p>
 		{:else if outcome === 'filled' && !busy}
 			<p>
 				{filledNote}
@@ -225,7 +228,7 @@
 		gap: var(--space-s);
 		margin-bottom: var(--space-l);
 		padding-bottom: var(--space-l);
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 	}
 
 	.label {
@@ -249,7 +252,7 @@
 		border: 0;
 		border-radius: var(--radius-field);
 		background: var(--colour-press);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 		font-size: var(--text-body);
 		line-height: 1.4;
 		resize: vertical;
@@ -269,7 +272,7 @@
 	.box textarea:focus,
 	.box input:focus {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			0 0 0 3px var(--colour-accent-soft);
 	}
 

@@ -72,13 +72,13 @@
 		padding: 20px 22px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
+			inset 0 0 0 var(--hairline) var(--colour-separator-strong),
 			var(--glass-highlight);
 	}
 
 	.choice:first-child .body {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			var(--glass-highlight);
 	}
 

@@ -56,8 +56,9 @@
 			</li>
 			<li>
 				<strong>Your home:</strong> what you and the people you live with put in it: tasks, lists (and
-				what you keep in the pantry), plans, recipes, money (including bills that repeat), posts, photos
-				and notes.
+				what you keep in the pantry), plans, recipes (and their photos), money (including bills that repeat),
+				posts, photos and notes. A recipe imported from a link brings the dish’s photo from that page,
+				kept privately for your home only.
 			</li>
 			<li>
 				<strong>Friends and postcards:</strong> who your friends are, anyone you’ve blocked, the postcards

@@ -107,10 +107,11 @@
 		display: flex;
 		align-items: center;
 		gap: 14px;
-		padding: 12px 12px 12px 14px;
+		/* Even on every side, so the glyph's corners follow the card's: 22px less the 12px inset. */
+		padding: 12px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 	}
 
@@ -120,7 +121,7 @@
 		width: 40px;
 		height: 40px;
 		flex: none;
-		border-radius: 12px;
+		border-radius: 10px;
 		background: var(--colour-accent-soft);
 		color: var(--colour-accent);
 	}
@@ -206,7 +207,7 @@
 	}
 
 	.details > div + div {
-		box-shadow: inset 0 1px var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) var(--colour-separator);
 	}
 
 	dt {

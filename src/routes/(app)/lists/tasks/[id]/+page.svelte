@@ -152,7 +152,7 @@
 		padding: 24px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 	}
 
@@ -196,7 +196,7 @@
 
 	/* <dl> rows: separators drawn the grouped way, by sibling, since these aren't <li>s. */
 	.details > .grouped-row + .grouped-row {
-		box-shadow: inset 0 1px var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) var(--colour-separator);
 		background-clip: padding-box;
 	}
 

@@ -60,7 +60,7 @@
 	</div>
 	{#if errors?.title}<p class="field-error">{errors.title}</p>{/if}
 	{#if title.trim()}
-		<a class="more" href={more}>Add who, when or a repeat <Icon name="chevron" size={14} /></a>
+		<a class="more" href={more}>Add who, when or a repeat <Icon name="chevron" size={14} trim /></a>
 	{/if}
 </form>
 
@@ -79,12 +79,12 @@
 		height: 56px;
 		padding: 0 6px 0 18px;
 		border-radius: var(--radius-field);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 	}
 
 	.title-row:focus-within {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			0 0 0 3px var(--colour-accent-soft);
 	}
 

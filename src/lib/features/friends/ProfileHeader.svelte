@@ -45,7 +45,7 @@
 		overflow: hidden;
 		border-radius: 28px;
 		background: var(--colour-fill);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		text-align: center;
 	}
 

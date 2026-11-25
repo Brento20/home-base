@@ -174,7 +174,7 @@
 		max-height: 420px;
 		object-fit: cover;
 		border-radius: 18px;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
 	.remove {

@@ -381,7 +381,7 @@
 		flex-direction: column;
 		gap: 6px;
 		padding-top: var(--space-m);
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 	}
 
 	.code {

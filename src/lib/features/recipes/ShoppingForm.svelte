@@ -105,7 +105,7 @@
 		align-items: center;
 		gap: 12px;
 		min-height: 48px;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		cursor: pointer;
 		transition: opacity var(--duration-quick) var(--ease-out);
 	}

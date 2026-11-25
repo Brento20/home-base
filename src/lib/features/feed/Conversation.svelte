@@ -142,7 +142,7 @@
 		display: flex;
 		gap: 12px;
 		padding: 10px 0;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 	}
 
 	.reply-body {

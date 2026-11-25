@@ -92,7 +92,7 @@
 		padding: 4px 16px;
 		border-radius: 16px;
 		background: var(--colour-fill);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
 	.group {
@@ -100,7 +100,7 @@
 	}
 
 	.group + .group {
-		box-shadow: inset 0 1px var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) var(--colour-separator);
 	}
 
 	header {
@@ -142,7 +142,7 @@
 	}
 
 	li + li {
-		box-shadow: inset 0 1px var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) var(--colour-separator);
 	}
 
 	li a {

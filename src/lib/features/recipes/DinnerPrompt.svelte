@@ -2,7 +2,8 @@
 	/**
 	 * The one small card at the top of Plan dinner. A dinner that's been cooked asks how it was
 	 * (stars, or Not now). A dinner whose time has passed but is still open asks whether you made
-	 * it first: Yes (then it asks how it was), Reschedule or Skip.
+	 * it first: Yes (then it asks how it was), Reschedule or Skip. Asking how it was, it shows the
+	 * dish's photo, or offers to add one: right after cooking is when there's one to take.
 	 */
 	import { enhance } from '$app/forms';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
@@ -10,6 +11,8 @@
 	import { formatDinnerWhen, formatTimeOfDay } from '#lib/time.js';
 	import type { Profile, Task } from '#lib/types.js';
 	import { inSentence } from './recipe.js';
+	import Icon from '#lib/ui/Icon.svelte';
+	import PhotoUpload from './PhotoUpload.svelte';
 	import ScheduleForm from './ScheduleForm.svelte';
 	import Stars from './Stars.svelte';
 
@@ -20,9 +23,13 @@
 		people: Profile[];
 		meId: string;
 		today: string;
+		/** The home's photo of the dish, if there is one. */
+		photoUrl?: string | null;
 	}
 
-	let { kind, task, stars, people, meId, today }: Props = $props();
+	let { kind, task, stars, people, meId, today, photoUrl = null }: Props = $props();
+	let photoBusy = $state(false);
+	let photoProblem = $state<string | null>(null);
 
 	const dish = $derived(inSentence(task.recipe!.title));
 	const cook = $derived(people.find((person) => person.id === task.assigneeId));
@@ -47,8 +54,11 @@
 	};
 </script>
 
-<section class="prompt" aria-live="polite">
+<section class="prompt" class:with-photo={kind === 'rate' && photoUrl} aria-live="polite">
 	<GlassSurface radius={24} glow />
+	{#if kind === 'rate' && photoUrl}
+		<img class="dish" src={photoUrl} alt="" decoding="async" />
+	{/if}
 	<div class="body">
 		{#if kind === 'rate'}
 			<h2>How was the {dish}?</h2>
@@ -62,10 +72,26 @@
 				<input type="hidden" name="recipeId" value={task.recipeId} />
 				<Stars value={stars} name="stars" label={task.recipe!.title} size={26} autosubmit />
 			</form>
-			<form method="POST" action="?/dismiss" use:enhance={submit}>
-				<input type="hidden" name="taskId" value={task.id} />
-				<button class="button-quiet later" disabled={busy}>Not now</button>
-			</form>
+			<div class="after">
+				<form method="POST" action="?/dismiss" use:enhance={submit}>
+					<input type="hidden" name="taskId" value={task.id} />
+					<button class="button-quiet later" disabled={busy}>Not now</button>
+				</form>
+				{#if !photoUrl && task.recipeId}
+					<PhotoUpload
+						action="/dinner/{task.recipeId}?/photo"
+						label="Add a photo of it"
+						class="button-quiet later"
+						bind:busy={photoBusy}
+						onsaved={() => (photoProblem = null)}
+						onproblem={(message) => (photoProblem = message)}
+					>
+						<Icon name="camera" size={18} />
+						{photoBusy ? 'Saving…' : 'Add a photo'}
+					</PhotoUpload>
+				{/if}
+			</div>
+			{#if photoProblem}<p class="problem" role="status">{photoProblem}</p>{/if}
 		{:else}
 			<h2>Did you make the {dish}?</h2>
 			<p>
@@ -135,6 +161,41 @@
 
 	.rate {
 		margin-left: -8px;
+	}
+
+	/* The dish on the right, fading into the card behind the words. */
+	.dish {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		width: 46%;
+		object-fit: cover;
+		border-radius: 0 24px 24px 0;
+		-webkit-mask-image: linear-gradient(90deg, transparent, #000 55%);
+		mask-image: linear-gradient(90deg, transparent, #000 55%);
+		opacity: 0.9;
+	}
+
+	.with-photo h2,
+	.with-photo p {
+		max-width: 62%;
+	}
+
+	.after {
+		display: flex;
+		align-items: center;
+		gap: var(--space-s);
+	}
+
+	.after :global(.later) {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.problem {
+		margin: 4px 0 0;
 	}
 
 	.later {

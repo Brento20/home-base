@@ -25,6 +25,7 @@ const TABLES = [
 	'dinner_checkins',
 	'recipes',
 	'recipe_ratings',
+	'recipe_photos',
 	'expense_groups',
 	'expense_group_members',
 	'expenses',

@@ -353,7 +353,7 @@
 	.weekdays {
 		margin-bottom: 6px;
 		padding-bottom: 8px;
-		box-shadow: inset 0 -1px 0 var(--colour-hairline);
+		box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--colour-separator);
 	}
 
 	.weekdays span {

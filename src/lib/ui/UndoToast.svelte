@@ -70,7 +70,7 @@
 		/* The same look as the recipe page's "Tonight · You're cooking" notice. */
 		background: var(--surface-raised);
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
+			inset 0 0 0 var(--hairline) var(--colour-separator-strong),
 			0 10px 28px -12px var(--shadow-colour);
 		transform: translateX(-50%);
 		animation: rise var(--duration-settle) var(--ease-out) both;

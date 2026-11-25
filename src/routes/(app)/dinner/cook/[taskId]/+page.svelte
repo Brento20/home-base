@@ -88,7 +88,7 @@
 	{/if}
 
 	<a class="recipe-link" href="/dinner/{task.recipeId}">
-		See {recipe.title} in the cookbook <Icon name="chevron" size={16} />
+		See {recipe.title} in the cookbook <Icon name="chevron" size={16} trim />
 	</a>
 
 	<section aria-labelledby="ingredients">
@@ -194,7 +194,7 @@
 		padding: var(--space-m);
 		border-radius: 22px;
 		background: var(--colour-accent-soft);
-		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-accent-separator);
 	}
 
 	.done p {

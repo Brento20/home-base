@@ -52,6 +52,7 @@
 	{#each reactions as reaction (reaction.key)}
 		<button
 			class="reaction"
+			data-haptic
 			class:mine={reaction.mine}
 			class:given={reaction.count > 0}
 			name="reaction"
@@ -88,7 +89,7 @@
 		min-width: 44px;
 		height: 34px;
 		padding: 0 11px;
-		border: 1px solid var(--colour-hairline);
+		border: var(--hairline) solid var(--colour-separator);
 		border-radius: var(--radius-pill);
 		background: var(--colour-press);
 		color: var(--colour-text-muted);

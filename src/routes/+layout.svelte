@@ -11,6 +11,7 @@
 	import { applyDaypart } from '#lib/ui/daypart.js';
 	import AppStatus from '#lib/ui/AppStatus.svelte';
 	import { drift } from '#lib/ui/backdrop-drift.js';
+	import { listenForHaptics } from '#lib/ui/haptics.js';
 	import { preloadTabs, usePageTransitions } from '#lib/ui/page-transitions.js';
 	import { installPress } from '#lib/ui/press.js';
 	import type { LayoutProps } from './$types';
@@ -40,10 +41,12 @@
 		applyDaypart();
 		preloadTabs();
 		const removePress = installPress();
+		const stopHaptics = listenForHaptics();
 		const timer = setInterval(applyDaypart, 5 * 60 * 1000);
 		return () => {
 			clearInterval(timer);
 			removePress();
+			stopHaptics();
 		};
 	});
 </script>

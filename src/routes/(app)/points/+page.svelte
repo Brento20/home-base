@@ -120,13 +120,13 @@
 		padding: 18px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 	}
 
 	.leading .body {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			var(--glass-highlight);
 	}
 

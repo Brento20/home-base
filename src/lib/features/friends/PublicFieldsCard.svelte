@@ -36,7 +36,7 @@
 	}
 
 	.field-row + .field-row {
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 	}
 
 	dd {

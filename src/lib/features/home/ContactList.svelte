@@ -55,7 +55,7 @@
 	}
 
 	li + li {
-		box-shadow: inset 0 1px var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) var(--colour-separator);
 	}
 
 	.who {

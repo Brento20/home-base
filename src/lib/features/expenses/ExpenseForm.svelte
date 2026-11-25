@@ -330,7 +330,7 @@
 		align-items: center;
 		gap: 10px;
 		min-height: 56px;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		transition: opacity var(--duration-quick) var(--ease-out);
 	}
 
@@ -383,7 +383,7 @@
 		gap: 4px;
 		height: 38px;
 		padding: 0 10px;
-		border: 1px solid var(--colour-hairline-strong);
+		border: var(--hairline) solid var(--colour-separator-strong);
 		border-radius: 12px;
 		background: var(--colour-well);
 	}

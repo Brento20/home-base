@@ -120,13 +120,13 @@
 		height: 48px;
 		padding: 0 4px 0 14px;
 		border-radius: var(--radius-field);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 		transition: box-shadow var(--duration-quick) var(--ease-out);
 	}
 
 	/* Focus shows as the edge turning accent, as an iOS field does, without a halo. */
 	.bar:focus-within {
-		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-accent-separator);
 	}
 
 	.lead,

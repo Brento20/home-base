@@ -70,7 +70,7 @@
 		height: 100%;
 		padding: 0 14px;
 		border-radius: inherit;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		transition: background-color var(--duration-settle) var(--ease-out);
 	}
 

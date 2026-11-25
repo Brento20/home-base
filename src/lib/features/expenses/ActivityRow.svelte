@@ -101,7 +101,7 @@
 		gap: 12px;
 		min-height: 60px;
 		padding: 8px 0;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		color: inherit;
 		text-decoration: none;
 	}

@@ -35,7 +35,7 @@
 	overflow: hidden;
 	border-radius: 16px;
 	background: var(--colour-fill);
-	box-shadow: inset 0 0 0 1px var(--colour-hairline);
+	box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	list-style: none;
 }
 
@@ -55,8 +55,8 @@
 	right: 0;
 	left: var(--grouped-inset);
 	z-index: 1;
-	height: 1px;
-	background: var(--colour-hairline);
+	height: var(--hairline);
+	background: var(--colour-separator);
 	pointer-events: none;
 }
 

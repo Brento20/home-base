@@ -328,7 +328,7 @@
 		background: var(--colour-fill-stronger);
 		color: var(--colour-text);
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
+			inset 0 0 0 var(--hairline) var(--colour-separator-strong),
 			0 1px 4px rgb(0 0 0 / 0.18);
 	}
 

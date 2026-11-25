@@ -187,7 +187,7 @@
 		gap: 8px;
 		min-width: 0;
 		padding-top: 10px;
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
 	}

@@ -11,15 +11,22 @@ import {
 	parseStars,
 	rateRecipe
 } from '#lib/features/recipes/recipes.server.js';
+import {
+	getRecipePhotoUrl,
+	photoFromForm,
+	removeRecipePhoto,
+	saveRecipePhoto
+} from '#lib/features/recipes/recipe-photos.server.js';
 import { todayISO } from '#lib/time.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const [recipe, ratings] = await Promise.all([
+	const [recipe, ratings, photoUrl] = await Promise.all([
 		getRecipe(locals, params.id),
-		getRecipeRatings(locals, params.id)
+		getRecipeRatings(locals, params.id),
+		getRecipePhotoUrl(locals, params.id)
 	]);
-	return { recipe, ratings, today: todayISO() };
+	return { recipe, ratings, photoUrl, today: todayISO() };
 };
 
 export const actions: Actions = {
@@ -49,6 +56,20 @@ export const actions: Actions = {
 		const servings = clampServings(Number(form.get('servings')));
 		const taskId = await scheduleDinner(locals, recipe, servings, input);
 		return { taskId, ...input };
+	},
+
+	/** A photo of the dish, for any recipe (the library's too); replaces the one it had. */
+	photo: async ({ request, locals, params }) => {
+		await getRecipe(locals, params.id);
+		const { photo, problem } = photoFromForm(await request.formData());
+		if (!photo || problem) return fail(400, { photoError: problem ?? 'Choose a photo first.' });
+		await saveRecipePhoto(locals, params.id, photo);
+		return { photoSaved: true };
+	},
+
+	removePhoto: async ({ locals, params }) => {
+		await removeRecipePhoto(locals, params.id);
+		return { photoRemoved: true };
 	},
 
 	delete: async ({ locals, params }) => {

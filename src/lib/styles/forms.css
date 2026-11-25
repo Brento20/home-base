@@ -31,7 +31,7 @@
 	width: 100%;
 	min-height: 50px;
 	padding: 12px 14px;
-	border: 1px solid var(--colour-hairline-strong);
+	border: var(--hairline) solid var(--colour-separator-strong);
 	border-radius: 14px;
 	background: var(--colour-well);
 	font-size: var(--text-body);
@@ -107,7 +107,7 @@ legend.field-label {
 	min-height: var(--tap-target);
 	padding: 0 16px;
 	border-radius: var(--radius-pill);
-	border: 1px solid var(--colour-hairline-strong);
+	border: var(--hairline) solid var(--colour-separator-strong);
 	font-size: var(--text-small);
 	color: var(--colour-text-muted);
 	cursor: pointer;
@@ -174,7 +174,7 @@ legend.field-label {
 	min-width: 72px;
 	min-height: var(--tap-target);
 	padding: 0 18px;
-	border: 1px solid var(--colour-hairline-strong);
+	border: var(--hairline) solid var(--colour-separator-strong);
 	border-radius: var(--radius-pill);
 	background: none;
 	color: var(--colour-text);
@@ -217,7 +217,7 @@ legend.field-label {
 	place-items: center;
 	min-height: 50px;
 	padding: 0 24px;
-	border: 1px solid var(--colour-hairline-strong);
+	border: var(--hairline) solid var(--colour-separator-strong);
 	border-radius: var(--radius-pill);
 	background: var(--colour-press);
 	color: var(--colour-text);

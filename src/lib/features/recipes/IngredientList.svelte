@@ -29,6 +29,7 @@
 				<button
 					type="button"
 					class="row"
+					data-haptic
 					aria-pressed={ticked.has(index)}
 					onclick={() => toggle(index)}
 				>
@@ -67,7 +68,7 @@
 		min-height: 52px;
 		padding: 8px 0;
 		border: 0;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		background: none;
 		color: inherit;
 		font: inherit;

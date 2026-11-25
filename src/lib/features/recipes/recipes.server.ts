@@ -5,6 +5,7 @@ import { dbError } from '#lib/server/db.js';
 import { sampleHomeRecipes, sampleRatings } from '#lib/server/sample-data.js';
 import type { FieldErrors } from '#lib/types.js';
 import { checkInRecipe } from './dinners.server.js';
+import { listRecipePhotos, removeRecipePhoto } from './recipe-photos.server.js';
 import library from './library.json';
 import {
 	clampServings,
@@ -90,7 +91,10 @@ async function homeRecipes(locals: App.Locals): Promise<Recipe[]> {
 
 /** Every recipe the home can cook, A to Z, as the library list shows them. */
 export async function listRecipeSummaries(locals: App.Locals) {
-	return [...LIBRARY, ...(await homeRecipes(locals))].sort(byTitle).map(summarise);
+	const [mine, photos] = await Promise.all([homeRecipes(locals), listRecipePhotos(locals)]);
+	return [...LIBRARY, ...mine]
+		.sort(byTitle)
+		.map((recipe) => summarise(recipe, photos.get(recipe.id) ?? null));
 }
 
 export async function getRecipe(locals: App.Locals, id: string): Promise<Recipe> {
@@ -315,12 +319,15 @@ export async function deleteRecipe(locals: App.Locals, id: string) {
 	if (!supabase) {
 		const index = sampleHomeRecipes.findIndex((entry) => entry.id === id);
 		if (index >= 0) sampleHomeRecipes.splice(index, 1);
+		await removeRecipePhoto(locals, id);
 		for (let i = sampleRatings.length - 1; i >= 0; i--)
 			if (sampleRatings[i].recipeId === id) sampleRatings.splice(i, 1);
 		return;
 	}
 	if (!UUID.test(id)) error(404, 'Only recipes added at home can be deleted.');
 
+	// The photo's file first: the database can't remove a stored file for us.
+	await removeRecipePhoto(locals, id);
 	const { error: deleteError } = await supabase.from('recipes').delete().eq('id', id);
 	if (deleteError) dbError(deleteError);
 }

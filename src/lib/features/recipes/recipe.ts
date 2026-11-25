@@ -71,6 +71,8 @@ export interface RecipeSummary {
 	/** Lowercased title, ingredient names, cuisine and tags, for search. */
 	searchText: string;
 	custom: boolean;
+	/** The home's photo of it (recipe-photos.server.ts), or null. */
+	photoUrl: string | null;
 }
 
 /** A dinner task's copy of the recipe as scheduled: amounts already scaled to `servings`. */
@@ -250,7 +252,7 @@ export function inSentence(title: string) {
 
 export const cookTitle = (title: string) => `Cook ${inSentence(title)}`.slice(0, 160);
 
-export function summarise(recipe: Recipe): RecipeSummary {
+export function summarise(recipe: Recipe, photoUrl: string | null = null): RecipeSummary {
 	return {
 		id: recipe.id,
 		title: recipe.title,
@@ -269,7 +271,8 @@ export function summarise(recipe: Recipe): RecipeSummary {
 		]
 			.join(' ')
 			.toLowerCase(),
-		custom: recipe.custom
+		custom: recipe.custom,
+		photoUrl
 	};
 }
 

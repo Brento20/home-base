@@ -117,7 +117,7 @@
 		padding: 16px 18px 14px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 		transition: background-color var(--duration-quick) var(--ease-out);
 	}
@@ -179,7 +179,7 @@
 		width: 100%;
 		border-radius: 18px;
 		background: var(--colour-press);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
 	.cropped {
@@ -197,7 +197,7 @@
 		padding: 8px 12px;
 		border-radius: 16px;
 		background: var(--colour-accent-soft);
-		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-accent-separator);
 		color: inherit;
 		text-decoration: none;
 	}
@@ -257,7 +257,7 @@
 		align-items: baseline;
 		gap: 8px;
 		padding-top: 10px;
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
 		min-width: 0;

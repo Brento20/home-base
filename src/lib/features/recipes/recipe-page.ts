@@ -368,18 +368,59 @@ export function pageText(html: string) {
 	return `RECIPE CARD:\n${cardText}\n\nSTART OF THE PAGE:\n${rest}`;
 }
 
-export async function fetchPage(url: URL): Promise<string | null> {
+/**
+ * How the app introduces itself to recipe sites: honestly, as an app fetching one page for one
+ * person, in the shape sites expect (some turn away anything that doesn't start "Mozilla/5.0").
+ */
+const FETCH_HEADERS = {
+	'user-agent': 'Mozilla/5.0 (compatible; home-base/1.0; recipe import for one household)',
+	'accept-language': 'en-AU,en;q=0.9'
+};
+
+/** Why a page couldn't be read: the site said no, it couldn't be reached, or it isn't a page. */
+export type PageProblem = 'blocked' | 'unreachable' | 'not-a-page';
+
+export async function fetchPage(url: URL): Promise<{ html: string } | { problem: PageProblem }> {
 	try {
 		const response = await fetch(url, {
-			headers: { accept: 'text/html', 'user-agent': 'home-base recipe import' },
+			headers: { accept: 'text/html,application/xhtml+xml', ...FETCH_HEADERS },
 			redirect: 'follow',
 			signal: AbortSignal.timeout(PAGE_TIMEOUT_MS)
 		});
-		if (!response.ok || !response.headers.get('content-type')?.includes('html')) return null;
-		return (await response.text()).slice(0, PAGE_MAX_CHARS);
-	} catch {
-		return null;
+		if (!response.ok) {
+			console.error('[recipe import] page', url.hostname, response.status);
+			// Bot walls answer 401/403/429, or 503 with a challenge page.
+			return {
+				problem: [401, 403, 429, 503].includes(response.status) ? 'blocked' : 'unreachable'
+			};
+		}
+		if (!response.headers.get('content-type')?.includes('html')) return { problem: 'not-a-page' };
+		const html = (await response.text()).slice(0, PAGE_MAX_CHARS);
+		// A challenge page that answered 200.
+		if (
+			/captcha|are you a robot|access denied|enable javascript and cookies/i.test(
+				html.slice(0, 4000)
+			)
+		) {
+			console.error('[recipe import] challenge page', url.hostname);
+			return { problem: 'blocked' };
+		}
+		return { html };
+	} catch (reason) {
+		console.error('[recipe import] page', url.hostname, reason);
+		return { problem: 'unreachable' };
 	}
+}
+
+/** Public addresses only: never let a link reach into a private network. */
+export function isPublicUrl(url: URL) {
+	return (
+		(url.protocol === 'https:' || url.protocol === 'http:') &&
+		!/^(localhost|0\.|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[)/.test(
+			url.hostname
+		) &&
+		!/\.(local|internal|localhost)$/i.test(url.hostname)
+	);
 }
 
 /** A lone http(s) link, or null if the text is anything else. */
@@ -387,14 +428,97 @@ export function linkIn(text: string): URL | null {
 	if (!/^https?:\/\/\S+$/i.test(text)) return null;
 	try {
 		const url = new URL(text);
-		// Public pages only: never let a pasted link reach into a private network.
-		if (
-			/^(localhost|0\.|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[)/.test(
-				url.hostname
-			)
-		)
-			return null;
-		return url;
+		return isPublicUrl(url) ? url : null;
+	} catch {
+		return null;
+	}
+}
+
+// The dish's photo -------------------------------------------------------------------------------
+
+/** Photo types a recipe photo may be (the recipe-photos bucket takes the same). */
+export const PAGE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+/** Read no further than this: the browser shrinks it to well under the bucket's 3 MB. */
+export const PAGE_PHOTO_MAX_BYTES = 8 * 1024 * 1024;
+
+const attribute = (tag: string, name: string) =>
+	tag
+		.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, 'i'))
+		?.slice(1)
+		.find(Boolean);
+
+/** A <meta> tag's content, by property or name (og:image, twitter:image). */
+function metaContent(html: string, key: string) {
+	for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+		const which = attribute(tag, 'property') ?? attribute(tag, 'name');
+		if (which?.toLowerCase() === key) return attribute(tag, 'content') ?? null;
+	}
+	return null;
+}
+
+/** schema.org's image: a link, an ImageObject, or a list of either (the first is the main one). */
+function imageIn(value: unknown): string | null {
+	if (typeof value === 'string') return value;
+	if (Array.isArray(value)) {
+		for (const item of value) {
+			const found = imageIn(item);
+			if (found) return found;
+		}
+		return null;
+	}
+	if (value && typeof value === 'object') {
+		const record = value as Record<string, unknown>;
+		return imageIn(record.url ?? record.contentUrl ?? record['@id']);
+	}
+	return null;
+}
+
+/**
+ * The dish's photo on a recipe page: the recipe data's image, else the picture the page shares
+ * when it's posted (og:image, twitter:image). Relative links are resolved against the page.
+ */
+export function photoLinkIn(
+	html: string,
+	data: Record<string, unknown> | null,
+	page: URL
+): URL | null {
+	const candidates = [
+		imageIn(data?.image),
+		metaContent(html, 'og:image'),
+		metaContent(html, 'og:image:url'),
+		metaContent(html, 'twitter:image')
+	];
+	for (const candidate of candidates) {
+		if (!candidate) continue;
+		try {
+			const url = new URL(decodeEntities(candidate.trim()), page);
+			if (isPublicUrl(url)) return url;
+		} catch {
+			// Not a link: try the next.
+		}
+	}
+	return null;
+}
+
+/** Downloads a recipe page's photo, as a data URL for the form to show and send on. */
+export async function fetchPhoto(url: URL): Promise<string | null> {
+	try {
+		const response = await fetch(url, {
+			headers: { accept: 'image/webp,image/jpeg,image/png;q=0.9', ...FETCH_HEADERS },
+			redirect: 'follow',
+			signal: AbortSignal.timeout(PAGE_TIMEOUT_MS)
+		});
+		const type = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() ?? '';
+		if (!response.ok || !PAGE_PHOTO_TYPES.includes(type)) return null;
+		if (response.url && !isPublicUrl(new URL(response.url))) return null;
+		if (Number(response.headers.get('content-length') ?? 0) > PAGE_PHOTO_MAX_BYTES) return null;
+		const bytes = new Uint8Array(await response.arrayBuffer());
+		if (bytes.length === 0 || bytes.length > PAGE_PHOTO_MAX_BYTES) return null;
+		let binary = '';
+		for (let i = 0; i < bytes.length; i += 0x8000) {
+			binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+		}
+		return `data:${type};base64,${btoa(binary)}`;
 	} catch {
 		return null;
 	}

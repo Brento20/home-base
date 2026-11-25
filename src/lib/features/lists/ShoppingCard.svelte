@@ -109,7 +109,7 @@
 		padding: 6px 12px 12px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 	}
 
@@ -170,12 +170,12 @@
 		padding: 0 4px 0 14px;
 		border-radius: 999px;
 		background: var(--colour-well);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
 	.quick-add:focus-within {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			0 0 0 3px var(--colour-accent-soft);
 	}
 

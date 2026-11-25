@@ -62,7 +62,7 @@
 		padding: 18px 22px 20px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 		transition: box-shadow var(--highlight-speed) var(--ease-out);
 	}
@@ -98,7 +98,7 @@
 
 	.highlighted .body {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			var(--glass-highlight);
 	}
 

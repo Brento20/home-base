@@ -205,8 +205,8 @@
 						{#if more}
 							<button type="button" class="show-more" onclick={showMore}>Show {more} more</button>
 						{/if}
-						<a href="/plans">All plans <Icon name="chevron" size={18} /></a>
-						<a href="/lists/tasks">All tasks <Icon name="chevron" size={18} /></a>
+						<a href="/plans">All plans <Icon name="chevron" size={18} trim /></a>
+						<a href="/lists/tasks">All tasks <Icon name="chevron" size={18} trim /></a>
 					</span>
 				</div>
 			</li>
@@ -352,19 +352,42 @@
 		-webkit-touch-callout: none;
 	}
 
+	/*
+	 * The rows share the card's height and sit 6px in from every edge, so a row's highlight at
+	 * the top or bottom is concentric with the card: its outer corners are the card's radius less
+	 * the inset. Rows in the middle keep the small radius.
+	 */
 	.more-body {
+		--inset: 6px;
+		--row-radius: 14px;
+		--edge-radius: calc(var(--radius-card) - var(--inset));
 		position: relative;
 		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		gap: 4px;
+		gap: 2px;
 		height: 100%;
-		padding: 0 6px;
+		padding: var(--inset);
+		box-sizing: border-box;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
+	}
+
+	.more-body > * {
+		flex: 1 1 0;
+		border-radius: var(--row-radius);
+	}
+
+	.more-body > :first-child {
+		border-top-left-radius: var(--edge-radius);
+		border-top-right-radius: var(--edge-radius);
+	}
+
+	.more-body > :last-child {
+		border-bottom-left-radius: var(--edge-radius);
+		border-bottom-right-radius: var(--edge-radius);
 	}
 
 	.more-body a {
@@ -373,7 +396,6 @@
 		justify-content: center;
 		gap: 2px;
 		min-height: var(--tap-target);
-		border-radius: 14px;
 		font-size: var(--text-small);
 		font-weight: var(--weight-medium);
 		color: var(--colour-text-muted);
@@ -388,7 +410,6 @@
 	.show-more {
 		min-height: var(--tap-target);
 		border: 0;
-		border-radius: 14px;
 		background: var(--colour-accent-soft);
 		font-size: var(--text-small);
 		font-weight: var(--weight-medium);
@@ -454,7 +475,7 @@
 		gap: 6px;
 		padding: 22px 24px 24px;
 		border-radius: var(--radius-card);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 		text-decoration: none;
 		color: inherit;
 	}

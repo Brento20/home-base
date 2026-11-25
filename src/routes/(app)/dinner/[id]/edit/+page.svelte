@@ -21,4 +21,9 @@
 	{/snippet}
 </PageHeader>
 
-<RecipeForm values={form?.values ?? data.values} errors={form?.errors} submitLabel="Save" />
+<RecipeForm
+	values={form?.values ?? data.values}
+	errors={form?.errors}
+	submitLabel="Save"
+	photo={data.photoUrl}
+/>

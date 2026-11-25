@@ -879,3 +879,33 @@ test('Friend requests: a dot on Home, accept one, send by code, send from a prof
 	await expect(page.locator('.code')).not.toHaveText(before ?? '');
 	expect(errors).toEqual([]);
 });
+
+test('Recipe photos: add one to a library recipe, see it in the list, then remove it', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	const photo = {
+		name: 'dish.jpg',
+		mimeType: 'image/jpeg',
+		buffer: Buffer.from(
+			'/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAwAEADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDWooor5U9oKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q==',
+			'base64'
+		)
+	};
+	await open(page, '/dinner/recipe_003');
+	await expect(page.locator('.hero')).toHaveCount(0);
+	// The camera button opens the phone's own picker; the photo saves as soon as it's picked.
+	await page.locator('.header-tools input[type="file"]').setInputFiles(photo);
+	await expect(page.locator('.hero img')).toBeVisible();
+
+	await open(page, '/dinner');
+	const row = page.locator('.recipe-row[href="/dinner/recipe_003"]');
+	await expect(row.locator('img.thumb')).toBeVisible();
+
+	await row.click();
+	await page.getByRole('button', { name: 'Photo', exact: true }).click();
+	await page.getByRole('button', { name: 'Remove photo' }).click();
+	await page.getByRole('button', { name: 'Tap again to remove it' }).click();
+	await expect(page.locator('.hero')).toHaveCount(0);
+	expect(errors).toEqual([]);
+});

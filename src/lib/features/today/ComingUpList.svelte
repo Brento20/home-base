@@ -97,6 +97,7 @@
 							<PointPop count={pops[task.id] ?? 0} />
 							<button
 								class="tick"
+								data-haptic
 								aria-label={dinner
 									? `Mark ${task.title} as cooked, earns a point`
 									: `Tick off ${task.title}, earns a point`}

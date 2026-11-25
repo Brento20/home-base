@@ -111,7 +111,7 @@
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
+			inset 0 0 0 var(--hairline) var(--colour-separator-strong),
 			var(--glass-highlight),
 			var(--shadow-lift);
 		font-size: var(--text-small);

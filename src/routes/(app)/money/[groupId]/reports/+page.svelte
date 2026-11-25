@@ -500,7 +500,7 @@
 		gap: 6px;
 		margin-top: var(--space-m);
 		padding-top: var(--space-s);
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 	}
 
 	.fact {
@@ -545,7 +545,7 @@
 
 	/* A hairline edge, so a pale colour (Silver) still shows on a light background. */
 	.split-part {
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		flex-basis: 0;
 		min-width: 4px;
 		animation: split-in 700ms var(--spring-soft) both;
@@ -574,7 +574,7 @@
 	}
 
 	.split-dot {
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 		width: 10px;
 		height: 10px;
 		border-radius: 50%;
@@ -638,7 +638,7 @@
 		align-items: center;
 		gap: 12px;
 		min-height: 56px;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		color: inherit;
 		text-decoration: none;
 	}
@@ -716,7 +716,7 @@
 	.versus-change {
 		margin-top: var(--space-m);
 		padding-top: var(--space-s);
-		border-top: 1px solid var(--colour-hairline);
+		border-top: var(--hairline) solid var(--colour-separator);
 		font-size: var(--text-small);
 	}
 </style>

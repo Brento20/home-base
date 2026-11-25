@@ -212,7 +212,7 @@
 		min-height: 60px;
 		padding: 10px 14px;
 		border-radius: 18px;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		color: inherit;
 		text-decoration: none;
 	}
@@ -262,7 +262,7 @@
 		padding: 24px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 	}
 
@@ -345,7 +345,7 @@
 		border: 0;
 		border-radius: var(--radius-pill);
 		background: var(--colour-fill);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		color: var(--colour-text);
 		font: inherit;
 		font-weight: var(--weight-medium);

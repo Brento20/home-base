@@ -8,6 +8,8 @@
  * nutrition, cuisine). If Claude doesn't answer, the tidied data is used as it is. Pasted text
  * and photos go to Claude alone. SYSTEM below is the field-by-field guide Claude follows, and
  * `sourceNote` records which fields were estimated, for the recipe's "About these numbers".
+ * A link also brings the dish's photo, if the page has one (photoLinkIn, fetchPhoto), for the
+ * form to show; it's only kept if the recipe is saved with it.
  */
 import { askForJson, imageBlock, textBlock } from '#lib/server/ai.js';
 import {
@@ -21,9 +23,12 @@ import {
 import {
 	clampServes,
 	fetchPage,
+	fetchPhoto,
 	findRecipeData,
 	linkIn,
+	type PageProblem,
 	pageText,
+	photoLinkIn,
 	TEXT_MAX_CHARS,
 	ESTIMATES,
 	sourceNote,
@@ -391,7 +396,11 @@ async function askAboutPage(draft: RecipeFormValues | null, text: string) {
  */
 export async function importRecipe(
 	form: FormData
-): Promise<{ values: RecipeFormValues; source: ImportSource } | null> {
+): Promise<
+	| { values: RecipeFormValues; source: ImportSource; photo?: string | null }
+	| { problem: PageProblem; site: string }
+	| null
+> {
 	const text = String(form.get('text') ?? '').trim();
 	const photo = await imageBlock(form.get('photo'));
 
@@ -413,16 +422,23 @@ export async function importRecipe(
 
 	const link = linkIn(text);
 	if (link) {
-		const html = await fetchPage(link);
-		if (!html) return null;
+		const page = await fetchPage(link);
+		const site = link.hostname.replace(/^www\./, '');
+		if ('problem' in page) return { problem: page.problem, site };
+		const { html } = page;
 		// The page's own recipe data, tidied. On its own it's a decent fill; Claude reads it with
 		// the recipe card to tidy the wording and estimate what it lacks (often times, nutrition).
-		const from = `Imported from ${link.hostname.replace(/^www\./, '')}`;
+		const from = `Imported from ${site}`;
 		const data = findRecipeData(html);
 		const draft = data ? valuesFromRecipeData(data) : null;
-		const read =
-			(await askAboutPage(draft, pageText(html))) ?? (draft && { values: draft, estimated: [] });
-		return read ? { values: await finish(read, from), source: 'link' } : null;
+		// The dish's photo comes down while Claude reads the page; the form shows it to keep or drop.
+		const photoLink = photoLinkIn(html, data, link);
+		const [answer, photo] = await Promise.all([
+			askAboutPage(draft, pageText(html)),
+			photoLink ? fetchPhoto(photoLink) : null
+		]);
+		const read = answer ?? (draft && { values: draft, estimated: [] });
+		return read ? { values: await finish(read, from), source: 'link', photo } : null;
 	}
 
 	if (text.length < 20) return null;

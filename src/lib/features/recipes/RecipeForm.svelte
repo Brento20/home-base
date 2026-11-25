@@ -9,6 +9,7 @@
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { PROTEIN_OPTIONS as PROTEINS, proteinLabel, type RecipeFormValues } from './recipe.js';
+	import RecipePhotoField from './RecipePhotoField.svelte';
 
 	interface Props {
 		values: RecipeFormValues;
@@ -16,9 +17,24 @@
 		submitLabel: string;
 		/** Where it posts: '?/create' on Add a recipe, which also has the import action. */
 		action?: string;
+		/** The photo it starts with: the recipe's own, or one from a link (a data URL). */
+		photo?: string | null;
+		/** `photo` is new and should be saved with the recipe. */
+		adoptPhoto?: boolean;
 	}
 
-	let { values, errors = {}, submitLabel, action }: Props = $props();
+	let {
+		values,
+		errors = {},
+		submitLabel,
+		action,
+		photo = null,
+		adoptPhoto = false
+	}: Props = $props();
+
+	let chosenPhoto = $state<File | null>(null);
+	let photoRemoved = $state(false);
+	let readingPhoto = $state(false);
 
 	const INGREDIENTS_EXAMPLE = [
 		'One per line, for the servings above:',
@@ -54,16 +70,30 @@
 <form
 	novalidate
 	method="POST"
+	enctype="multipart/form-data"
 	{action}
 	class="form-stack recipe-form"
-	use:enhance={() => {
+	use:enhance={({ formData }) => {
 		saving = true;
+		// The shrunk copy, never the original from the camera roll.
+		formData.delete('photo');
+		if (chosenPhoto) formData.set('photo', chosenPhoto);
+		else if (photoRemoved) formData.set('removePhoto', '1');
 		return async ({ update }) => {
 			await update({ reset: false });
 			saving = false;
 		};
 	}}
 >
+	<RecipePhotoField
+		current={photo}
+		adopt={adoptPhoto}
+		error={errors.photo}
+		bind:photo={chosenPhoto}
+		bind:removed={photoRemoved}
+		bind:reading={readingPhoto}
+	/>
+
 	<label class="field">
 		<span class="field-label">What’s it called?</span>
 		<input
@@ -285,7 +315,9 @@
 	{/if}
 
 	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
+		<button class="button-primary" disabled={saving || readingPhoto}
+			>{saving ? 'Saving…' : submitLabel}</button
+		>
 	</div>
 </form>
 

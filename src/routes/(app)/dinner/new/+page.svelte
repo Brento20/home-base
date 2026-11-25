@@ -16,6 +16,18 @@
 		text: 'Filled in with AI from what you pasted.',
 		photo: 'Filled in with AI from your photo.'
 	};
+	// When a site won't hand its page over, say so, and the two ways that always work.
+	const failedNote = $derived.by(() => {
+		const problem = form && 'problem' in form ? form.problem : null;
+		const site = form && 'site' in form ? form.site : 'That site';
+		if (problem === 'blocked')
+			return `${site} wouldn’t let home base read the page (some sites turn apps away). Take a screenshot of the recipe and add it as a photo, or copy the recipe and paste it here.`;
+		if (problem === 'unreachable')
+			return `Couldn’t reach ${site} just now. Try again, or paste the recipe or a screenshot of it.`;
+		if (problem === 'not-a-page')
+			return 'That link isn’t a web page. Paste the recipe, or add a photo of it.';
+		return undefined;
+	});
 	const filledNote = $derived(
 		form && 'source' in form && form.source ? FILLED_FROM[form.source] : undefined
 	);
@@ -45,6 +57,7 @@
 		photoBusyLabel="Reading the cookbook page…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		{filledNote}
+		{failedNote}
 		focusOnFail="#recipe-title"
 	/>
 {/if}
@@ -56,5 +69,7 @@
 		errors={form && 'errors' in form ? form.errors : undefined}
 		submitLabel="Add to the cookbook"
 		action="?/create"
+		photo={form && 'photo' in form ? form.photo : null}
+		adoptPhoto
 	/>
 {/key}

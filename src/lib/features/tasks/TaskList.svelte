@@ -141,7 +141,7 @@
 		padding: 2px;
 		border-radius: 999px;
 		background: var(--colour-fill);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
 	.who a {
@@ -192,8 +192,8 @@
 
 	/* A hairline between rows that starts at the text, past the circle. */
 	.rows > :global(li + li) {
-		background: linear-gradient(var(--colour-hairline), var(--colour-hairline)) no-repeat
-			calc(24px + var(--space-m)) 0 / calc(100% - 24px - var(--space-m)) 1px;
+		background: linear-gradient(var(--colour-separator), var(--colour-separator)) no-repeat
+			calc(24px + var(--space-m)) 0 / calc(100% - 24px - var(--space-m)) var(--hairline);
 	}
 
 	.empty {

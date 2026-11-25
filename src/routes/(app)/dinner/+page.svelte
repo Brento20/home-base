@@ -80,6 +80,8 @@
 			people={data.household.members}
 			meId={data.me.id}
 			today={data.today}
+			photoUrl={data.recipes.find((recipe) => recipe.id === data.prompt?.task.recipeId)?.photoUrl ??
+				null}
 		/>
 	{/key}
 {/if}
@@ -284,7 +286,7 @@
 		gap: 6px;
 		min-height: var(--tap-target);
 		padding: 0 14px;
-		border: 1px solid var(--colour-hairline-strong);
+		border: var(--hairline) solid var(--colour-separator-strong);
 		border-radius: var(--radius-pill);
 		background: none;
 		color: var(--colour-text-muted);
@@ -324,7 +326,7 @@
 		padding: var(--space-m);
 		border-radius: 22px;
 		background: var(--colour-press);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		animation: open-down 320ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 

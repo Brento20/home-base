@@ -200,7 +200,7 @@
 		width: 100%;
 		aspect-ratio: 5 / 4;
 		border-radius: 18px;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 	}
 
 	.mode:has(input:focus-visible) .mode-preview {
@@ -270,14 +270,14 @@
 		border-radius: 18px;
 		background: var(--glass-body);
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 		list-style: none;
 		overflow: hidden;
 	}
 
 	.group li + li .row {
-		box-shadow: inset 0 1px 0 var(--colour-hairline);
+		box-shadow: inset 0 var(--hairline) 0 var(--colour-separator);
 	}
 
 	.row {
@@ -345,7 +345,7 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 	}
 
 	.footnote {
@@ -376,7 +376,7 @@
 		width: 56px;
 		height: 56px;
 		border-radius: 50%;
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 	}
 
 	/* The theme's accent as a dot, so you can see what the buttons will be. */
@@ -393,7 +393,7 @@
 
 	.swatch.on .swatch-colour {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline-strong),
+			inset 0 0 0 var(--hairline) var(--colour-separator-strong),
 			0 0 0 2px var(--colour-ground),
 			0 0 0 4px var(--colour-accent);
 	}

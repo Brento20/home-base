@@ -78,6 +78,7 @@
 			<input type="hidden" name="checked" value={String(!item.checked)} />
 			<button
 				class="tick"
+				data-haptic
 				aria-pressed={item.checked}
 				aria-label={item.checked ? `Untick ${item.name}` : `Tick off ${item.name}`}
 			>

@@ -57,7 +57,7 @@
 		gap: var(--space-m);
 		min-height: 52px;
 		margin: 0;
-		border-bottom: 1px solid var(--colour-hairline);
+		border-bottom: var(--hairline) solid var(--colour-separator);
 	}
 
 	.rating:last-child {

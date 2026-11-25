@@ -268,7 +268,7 @@
 		min-height: 52px;
 		border-radius: 16px;
 		background: var(--colour-fill);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		font-size: var(--text-small);
 		color: var(--colour-text);
 		text-decoration: none;

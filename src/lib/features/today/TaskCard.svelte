@@ -78,6 +78,7 @@
 					<PointPop count={pops} />
 					<button
 						class="done-button"
+						data-haptic
 						aria-label={dinner
 							? `Mark ${task.title} as cooked, earns a point`
 							: `Tick off ${task.title}, earns a point`}
@@ -133,7 +134,7 @@
 		padding: 18px 22px 16px;
 		border-radius: inherit;
 		box-shadow:
-			inset 0 0 0 1px var(--colour-hairline),
+			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 		transition: box-shadow var(--highlight-speed) var(--ease-out);
 	}
@@ -152,7 +153,7 @@
 
 	.highlighted .body {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			var(--glass-highlight);
 	}
 

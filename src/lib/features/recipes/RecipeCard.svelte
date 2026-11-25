@@ -1,7 +1,8 @@
 <script lang="ts">
 	/**
-	 * A recipe row in the library: the name and your stars, then one quiet line of time, diet and
-	 * nutrition. Rows sit in one list with hairlines between them, like the rest of the app's lists.
+	 * A recipe row in the library: the home's photo of it (or a quiet bowl when there isn't one),
+	 * the name and your stars, then one quiet line of time, diet and nutrition. Rows sit in one
+	 * list with hairlines between them, like the rest of the app's lists.
 	 */
 	import Icon from '#lib/ui/Icon.svelte';
 	import { formatMinutes, type RecipeSummary } from './recipe.js';
@@ -23,6 +24,11 @@
 </script>
 
 <a class="recipe-row" href="/dinner/{recipe.id}">
+	{#if recipe.photoUrl}
+		<img class="thumb" src={recipe.photoUrl} alt="" loading="lazy" decoding="async" />
+	{:else}
+		<span class="thumb empty" aria-hidden="true"><Icon name="dinner" size={22} /></span>
+	{/if}
 	<span class="body">
 		<span class="top">
 			<span class="title">{recipe.title}</span>
@@ -31,8 +37,9 @@
 		<span class="meta">
 			<span>{formatMinutes(recipe.totalMinutes)}</span>
 			{#if diet}<span class="diet">{diet}</span>{/if}
-			{#if nutrition}<span>{nutrition}</span>{/if}
 		</span>
+		<!-- Its own line: beside the photo there isn't room for all of it on one. -->
+		{#if nutrition}<span class="meta">{nutrition}</span>{/if}
 	</span>
 	<Icon name="chevron" size={18} />
 </a>
@@ -43,8 +50,8 @@
 		align-items: center;
 		gap: var(--space-m);
 		min-height: 64px;
-		padding: 12px 0;
-		border-bottom: 1px solid var(--colour-hairline);
+		padding: 10px 0;
+		border-bottom: var(--hairline) solid var(--colour-separator);
 		color: inherit;
 		text-decoration: none;
 		transition: opacity var(--duration-quick) var(--ease-out);
@@ -55,10 +62,26 @@
 		transition-duration: var(--duration-press);
 	}
 
+	.thumb {
+		flex: none;
+		width: 56px;
+		height: 56px;
+		border-radius: 14px;
+		object-fit: cover;
+		background: var(--colour-fill);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
+	}
+
+	.thumb.empty {
+		display: grid;
+		place-items: center;
+		color: var(--colour-text-faint);
+	}
+
 	.body {
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
+		gap: 2px;
 		flex: 1;
 		min-width: 0;
 	}

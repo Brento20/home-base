@@ -134,7 +134,7 @@
 		padding: 16px 18px;
 		border-radius: var(--radius-field);
 		background: var(--colour-accent-soft);
-		box-shadow: inset 0 0 0 1px var(--colour-accent-edge);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-accent-separator);
 	}
 
 	.complete-title {
@@ -161,7 +161,7 @@
 		height: 56px;
 		padding: 0 6px 0 18px;
 		border-radius: var(--radius-field);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline-strong);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator-strong);
 	}
 
 	.add input[name='name'] {
@@ -182,7 +182,7 @@
 
 	.add:focus-within {
 		box-shadow:
-			inset 0 0 0 1px var(--colour-accent-edge),
+			inset 0 0 0 var(--hairline) var(--colour-accent-separator),
 			0 0 0 3px var(--colour-accent-soft);
 	}
 
@@ -209,8 +209,8 @@
 
 	/* A hairline between rows that starts at the text, past the circle (as in Reminders). */
 	.items > :global(li + li) {
-		background: linear-gradient(var(--colour-hairline), var(--colour-hairline)) no-repeat
-			calc(24px + var(--space-m)) 0 / calc(100% - 24px - var(--space-m)) 1px;
+		background: linear-gradient(var(--colour-separator), var(--colour-separator)) no-repeat
+			calc(24px + var(--space-m)) 0 / calc(100% - 24px - var(--space-m)) var(--hairline);
 	}
 
 	.ticked-head {

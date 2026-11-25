@@ -50,7 +50,7 @@
 		border-radius: 50%;
 		background: var(--person-colour);
 		/* A pale person colour still has an edge on a light page. */
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		color: var(--colour-on-ring);
 		font-size: calc(var(--size) * 0.4);
 		font-weight: var(--weight-strong);

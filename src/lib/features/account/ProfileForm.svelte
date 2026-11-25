@@ -344,7 +344,7 @@
 		height: 44px;
 		border-radius: 50%;
 		background: var(--swatch);
-		box-shadow: inset 0 0 0 1px var(--colour-hairline);
+		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 		color: var(--colour-on-ring);
 	}
 

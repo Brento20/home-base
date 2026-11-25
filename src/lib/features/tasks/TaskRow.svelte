@@ -74,6 +74,7 @@
 		<span class="pop-anchor"><PointPop count={pops} /></span>
 		<button
 			class="toggle"
+			data-haptic
 			class:anyone={!assignee}
 			aria-label={label}
 			disabled={ticking}
