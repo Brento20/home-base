@@ -11,3 +11,5 @@ bun.lockb
 # Test output
 /test-results/
 /playwright-report/
+src/lib/icons/glyphs.ts
+tools/icons/

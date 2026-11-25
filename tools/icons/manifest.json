@@ -1,0 +1,670 @@
+[
+  {
+    "name": "home",
+    "category": "Navigation",
+    "path": "navigation/home.svg"
+  },
+  {
+    "name": "grid",
+    "category": "Navigation",
+    "path": "navigation/grid.svg"
+  },
+  {
+    "name": "menu",
+    "category": "Navigation",
+    "path": "navigation/menu.svg"
+  },
+  {
+    "name": "back",
+    "category": "Navigation",
+    "path": "navigation/back.svg"
+  },
+  {
+    "name": "forward",
+    "category": "Navigation",
+    "path": "navigation/forward.svg"
+  },
+  {
+    "name": "chevron-left",
+    "category": "Navigation",
+    "path": "navigation/chevron-left.svg"
+  },
+  {
+    "name": "chevron-right",
+    "category": "Navigation",
+    "path": "navigation/chevron-right.svg"
+  },
+  {
+    "name": "chevron-down",
+    "category": "Navigation",
+    "path": "navigation/chevron-down.svg"
+  },
+  {
+    "name": "chevron-up",
+    "category": "Navigation",
+    "path": "navigation/chevron-up.svg"
+  },
+  {
+    "name": "close",
+    "category": "Navigation",
+    "path": "navigation/close.svg"
+  },
+  {
+    "name": "search",
+    "category": "Navigation",
+    "path": "navigation/search.svg"
+  },
+  {
+    "name": "more",
+    "category": "Navigation",
+    "path": "navigation/more.svg"
+  },
+  {
+    "name": "plus",
+    "category": "Navigation",
+    "path": "navigation/plus.svg"
+  },
+  {
+    "name": "check",
+    "category": "Navigation",
+    "path": "navigation/check.svg"
+  },
+  {
+    "name": "message",
+    "category": "Social & communication",
+    "path": "social-communication/message.svg"
+  },
+  {
+    "name": "chat-bubbles",
+    "category": "Social & communication",
+    "path": "social-communication/chat-bubbles.svg"
+  },
+  {
+    "name": "call",
+    "category": "Social & communication",
+    "path": "social-communication/call.svg"
+  },
+  {
+    "name": "video-call",
+    "category": "Social & communication",
+    "path": "social-communication/video-call.svg"
+  },
+  {
+    "name": "post",
+    "category": "Social & communication",
+    "path": "social-communication/post.svg"
+  },
+  {
+    "name": "create-post",
+    "category": "Social & communication",
+    "path": "social-communication/create-post.svg"
+  },
+  {
+    "name": "send",
+    "category": "Social & communication",
+    "path": "social-communication/send.svg"
+  },
+  {
+    "name": "heart",
+    "category": "Social & communication",
+    "path": "social-communication/heart.svg"
+  },
+  {
+    "name": "comment",
+    "category": "Social & communication",
+    "path": "social-communication/comment.svg"
+  },
+  {
+    "name": "share",
+    "category": "Social & communication",
+    "path": "social-communication/share.svg"
+  },
+  {
+    "name": "notification",
+    "category": "Social & communication",
+    "path": "social-communication/notification.svg"
+  },
+  {
+    "name": "user",
+    "category": "Social & communication",
+    "path": "social-communication/user.svg"
+  },
+  {
+    "name": "users",
+    "category": "Social & communication",
+    "path": "social-communication/users.svg"
+  },
+  {
+    "name": "camera",
+    "category": "Social & communication",
+    "path": "social-communication/camera.svg"
+  },
+  {
+    "name": "calendar",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/calendar.svg"
+  },
+  {
+    "name": "calendar-add",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/calendar-add.svg"
+  },
+  {
+    "name": "clock",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/clock.svg"
+  },
+  {
+    "name": "alarm",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/alarm.svg"
+  },
+  {
+    "name": "checklist",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/checklist.svg"
+  },
+  {
+    "name": "list",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/list.svg"
+  },
+  {
+    "name": "task",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/task.svg"
+  },
+  {
+    "name": "flag",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/flag.svg"
+  },
+  {
+    "name": "bookmark",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/bookmark.svg"
+  },
+  {
+    "name": "note",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/note.svg"
+  },
+  {
+    "name": "repeat",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/repeat.svg"
+  },
+  {
+    "name": "filter",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/filter.svg"
+  },
+  {
+    "name": "sort",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/sort.svg"
+  },
+  {
+    "name": "archive",
+    "category": "Planning & productivity",
+    "path": "planning-productivity/archive.svg"
+  },
+  {
+    "name": "household",
+    "category": "Household & chores",
+    "path": "household-chores/household.svg"
+  },
+  {
+    "name": "key",
+    "category": "Household & chores",
+    "path": "household-chores/key.svg"
+  },
+  {
+    "name": "lightbulb",
+    "category": "Household & chores",
+    "path": "household-chores/lightbulb.svg"
+  },
+  {
+    "name": "vacuum",
+    "category": "Household & chores",
+    "path": "household-chores/vacuum.svg"
+  },
+  {
+    "name": "laundry",
+    "category": "Household & chores",
+    "path": "household-chores/laundry.svg"
+  },
+  {
+    "name": "broom",
+    "category": "Household & chores",
+    "path": "household-chores/broom.svg"
+  },
+  {
+    "name": "dishes",
+    "category": "Household & chores",
+    "path": "household-chores/dishes.svg"
+  },
+  {
+    "name": "bin",
+    "category": "Household & chores",
+    "path": "household-chores/bin.svg"
+  },
+  {
+    "name": "plant",
+    "category": "Household & chores",
+    "path": "household-chores/plant.svg"
+  },
+  {
+    "name": "paw",
+    "category": "Household & chores",
+    "path": "household-chores/paw.svg"
+  },
+  {
+    "name": "air-conditioning",
+    "category": "Household & chores",
+    "path": "household-chores/air-conditioning.svg"
+  },
+  {
+    "name": "bed",
+    "category": "Household & chores",
+    "path": "household-chores/bed.svg"
+  },
+  {
+    "name": "sofa",
+    "category": "Household & chores",
+    "path": "household-chores/sofa.svg"
+  },
+  {
+    "name": "wifi",
+    "category": "Household & chores",
+    "path": "household-chores/wifi.svg"
+  },
+  {
+    "name": "utensils",
+    "category": "Food & shopping",
+    "path": "food-shopping/utensils.svg"
+  },
+  {
+    "name": "cooking-pot",
+    "category": "Food & shopping",
+    "path": "food-shopping/cooking-pot.svg"
+  },
+  {
+    "name": "chef-hat",
+    "category": "Food & shopping",
+    "path": "food-shopping/chef-hat.svg"
+  },
+  {
+    "name": "coffee",
+    "category": "Food & shopping",
+    "path": "food-shopping/coffee.svg"
+  },
+  {
+    "name": "wine",
+    "category": "Food & shopping",
+    "path": "food-shopping/wine.svg"
+  },
+  {
+    "name": "pizza",
+    "category": "Food & shopping",
+    "path": "food-shopping/pizza.svg"
+  },
+  {
+    "name": "cake",
+    "category": "Food & shopping",
+    "path": "food-shopping/cake.svg"
+  },
+  {
+    "name": "carrot",
+    "category": "Food & shopping",
+    "path": "food-shopping/carrot.svg"
+  },
+  {
+    "name": "egg",
+    "category": "Food & shopping",
+    "path": "food-shopping/egg.svg"
+  },
+  {
+    "name": "groceries",
+    "category": "Food & shopping",
+    "path": "food-shopping/groceries.svg"
+  },
+  {
+    "name": "shopping-cart",
+    "category": "Food & shopping",
+    "path": "food-shopping/shopping-cart.svg"
+  },
+  {
+    "name": "recipe-book",
+    "category": "Food & shopping",
+    "path": "food-shopping/recipe-book.svg"
+  },
+  {
+    "name": "water",
+    "category": "Food & shopping",
+    "path": "food-shopping/water.svg"
+  },
+  {
+    "name": "ice-cream",
+    "category": "Food & shopping",
+    "path": "food-shopping/ice-cream.svg"
+  },
+  {
+    "name": "wallet",
+    "category": "Money & travel",
+    "path": "money-travel/wallet.svg"
+  },
+  {
+    "name": "card",
+    "category": "Money & travel",
+    "path": "money-travel/card.svg"
+  },
+  {
+    "name": "receipt",
+    "category": "Money & travel",
+    "path": "money-travel/receipt.svg"
+  },
+  {
+    "name": "dollar",
+    "category": "Money & travel",
+    "path": "money-travel/dollar.svg"
+  },
+  {
+    "name": "split-expense",
+    "category": "Money & travel",
+    "path": "money-travel/split-expense.svg"
+  },
+  {
+    "name": "chart",
+    "category": "Money & travel",
+    "path": "money-travel/chart.svg"
+  },
+  {
+    "name": "location",
+    "category": "Money & travel",
+    "path": "money-travel/location.svg"
+  },
+  {
+    "name": "map",
+    "category": "Money & travel",
+    "path": "money-travel/map.svg"
+  },
+  {
+    "name": "compass",
+    "category": "Money & travel",
+    "path": "money-travel/compass.svg"
+  },
+  {
+    "name": "car",
+    "category": "Money & travel",
+    "path": "money-travel/car.svg"
+  },
+  {
+    "name": "plane",
+    "category": "Money & travel",
+    "path": "money-travel/plane.svg"
+  },
+  {
+    "name": "suitcase",
+    "category": "Money & travel",
+    "path": "money-travel/suitcase.svg"
+  },
+  {
+    "name": "pokeball",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/pokeball.svg"
+  },
+  {
+    "name": "switch-controller",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/switch-controller.svg"
+  },
+  {
+    "name": "gamepad",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/gamepad.svg"
+  },
+  {
+    "name": "dice",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/dice.svg"
+  },
+  {
+    "name": "playing-cards",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/playing-cards.svg"
+  },
+  {
+    "name": "puzzle",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/puzzle.svg"
+  },
+  {
+    "name": "music",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/music.svg"
+  },
+  {
+    "name": "headphones",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/headphones.svg"
+  },
+  {
+    "name": "film",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/film.svg"
+  },
+  {
+    "name": "tv",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/tv.svg"
+  },
+  {
+    "name": "play",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/play.svg"
+  },
+  {
+    "name": "party",
+    "category": "Gaming & entertainment",
+    "path": "gaming-entertainment/party.svg"
+  },
+  {
+    "name": "snowflake",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/snowflake.svg"
+  },
+  {
+    "name": "christmas-tree",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/christmas-tree.svg"
+  },
+  {
+    "name": "gift",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/gift.svg"
+  },
+  {
+    "name": "bauble",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/bauble.svg"
+  },
+  {
+    "name": "candy-cane",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/candy-cane.svg"
+  },
+  {
+    "name": "stocking",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/stocking.svg"
+  },
+  {
+    "name": "holly",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/holly.svg"
+  },
+  {
+    "name": "wreath",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/wreath.svg"
+  },
+  {
+    "name": "star",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/star.svg"
+  },
+  {
+    "name": "sparkles",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/sparkles.svg"
+  },
+  {
+    "name": "sun",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/sun.svg"
+  },
+  {
+    "name": "moon",
+    "category": "Christmas & seasonal",
+    "path": "christmas-seasonal/moon.svg"
+  },
+  {
+    "name": "settings",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/settings.svg"
+  },
+  {
+    "name": "sliders",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/sliders.svg"
+  },
+  {
+    "name": "lock",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/lock.svg"
+  },
+  {
+    "name": "eye",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/eye.svg"
+  },
+  {
+    "name": "info",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/info.svg"
+  },
+  {
+    "name": "help",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/help.svg"
+  },
+  {
+    "name": "edit",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/edit.svg"
+  },
+  {
+    "name": "download",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/download.svg"
+  },
+  {
+    "name": "upload",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/upload.svg"
+  },
+  {
+    "name": "link",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/link.svg"
+  },
+  {
+    "name": "activity",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/activity.svg"
+  },
+  {
+    "name": "dumbbell",
+    "category": "Controls & wellbeing",
+    "path": "controls-wellbeing/dumbbell.svg"
+  },
+  {
+    "name": "home-fill",
+    "category": "Selected states",
+    "path": "selected/home-fill.svg",
+    "base": "home"
+  },
+  {
+    "name": "grid-fill",
+    "category": "Selected states",
+    "path": "selected/grid-fill.svg",
+    "base": "grid"
+  },
+  {
+    "name": "message-fill",
+    "category": "Selected states",
+    "path": "selected/message-fill.svg",
+    "base": "message"
+  },
+  {
+    "name": "heart-fill",
+    "category": "Selected states",
+    "path": "selected/heart-fill.svg",
+    "base": "heart"
+  },
+  {
+    "name": "bookmark-fill",
+    "category": "Selected states",
+    "path": "selected/bookmark-fill.svg",
+    "base": "bookmark"
+  },
+  {
+    "name": "user-fill",
+    "category": "Selected states",
+    "path": "selected/user-fill.svg",
+    "base": "user"
+  },
+  {
+    "name": "notification-fill",
+    "category": "Selected states",
+    "path": "selected/notification-fill.svg",
+    "base": "notification"
+  },
+  {
+    "name": "location-fill",
+    "category": "Selected states",
+    "path": "selected/location-fill.svg",
+    "base": "location"
+  },
+  {
+    "name": "star-fill",
+    "category": "Selected states",
+    "path": "selected/star-fill.svg",
+    "base": "star"
+  },
+  {
+    "name": "moon-fill",
+    "category": "Selected states",
+    "path": "selected/moon-fill.svg",
+    "base": "moon"
+  },
+  {
+    "name": "pokeball-fill",
+    "category": "Selected states",
+    "path": "selected/pokeball-fill.svg",
+    "base": "pokeball"
+  },
+  {
+    "name": "calendar-fill",
+    "category": "Selected states",
+    "path": "selected/calendar-fill.svg",
+    "base": "calendar"
+  },
+  {
+    "name": "task-fill",
+    "category": "Selected states",
+    "path": "selected/task-fill.svg",
+    "base": "task"
+  }
+]

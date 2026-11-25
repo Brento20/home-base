@@ -1,11 +1,16 @@
 <script lang="ts">
-	/** A chore card in Today's row, with a Done button that earns a point. */
+	/**
+	 * A chore card in Today's row, with a Done button that earns a point, and the chore's icon
+	 * etched faintly into the glass (meaning.ts picks it from what the chore says).
+	 */
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import { enhance } from '$app/forms';
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
+	import IconEtching from '#lib/icons/IconEtching.svelte';
+	import { taskIcon } from '#lib/icons/meaning.js';
 	import { canFinish as finishable, taskWhen } from './coming-up.js';
 	import type { Profile, Task } from '#lib/types.js';
 
@@ -29,6 +34,7 @@
 	const canFinish = $derived(finishable(task, today));
 	const due = $derived(taskWhen(task, today));
 	const when = $derived(due.label);
+	const motif = $derived(taskIcon(task));
 </script>
 
 <div class="task-card" class:highlighted class:done>
@@ -39,6 +45,7 @@
 		aria-label={label ?? task.title}
 	></a>
 	<div class="body">
+		{#if motif}<span class="motif"><IconEtching icon={motif} /></span>{/if}
 		<span class="when caption-label" class:late={due.late}>
 			{dinner ? 'Dinner' : 'Chore'} · {when}
 			{#if task.repeat !== 'none'}<span class="repeat" title={repeatLabel(task.repeat)}
@@ -137,6 +144,21 @@
 			inset 0 0 0 var(--hairline) var(--colour-separator),
 			var(--glass-highlight);
 		transition: box-shadow var(--highlight-speed) var(--ease-out);
+	}
+
+	/* The chore's icon, etched into the glass up in the corner, clear of the Done button. */
+	.motif {
+		position: absolute;
+		top: 18px;
+		right: 20px;
+		z-index: -1;
+		width: 76px;
+		pointer-events: none;
+	}
+
+	.highlighted .motif {
+		--motif-colour: var(--colour-accent);
+		--motif-opacity: 0.12;
 	}
 
 	.body::before {

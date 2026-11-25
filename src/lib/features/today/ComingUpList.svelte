@@ -11,6 +11,7 @@
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
 	import Icon from '#lib/ui/Icon.svelte';
+	import { planIcon, taskIcon } from '#lib/icons/meaning.js';
 	import { arrive, glide, leave } from '#lib/ui/motion.js';
 	import type { Profile } from '#lib/types.js';
 	import { canFinish, taskWhen, type ComingUpItem } from './coming-up.js';
@@ -39,7 +40,9 @@
 			{#if item.kind === 'plan'}
 				{@const plan = item.plan}
 				<a class="grouped-row link" href="/plans/{plan.id}">
-					<span class="icon plan" aria-hidden="true"><Icon name="plans" size={16} /></span>
+					<span class="icon plan" aria-hidden="true"
+						><Icon name={planIcon(plan) ?? 'plans'} size={16} /></span
+					>
 					<span class="grouped-label">
 						<span class="title">{plan.title}</span>
 						<span class="grouped-sub"
@@ -58,7 +61,7 @@
 						href={dinner ? `/dinner/cook/${task.id}` : `/lists/tasks/${task.id}`}
 					>
 						<span class="icon" class:dinner aria-hidden="true"
-							><Icon name={dinner ? 'dinner' : 'lists'} size={16} /></span
+							><Icon name={taskIcon(task) ?? 'lists'} size={16} /></span
 						>
 						<span class="grouped-label">
 							<span class="title"

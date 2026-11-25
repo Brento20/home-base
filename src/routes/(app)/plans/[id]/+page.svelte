@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { describePlanTime, planDay } from '#lib/features/plans/describe.js';
 	import LinkedText from '#lib/features/plans/LinkedText.svelte';
-	import { planMotif } from '#lib/features/plans/motif.js';
-	import PlanMotif from '#lib/features/plans/PlanMotif.svelte';
 	import { describeGuests } from '#lib/features/plans/plan-guests.js';
+	import IconEtching from '#lib/icons/IconEtching.svelte';
+	import { planIcon } from '#lib/icons/meaning.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import { enhance } from '$app/forms';
@@ -16,7 +16,7 @@
 	const plan = $derived(data.plan);
 	const day = $derived(planDay(plan));
 	const daysAway = $derived(describeDaysAway(day, data.today));
-	const motif = $derived(planMotif(plan));
+	const motif = $derived(planIcon(plan));
 	const guests = $derived(data.guests);
 	const summary = $derived(describeGuests(guests));
 	// Grouped by home, the plan's own home first (the database orders them that way).
@@ -49,7 +49,7 @@
 	<header class="hero">
 		<GlassSurface radius={28} />
 		<div class="hero-body">
-			{#if motif}<span class="motif"><PlanMotif {motif} /></span>{/if}
+			{#if motif}<span class="motif"><IconEtching icon={motif} /></span>{/if}
 			{#if daysAway}<p class="days-away">{daysAway}</p>{/if}
 			<h1>{plan.title}</h1>
 			<p class="when">

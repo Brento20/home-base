@@ -1,43 +1,59 @@
 <script lang="ts" module>
-	export type IconName =
-		| 'today'
-		| 'plans'
-		| 'lists'
-		| 'money'
-		| 'home'
-		| 'check'
-		| 'plus'
-		| 'chevron'
-		| 'back'
-		| 'repeat'
-		| 'close'
-		| 'compose'
-		| 'more'
-		| 'photo'
-		| 'reply'
-		| 'refresh'
-		| 'dinner'
-		| 'star'
-		| 'search'
-		| 'clock'
-		| 'minus'
-		| 'filter'
-		| 'leaf'
-		| 'sparkle'
-		| 'camera'
-		| 'wifi'
-		| 'phone'
-		| 'message'
-		| 'qr'
-		| 'basket'
-		| 'archive'
-		| 'share';
+	import { GLYPHS, type GlyphId } from '#lib/icons/glyphs.js';
+
+	/**
+	 * The app's own names for its icons, and the Home Base icon set's drawing each one uses
+	 * (src/lib/icons, from tools/icons). A few the set doesn't have are drawn here in the same
+	 * hand: the 24-unit grid, the 1.5 stroke, round ends, solid detail dots.
+	 */
+	const APP_ICONS = {
+		today: 'sun',
+		plans: 'calendar',
+		lists: 'checklist',
+		money: 'wallet',
+		home: 'home',
+		check: 'check',
+		plus: 'plus',
+		chevron: 'chevron-right',
+		back: 'chevron-left',
+		repeat: 'repeat',
+		close: 'close',
+		compose: 'create-post',
+		more: 'more',
+		dinner: 'utensils',
+		star: 'star',
+		search: 'search',
+		clock: 'clock',
+		filter: 'filter',
+		leaf: 'plant',
+		sparkle: 'sparkles',
+		camera: 'camera',
+		wifi: 'wifi',
+		phone: 'call',
+		message: 'message',
+		basket: 'groceries',
+		archive: 'archive',
+		share: 'share'
+	} as const satisfies Record<string, GlyphId>;
+
+	const DRAWN = {
+		photo:
+			'<rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m3.75 16 4.6-4.6a1.5 1.5 0 0 1 2.1 0L16.5 17.5"/><path d="m14 15 1.55-1.55a1.5 1.5 0 0 1 2.1 0l2.6 2.6"/><circle cx="15.75" cy="9.5" r="1.25" fill="currentColor" stroke="none"/>',
+		reply: '<path d="M9.5 6.5 4.5 11.5l5 5"/><path d="M4.75 11.5h8.75a6 6 0 0 1 6 6v1"/>',
+		refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4.25h-4.25"/>',
+		minus: '<path d="M5 12h14"/>',
+		qr: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><path d="M13.5 13.5h2.75v2.75M20 13.5v.01M13.5 20v.01M17 20h3v-3"/>'
+	} as const;
+
+	export type IconName = keyof typeof APP_ICONS | keyof typeof DRAWN;
 </script>
 
 <script lang="ts">
 	interface Props {
-		name: IconName;
+		/** One of the app's names, or any icon in the set by its own name ("pokeball"). */
+		name: IconName | GlyphId;
 		size?: number;
+		/** The selected state: the set's filled drawing where it has one, else a fill. */
 		filled?: boolean;
 		/** A chevron after words ("All plans ›"): trims its empty sides so it sits close to them. */
 		trim?: boolean;
@@ -45,29 +61,27 @@
 
 	let { name, size = 22, filled = false, trim = false }: Props = $props();
 
-	/*
-	 * Optical centring: a few drawings sit off the middle of their 24-unit box (a wifi's dot pulls
-	 * it down, a list's ticks pull it up), so they're shifted until what you see is centred, in
-	 * units of the box. Measured from each drawing's own bounds; the magnifier is left alone, as
-	 * its lens, not its handle, is what the eye centres.
-	 */
-	const NUDGE: Partial<Record<IconName, [number, number]>> = {
-		chevron: [-0.5, 0],
-		back: [0.5, 0],
-		lists: [0, 0.85],
-		wifi: [0, -0.8],
-		compose: [0, -0.65],
-		star: [0, 0.6],
-		plans: [0, 0.5],
-		dinner: [0, 0.5],
-		money: [0, -0.5],
-		reply: [0, -0.5],
-		phone: [-0.5, 0.5]
-	};
-	const nudge = $derived(NUDGE[name]);
+	const glyph = $derived<GlyphId | null>(
+		name in APP_ICONS
+			? APP_ICONS[name as keyof typeof APP_ICONS]
+			: name in GLYPHS
+				? (name as GlyphId)
+				: null
+	);
+	const fillId = $derived(glyph && `${glyph}-fill` in GLYPHS ? (`${glyph}-fill` as GlyphId) : null);
+	const body = $derived(
+		filled && fillId
+			? GLYPHS[fillId]
+			: glyph
+				? GLYPHS[glyph]
+				: (DRAWN[name as keyof typeof DRAWN] ?? '')
+	);
 </script>
 
-<!-- Pale etched icons: one stroke weight, round ends, no fills unless a state needs one. -->
+<!--
+	One weight everywhere: the set is drawn with a 1.5 stroke on a 24-unit grid, and everything
+	here keeps it. The sparkle only ever means AI, so it's always drawn in the AI spectrum.
+-->
 <svg
 	class="icon icon-{name}"
 	class:trim
@@ -75,120 +89,15 @@
 	width={size}
 	height={size}
 	viewBox="0 0 24 24"
-	fill="none"
-	stroke="currentColor"
-	stroke-width="1.6"
+	fill={filled && !fillId ? 'currentColor' : 'none'}
+	stroke={name === 'sparkle' ? 'url(#ai-spectrum)' : 'currentColor'}
+	stroke-width="1.5"
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	aria-hidden="true"
 >
-	<g transform={nudge ? `translate(${nudge[0]} ${nudge[1]})` : undefined}>
-		{#if name === 'today'}
-			<circle cx="12" cy="12" r="4" />
-			<path
-				d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"
-			/>
-		{:else if name === 'plans'}
-			<rect x="3.5" y="5" width="17" height="15" rx="3" />
-			<path d="M3.5 10h17M8 3v4M16 3v4" />
-		{:else if name === 'lists'}
-			<path d="M4 6.5l1.8 1.8L9 5M4 15.5l1.8 1.8L9 14M12.5 7h7.5M12.5 16h7.5" />
-		{:else if name === 'money'}
-			<rect x="3" y="6" width="18" height="13" rx="3" />
-			<path d="M3 10h18M15 15h3" />
-		{:else if name === 'home'}
-			<path d="M4 10.5L12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-5v6h-4A1.5 1.5 0 0 1 4 19z" />
-		{:else if name === 'check'}
-			<path d="M5 12.5l4.5 4.5L19 7.5" />
-		{:else if name === 'plus'}
-			<path d="M12 5v14M5 12h14" />
-		{:else if name === 'chevron'}
-			<path d="M9.5 6l6 6-6 6" />
-		{:else if name === 'back'}
-			<path d="M14.5 6l-6 6 6 6" />
-		{:else if name === 'wifi'}
-			<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.6 15.9a5 5 0 0 1 6.8 0" />
-			<circle cx="12" cy="19.2" r="1.1" fill="currentColor" stroke="none" />
-		{:else if name === 'phone'}
-			<path
-				d="M6.6 3.5h2.2l1.4 4-2 1.3a11 11 0 0 0 7 7l1.3-2 4 1.4v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"
-			/>
-		{:else if name === 'message'}
-			<path
-				d="M12 4c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-1 0-2-.1-2.9-.4L5 19.5l1.2-3.4A6.6 6.6 0 0 1 3.5 11c0-3.9 3.8-7 8.5-7z"
-			/>
-		{:else if name === 'qr'}
-			<rect x="4" y="4" width="6" height="6" rx="1.2" />
-			<rect x="14" y="4" width="6" height="6" rx="1.2" />
-			<rect x="4" y="14" width="6" height="6" rx="1.2" />
-			<path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 19.5V20M20 14v.5" />
-		{:else if name === 'basket'}
-			<path d="M3.5 9.5h17l-1.6 9a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6z" />
-			<path d="M8 9.5 11 4M16 9.5 13 4M9.5 13.5v3M14.5 13.5v3" />
-		{:else if name === 'share'}
-			<path
-				d="M12 3.5v11M8 7.5l4-4 4 4M8.5 10.5H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1.5"
-			/>
-		{:else if name === 'archive'}
-			<rect x="3.5" y="4.5" width="17" height="4.5" rx="1.2" />
-			<path d="M5 9v8.5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4" />
-		{:else if name === 'repeat'}
-			<path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4" />
-		{:else if name === 'close'}
-			<path d="M6 6l12 12M18 6L6 18" />
-		{:else if name === 'compose'}
-			<path d="M20 11.5a7.5 7.5 0 0 1-11 6.6L4 19.5l1.4-4.3A7.5 7.5 0 1 1 20 11.5z" />
-			<path d="M9 11.5h6M12 8.5v6" />
-		{:else if name === 'more'}
-			<circle cx="6" cy="12" r="1.2" fill="currentColor" />
-			<circle cx="12" cy="12" r="1.2" fill="currentColor" />
-			<circle cx="18" cy="12" r="1.2" fill="currentColor" />
-		{:else if name === 'photo'}
-			<rect x="3.5" y="5" width="17" height="14" rx="3" />
-			<circle cx="9" cy="10" r="1.6" />
-			<path d="M4 17l4.5-4.5 3.5 3.5 3-3 5 5" />
-		{:else if name === 'sparkle'}
-			<!-- Always drawn in the AI spectrum: the sparkle only ever means AI. -->
-			<path
-				stroke="url(#ai-spectrum)"
-				d="M12 3.5l1.8 5.2a2 2 0 0 0 1.5 1.5l5.2 1.8-5.2 1.8a2 2 0 0 0-1.5 1.5L12 20.5l-1.8-5.2a2 2 0 0 0-1.5-1.5L3.5 12l5.2-1.8a2 2 0 0 0 1.5-1.5z"
-			/>
-		{:else if name === 'camera'}
-			<path
-				d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"
-			/>
-			<circle cx="12" cy="12.5" r="3.2" />
-		{:else if name === 'refresh'}
-			<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
-			<path d="M19.5 4.5v4h-4" />
-		{:else if name === 'reply'}
-			<path d="M10 7L5 12l5 5" />
-			<path d="M5.5 12H14a5 5 0 0 1 5 5v1" />
-		{:else if name === 'dinner'}
-			<path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z" />
-			<path d="M8.5 4c0 1.3 1 1.7 1 3M12 3c0 1.3 1 1.7 1 3M15.5 4c0 1.3 1 1.7 1 3" />
-		{:else if name === 'star'}
-			<path
-				fill={filled ? 'currentColor' : 'none'}
-				d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.5l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"
-			/>
-		{:else if name === 'search'}
-			<circle cx="11" cy="11" r="6.5" />
-			<path d="M16 16l4.5 4.5" />
-		{:else if name === 'clock'}
-			<circle cx="12" cy="12" r="8.5" />
-			<path d="M12 7.5V12l3 2" />
-		{:else if name === 'minus'}
-			<path d="M5 12h14" />
-		{:else if name === 'filter'}
-			<path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
-			<circle cx="15" cy="7" r="2" />
-			<circle cx="9" cy="17" r="2" />
-		{:else if name === 'leaf'}
-			<path d="M5.5 18.5C5.5 10.5 10.5 5.5 19 5c0 8.5-5 13.5-13.5 13.5z" />
-			<path d="M5.5 18.5c2.8-3.8 5.8-6.8 9-9" />
-		{/if}
-	</g>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- the set's own drawings, cleaned when generated (tools/make_icons.py) -->
+	{@html body}
 </svg>
 
 <style>
@@ -197,14 +106,14 @@
 		display: block;
 	}
 
-	/* A chevron's stroke is a quarter of its box: keep 3 units either side of it, not 9. */
+	/* A chevron's stroke is narrow in its box: keep 2.5 units either side of it, not 8 or 9. */
 	.trim {
-		margin-inline: calc(var(--icon-size) * -6 / 24);
+		margin-inline: calc(var(--icon-size) * -6.5 / 24) calc(var(--icon-size) * -5.25 / 24);
 	}
 
 	/* A back link's chevron lines its stroke up with the page's text edge, as iOS does. */
 	:global(.button-quiet) > .icon-back:first-child {
-		margin-inline-start: calc(var(--icon-size) * -9 / 24);
-		margin-inline-end: calc(var(--icon-size) * -4 / 24);
+		margin-inline-start: calc(var(--icon-size) * -7.75 / 24);
+		margin-inline-end: calc(var(--icon-size) * -5 / 24);
 	}
 </style>

@@ -1,8 +1,8 @@
 <script lang="ts">
 	/** A plan card in Today's row. The next plan gets a live countdown and a larger title. */
 	import { describePlanWhen } from '#lib/features/plans/describe.js';
-	import { planMotif } from '#lib/features/plans/motif.js';
-	import PlanMotif from '#lib/features/plans/PlanMotif.svelte';
+	import IconEtching from '#lib/icons/IconEtching.svelte';
+	import { planIcon } from '#lib/icons/meaning.js';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import { describeCountdown } from '#lib/time.js';
 	import type { Plan } from '#lib/types.js';
@@ -23,7 +23,7 @@
 
 	const when = $derived(describePlanWhen(plan, today));
 	const detail = $derived(plan.notes.split('\n')[0] || plan.location);
-	const motif = $derived(planMotif(plan));
+	const motif = $derived(planIcon(plan));
 	const countdown = $derived(
 		next && now && !plan.allDay ? describeCountdown(new Date(plan.startsAt), now) : null
 	);
@@ -32,7 +32,7 @@
 <a class="hero-card" class:next class:highlighted href="/plans/{plan.id}" aria-label={label}>
 	<GlassSurface radius={28} squish />
 	<span class="body">
-		{#if motif}<span class="motif"><PlanMotif {motif} /></span>{/if}
+		{#if motif}<span class="motif"><IconEtching icon={motif} /></span>{/if}
 		<span class="when caption-label"
 			>{when}{#if countdown}<span>{` · ${countdown}`}</span>{/if}</span
 		>
