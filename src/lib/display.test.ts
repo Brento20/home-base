@@ -9,8 +9,20 @@ describe('display preferences', () => {
 
 	it('keeps what it recognises and defaults the rest', () => {
 		expect(
-			parseDisplay({ reduceGlow: true, todayCardLimit: 3, todayCardLayout: 'list', extra: 1 })
-		).toEqual({ ...DEFAULT_DISPLAY, reduceGlow: true, todayCardLimit: 3, todayCardLayout: 'list' });
+			parseDisplay({
+				reduceGlow: true,
+				todayCardLimit: 3,
+				todayCardLayout: 'list',
+				settleNudge: 100,
+				extra: 1
+			})
+		).toEqual({
+			...DEFAULT_DISPLAY,
+			reduceGlow: true,
+			todayCardLimit: 3,
+			todayCardLayout: 'list',
+			settleNudge: 100
+		});
 	});
 
 	it('ignores values it does not know', () => {

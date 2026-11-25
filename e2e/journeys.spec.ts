@@ -719,6 +719,111 @@ test('Display preferences: glow, steady placeholders, summary, cards shown and a
 	expect(errors).toEqual([]);
 });
 
+test('Shop for dinners: the week’s dinners, merged, onto Shopping', async ({ page }) => {
+	const errors = watchErrors(page);
+	await open(page, '/lists');
+	await page.getByRole('link', { name: /Shop for this week’s dinners/ }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Shop for dinners');
+
+	// Both sample dinners, ticked; garlic is needed by both, so it's one line.
+	await expect(page.locator('input[name="dinner"]:checked')).toHaveCount(2);
+	const garlic = page.locator('.tick-row', { hasText: 'Garlic' });
+	await expect(garlic).toHaveCount(1);
+	await expect(garlic).toContainText('For 2 dinners');
+	// To taste and pantry things start unticked, in their own group.
+	await expect(page.locator('#got-heading')).toBeVisible();
+	await expect(page.locator('.tick-row', { hasText: 'Salt' }).locator('input')).not.toBeChecked();
+
+	// Untick a dinner and its things leave the list.
+	const before = await page.locator('input[name="need"]').count();
+	await page.locator('.tick-row', { hasText: 'Lemon and herb' }).click();
+	await expect(page.locator('input[name="need"]')).not.toHaveCount(before);
+	await page.locator('.tick-row', { hasText: 'Lemon and herb' }).click();
+	await expect(page.locator('input[name="need"]')).toHaveCount(before);
+
+	// Add: everything ticked goes on Shopping, and you land on it.
+	const add = page.locator('.shop-act');
+	const count = Number((await add.textContent())?.match(/\d+/)?.[0]);
+	expect(count).toBeGreaterThan(5);
+	await add.click();
+	await expect(page).toHaveURL(/\/lists\/(?!dinners)/);
+	await expect(page.getByText(/Garlic · /)).toBeVisible();
+
+	// Back again: what's now on the list starts unticked, as already on Shopping.
+	await open(page, '/lists/dinners');
+	await expect(page.locator('.tick-row', { hasText: 'Garlic' })).toContainText(
+		'Already on Shopping'
+	);
+	expect(errors).toEqual([]);
+});
+
+test('Recurring bills: repeat an expense, see it under Repeats, pause and stop it', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/money/sample-group-place/expenses/new');
+	await page.locator('#expense-amount').fill('24.99');
+	await page.locator('input[name="description"]').fill(`Streaming ${run}`);
+	await page.locator('label.choice-pill', { hasText: 'Monthly' }).click();
+	await expect(page.getByText(/Adds itself every month from this date/)).toBeVisible();
+	await page.locator('.expense-form button.button-primary').click();
+	await expect(page).toHaveURL(/\/money\/sample-group-place$/);
+
+	const bill = page.locator('.repeats .grouped-row', { hasText: `Streaming ${run}` });
+	await expect(bill).toContainText('Monthly · next');
+	await expect(bill).toContainText('$24.99');
+	// This month's is in the activity, marked as a recurring bill.
+	await expect(
+		page.locator('.row', { hasText: `Streaming ${run}` }).getByLabel('Recurring bill')
+	).toBeVisible();
+
+	await bill.click();
+	await page.getByRole('button', { name: 'Pause' }).click();
+	await expect(page.getByText(/Paused\. It won’t add itself/)).toBeVisible();
+	await page.getByRole('button', { name: 'Resume' }).click();
+	await expect(page.getByText(/Monthly\. Next on/)).toBeVisible();
+	// Two taps, like every delete.
+	await page.getByRole('button', { name: 'Stop repeating' }).click();
+	await page.getByRole('button', { name: 'Tap again to stop it' }).click();
+	await expect(page).toHaveURL(/\/money\/sample-group-place$/);
+	await expect(page.locator('.repeats .grouped-row', { hasText: `Streaming ${run}` })).toHaveCount(
+		0
+	);
+	expect(errors).toEqual([]);
+});
+
+test('Settle-up nudge and the snow globe, from Preferences', async ({ page }) => {
+	const errors = watchErrors(page);
+	expect((await page.request.post('/account/display', { data: { prefs: {} } })).ok()).toBe(true);
+
+	// Off by default: no nudge, even when you owe something.
+	await open(page, '/');
+	await expect(page.locator('.nudge')).toHaveCount(0);
+
+	// Snow globe: switching it on shows a few seconds of snow, with a Shake button.
+	await open(page, '/profile/preferences');
+	await page.locator('.switch-row', { hasText: 'Snow globe' }).click();
+	await expect(page.locator('canvas.snow')).toHaveCount(1);
+	await page.getByRole('button', { name: /Shake it/ }).click();
+	await page.locator('.switch-row', { hasText: 'Snow globe' }).click();
+	await expect(page.locator('canvas.snow')).toHaveCount(0);
+
+	// Choosing a nudge amount saves; Today shows it once you're that far behind.
+	await page.locator('.segmented label', { hasText: /^\s*\$50\s*$/ }).click();
+	await expect(page.getByRole('radio', { name: '$50', exact: true })).toBeChecked();
+	await page.waitForTimeout(800);
+	await open(page, '/');
+	const nudge = page.locator('.nudge');
+	if (await nudge.count()) {
+		await expect(nudge).toContainText('behind');
+		await nudge.getByRole('button', { name: 'Not now' }).click();
+		await expect(nudge).toHaveCount(0);
+	}
+
+	expect((await page.request.post('/account/display', { data: { prefs: {} } })).ok()).toBe(true);
+	expect(errors).toEqual([]);
+});
+
 test('Friend requests: a dot on Home, accept one, send by code, send from a profile, cancel', async ({
 	page
 }) => {

@@ -50,6 +50,7 @@ interface ExpenseRow {
 	category: CategoryKey;
 	split_method: SplitMethod;
 	created_at: string;
+	recurring_id: string | null;
 	expense_shares: { profile_id: string; owed_cents: number; split_input: number | null }[];
 }
 
@@ -64,7 +65,7 @@ interface SettlementRow {
 }
 
 const EXPENSE_COLUMNS =
-	'id, group_id, description, amount_cents, paid_by, spent_on, category, split_method, created_at, expense_shares ( profile_id, owed_cents, split_input )';
+	'id, group_id, description, amount_cents, paid_by, spent_on, category, split_method, created_at, recurring_id, expense_shares ( profile_id, owed_cents, split_input )';
 const SETTLEMENT_COLUMNS = 'id, group_id, paid_by, paid_to, amount_cents, paid_on, created_at';
 
 const toExpense = (row: ExpenseRow): Expense => ({
@@ -77,6 +78,7 @@ const toExpense = (row: ExpenseRow): Expense => ({
 	category: row.category,
 	splitMethod: row.split_method,
 	createdAt: row.created_at,
+	recurringId: row.recurring_id,
 	shares: row.expense_shares.map((share) => ({
 		profileId: share.profile_id,
 		owedCents: share.owed_cents,

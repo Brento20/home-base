@@ -5,6 +5,7 @@
 	import ComingUp from '#lib/features/today/ComingUp.svelte';
 	import GettingStarted from '#lib/features/today/GettingStarted.svelte';
 	import ListsGlance from '#lib/features/today/ListsGlance.svelte';
+	import SettleNudge from '#lib/features/today/SettleNudge.svelte';
 	import AddBar from '#lib/features/today/AddBar.svelte';
 	import WeekSummary from '#lib/features/today/WeekSummary.svelte';
 	import { displayPrefs } from '#lib/display.svelte.js';
@@ -87,6 +88,13 @@
 					layout={display.todayCardLayout}
 				/>
 			</div>
+			{#if today.nudge && display.settleNudge}
+				<SettleNudge
+					nudge={today.nudge}
+					people={data.household.members}
+					step={display.settleNudge}
+				/>
+			{/if}
 			<ListsGlance lists={today.lists} />
 		{/snippet}
 	</Reveal>

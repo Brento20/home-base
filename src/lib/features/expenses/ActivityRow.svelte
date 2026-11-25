@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '#lib/ui/Icon.svelte';
 	/**
 	 * One line in a group's history: an expense with your part of it, or a repayment.
 	 * Tapping opens it to edit or delete.
@@ -46,7 +47,12 @@
 			<span class="swatch" style:--swatch={categoryColour(expense.category)} aria-hidden="true"
 			></span>
 			<span class="text">
-				<span class="one-line">{expense.description}</span>
+				<span class="one-line"
+					>{expense.description}{#if expense.recurringId}<span
+							class="repeats"
+							aria-label="Recurring bill"><Icon name="repeat" size={12} /></span
+						>{/if}</span
+				>
 				<span class="meta">
 					{nameOf(people, expense.paidBy, me)} paid {formatMoney(
 						expense.amountCents
@@ -152,5 +158,13 @@
 
 	.part.borrowed {
 		color: var(--colour-text-muted);
+	}
+
+	/* Added by a recurring bill. */
+	.repeats {
+		display: inline-flex;
+		margin-left: 6px;
+		color: var(--colour-text-faint);
+		vertical-align: -1px;
 	}
 </style>

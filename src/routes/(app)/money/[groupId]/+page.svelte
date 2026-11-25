@@ -1,5 +1,9 @@
 <script lang="ts">
 	import ActivityRow from '#lib/features/expenses/ActivityRow.svelte';
+	import { categoryColour } from '#lib/features/expenses/categories.js';
+	import { formatMoney } from '#lib/features/expenses/money.js';
+	import { frequencyLabel } from '#lib/features/expenses/recurring.js';
+	import { formatDayLabel, todayISO } from '#lib/time.js';
 	import {
 		describeBetween,
 		describeDebt,
@@ -104,6 +108,33 @@
 	<a href="/money/{data.group.id}/settings">Group settings</a>
 </nav>
 
+{#if data.recurring.length}
+	<!-- Bills that add themselves; each opens to change, pause or stop it. -->
+	<section class="repeats" aria-labelledby="repeats-heading">
+		<h2 id="repeats-heading" class="section-label caption-label">Repeats</h2>
+		<ul class="grouped">
+			{#each data.recurring as bill (bill.id)}
+				<li>
+					<a class="grouped-row" href="/money/{data.group.id}/recurring/{bill.id}">
+						<span class="grouped-icon" style:--icon-colour={categoryColour(bill.category)}
+							><Icon name="repeat" size={16} /></span
+						>
+						<span class="grouped-label"
+							>{bill.description}<span class="grouped-sub"
+								>{bill.paused
+									? 'Paused'
+									: `${frequencyLabel(bill.frequency)} · next ${formatDayLabel(bill.nextOn, todayISO())}`}</span
+							></span
+						>
+						<span class="grouped-value">{formatMoney(bill.amountCents)}</span>
+						<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</section>
+{/if}
+
 {#if months.length === 0}
 	<p class="empty">
 		No expenses yet. Add the first one and everyone’s share is worked out for you.
@@ -122,6 +153,10 @@
 {/if}
 
 <style>
+	.repeats {
+		margin-bottom: var(--space-xl);
+	}
+
 	.summary {
 		display: flex;
 		flex-direction: column;

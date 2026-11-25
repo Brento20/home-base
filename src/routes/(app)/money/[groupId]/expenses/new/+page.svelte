@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import ExpenseForm from '#lib/features/expenses/ExpenseForm.svelte';
+	import { isFrequency } from '#lib/features/expenses/recurring.js';
 	import AssistBox from '#lib/ui/AssistBox.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -48,6 +49,8 @@
 		people={data.people}
 		me={data.me.id}
 		action="?/create"
+		showRepeat
+		repeat={form && 'repeat' in form && isFrequency(form.repeat) ? form.repeat : 'none'}
 		submitLabel="Add it"
 	/>
 {/key}

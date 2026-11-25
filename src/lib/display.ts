@@ -6,6 +6,8 @@
  * home base as designed.
  */
 
+import { NUDGE_AMOUNTS, type NudgeAmount } from '#lib/features/expenses/nudge.js';
+
 export const CARD_LIMITS = [1, 3, 5] as const;
 export type CardLimit = (typeof CARD_LIMITS)[number] | 'all';
 
@@ -20,6 +22,10 @@ export interface DisplayPrefs {
 	todayCardLimit: CardLimit;
 	/** Today's coming-up as the big swipeable cards, or a compact list. */
 	todayCardLayout: 'cards' | 'list';
+	/** A gentle note on Today once you owe more than this many dollars; 0 is off. */
+	settleNudge: NudgeAmount;
+	/** December's snow globe behind the page: tilt to move the snow, shake to swirl it. */
+	snowGlobe: boolean;
 }
 
 export const DEFAULT_DISPLAY: DisplayPrefs = {
@@ -27,7 +33,9 @@ export const DEFAULT_DISPLAY: DisplayPrefs = {
 	staticPlaceholders: false,
 	hideDailySummary: false,
 	todayCardLimit: 'all',
-	todayCardLayout: 'cards'
+	todayCardLayout: 'cards',
+	settleNudge: 0,
+	snowGlobe: false
 };
 
 /** Reads stored preferences, keeping only what's recognised; the rest is the default. */
@@ -44,7 +52,11 @@ export function parseDisplay(value: unknown): DisplayPrefs {
 			limit === 'all' || (CARD_LIMITS as readonly unknown[]).includes(limit)
 				? (limit as CardLimit)
 				: DEFAULT_DISPLAY.todayCardLimit,
-		todayCardLayout: raw.todayCardLayout === 'list' ? 'list' : 'cards'
+		todayCardLayout: raw.todayCardLayout === 'list' ? 'list' : 'cards',
+		settleNudge: (NUDGE_AMOUNTS as readonly unknown[]).includes(raw.settleNudge)
+			? (raw.settleNudge as NudgeAmount)
+			: 0,
+		snowGlobe: flag('snowGlobe')
 	};
 }
 

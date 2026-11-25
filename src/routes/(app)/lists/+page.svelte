@@ -38,11 +38,31 @@
 </svelte:head>
 
 <Reveal of={screen} placeholder={[SHOPPING_HEIGHT, PANEL_HEIGHT]} gap={32} label="Loading lists">
-	{#snippet children({ lists })}
+	{#snippet children({ lists, dinners })}
 		{@const shopping = lists.find((list) => list.pinned)}
 		{@const others = lists.filter((list) => !list.pinned)}
 		{#if shopping}
-			<ShoppingCard list={shopping} />
+			<div class="shopping">
+				<ShoppingCard list={shopping} />
+				{#if dinners}
+					<!-- The week's dinners, merged into one list to add to Shopping. -->
+					<ul class="grouped">
+						<li>
+							<a class="grouped-row" href="/lists/dinners">
+								<span class="grouped-icon" style:--icon-colour="var(--colour-dinner)"
+									><Icon name="dinner" size={16} /></span
+								>
+								<span class="grouped-label"
+									>Shop for this week’s dinners<span class="grouped-sub"
+										>{dinners} {dinners === 1 ? 'dinner' : 'dinners'} planned</span
+									></span
+								>
+								<span class="grouped-chevron"><Icon name="chevron" size={16} /></span>
+							</a>
+						</li>
+					</ul>
+				{/if}
+			</div>
 		{/if}
 
 		<section class="group" aria-labelledby="my-lists">
@@ -115,6 +135,12 @@
 </ul>
 
 <style>
+	.shopping {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
 	.group {
 		margin-top: var(--space-xl);
 	}

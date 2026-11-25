@@ -7,6 +7,7 @@
 	import { startLiveRefresh } from '#lib/ui/live-refresh.js';
 	import { setHomeSettings } from '#lib/home.js';
 	import { applyDisplay, displayPrefs } from '#lib/display.svelte.js';
+	import SnowGlobe from '#lib/ui/SnowGlobe.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -55,6 +56,9 @@
 	aria-hidden="true"
 	use:drift
 ></div>
+
+<!-- December's snow, for anyone who's switched it on (Preferences). -->
+<SnowGlobe prefs={displayPrefs(data.display)} />
 
 <TabBar homeDot={data.requestsWaiting} />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->

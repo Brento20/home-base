@@ -206,6 +206,8 @@ export interface Expense {
 	splitMethod: import('#lib/features/expenses/split.js').SplitMethod;
 	shares: ExpenseShare[];
 	createdAt: string;
+	/** The recurring bill that added it, if one did. */
+	recurringId?: string | null;
 }
 
 /** A repayment recorded with Settle up. */

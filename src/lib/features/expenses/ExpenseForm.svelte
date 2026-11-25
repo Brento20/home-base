@@ -22,6 +22,7 @@
 		SPLIT_METHODS,
 		type SplitMethod
 	} from './split.js';
+	import { FREQUENCIES, type Frequency } from './recurring.js';
 
 	interface Props {
 		values: ExpenseFormValues;
@@ -31,9 +32,29 @@
 		me: string;
 		action: string;
 		submitLabel: string;
+		/**
+		 * Recurring bills: offer "Repeats" (Never, then weekly to yearly) and start on this. A
+		 * recurring bill's own page sets `repeatOnly`, so it always repeats and its date is the
+		 * next bill.
+		 */
+		repeat?: Frequency | 'none';
+		showRepeat?: boolean;
+		repeatOnly?: boolean;
 	}
 
-	let { values, errors = {}, people, me, action, submitLabel }: Props = $props();
+	let {
+		values,
+		errors = {},
+		people,
+		me,
+		action,
+		submitLabel,
+		repeat: startRepeat = 'none',
+		showRepeat = false,
+		repeatOnly = false
+	}: Props = $props();
+	let repeat = $state<Frequency | 'none'>(untrack(() => startRepeat));
+	const every = $derived(FREQUENCIES.find((entry) => entry.value === repeat)?.every);
 
 	// The form keeps its own copy of every field. The live result re-renders on each keystroke,
 	// and fields bound to their own state keep what was typed through those re-renders.
@@ -245,7 +266,7 @@
 	</fieldset>
 
 	<label class="field date">
-		<span class="field-label">Date</span>
+		<span class="field-label">{repeatOnly ? 'Next bill' : 'Date'}</span>
 		<input
 			class="field-input"
 			name="spentOn"
@@ -256,6 +277,32 @@
 		/>
 		{#if errors.spentOn}<span class="field-error">{errors.spentOn}</span>{/if}
 	</label>
+
+	{#if showRepeat || repeatOnly}
+		<fieldset class="field">
+			<legend class="field-label">Repeats</legend>
+			<div class="choice-pills">
+				{#if !repeatOnly}
+					<label class="choice-pill">
+						<input type="radio" name="repeat" value="none" bind:group={repeat} />
+						Never
+					</label>
+				{/if}
+				{#each FREQUENCIES as option (option.value)}
+					<label class="choice-pill">
+						<input type="radio" name="repeat" value={option.value} bind:group={repeat} />
+						{option.label}
+					</label>
+				{/each}
+			</div>
+			{#if every}
+				<span class="field-hint"
+					>Adds itself {every} from {repeatOnly ? 'the next bill' : 'this date'}, paid and split the
+					same way. You can pause or stop it any time.</span
+				>
+			{/if}
+		</fieldset>
+	{/if}
 
 	<div class="form-actions">
 		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>

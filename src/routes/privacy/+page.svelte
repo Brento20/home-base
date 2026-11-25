@@ -55,8 +55,9 @@
 				to add, and your preferences (how the app looks to you, like light or dark and calmer screens).
 			</li>
 			<li>
-				<strong>Your home:</strong> what you and the people you live with put in it: tasks, lists, plans,
-				recipes, money, posts, photos and notes.
+				<strong>Your home:</strong> what you and the people you live with put in it: tasks, lists (and
+				what you keep in the pantry), plans, recipes, money (including bills that repeat), posts, photos
+				and notes.
 			</li>
 			<li>
 				<strong>Friends and postcards:</strong> who your friends are, anyone you’ve blocked, the postcards

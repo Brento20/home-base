@@ -1,6 +1,7 @@
 import library from '#lib/features/recipes/library.json';
 import { cookTitle, scaleIngredients, type Recipe } from '#lib/features/recipes/recipe.js';
 import type { PublicFields } from '#lib/features/friends/public-profile.js';
+import { nextRecurringDate, type RecurringBill } from '#lib/features/expenses/recurring.js';
 import { addDays, todayISO, zonedToInstant } from '#lib/time.js';
 import type {
 	CookDinner,
@@ -197,7 +198,9 @@ sampleTasks.push(
 		completedAt: zonedToInstant(addDays(today, -1), '19:40').toISOString(),
 		completedBy: chris.id
 	},
-	dinner('recipe_008', brenton.id, 0, '18:30')
+	dinner('recipe_008', brenton.id, 0, '18:30'),
+	// Thursday's tray bake: shares garlic, carrot and oregano with tonight's, for Shop for dinners.
+	dinner('recipe_002', chris.id, 2, '18:30')
 );
 
 /** Recipes added at home (the library itself ships with the app). */
@@ -211,6 +214,9 @@ export const sampleRatings: { recipeId: string; profileId: string; stars: number
 
 /** `${taskId}:${profileId}` for each "How was it?" answered. */
 export const sampleCheckins = new Set<string>();
+
+/** What the sample home always has in the pantry (Shop for dinners starts these unticked). */
+export const samplePantry = new Set<string>(['olive oil']);
 
 const plan = (
 	title: string,
@@ -334,9 +340,31 @@ const sampleExpense = (
 const place = 'sample-group-place';
 const car = 'sample-group-car';
 
+/** The sample home's internet, split in half and added each month (see sampleExpenses' Internet). */
+export const sampleRecurring: RecurringBill[] = [
+	{
+		id: 'sample-recurring-internet',
+		groupId: 'sample-group-place',
+		description: 'Internet',
+		amountCents: 4000,
+		paidBy: chris.id,
+		category: 'internet',
+		splitMethod: 'equal',
+		shares: halves(4000),
+		frequency: 'monthly',
+		startOn: addDays(today, -3),
+		addedCount: 1,
+		nextOn: nextRecurringDate(addDays(today, -3), 'monthly', 1),
+		paused: false
+	}
+];
+
 export const sampleExpenses: Expense[] = [
 	sampleExpense(place, 1, 'Groceries', 12000, 'groceries', brenton.id),
-	sampleExpense(place, 3, 'Internet', 4000, 'internet', chris.id),
+	{
+		...sampleExpense(place, 3, 'Internet', 4000, 'internet', chris.id),
+		recurringId: 'sample-recurring-internet'
+	},
 	sampleExpense(place, 6, 'Dumplings', 6400, 'eating_out', brenton.id),
 	sampleExpense(place, 9, 'Groceries', 9850, 'groceries', chris.id),
 	sampleExpense(place, 12, 'Rent', 180000, 'rent', brenton.id),

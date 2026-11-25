@@ -63,6 +63,9 @@
 	{#snippet lead()}
 		<a class="button-quiet" href="/"><Icon name="back" size={18} /> Today</a>
 	{/snippet}
+	{#snippet trailing()}
+		<a class="button-quiet" href="/lists/dinners">Shop for dinners</a>
+	{/snippet}
 	{#snippet action()}
 		<RoundButton icon="plus" label="Add a recipe" href="/dinner/new" />
 	{/snippet}
