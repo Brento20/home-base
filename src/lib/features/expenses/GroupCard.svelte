@@ -79,7 +79,7 @@
 
 	.name {
 		overflow: hidden;
-		font-size: 1.125rem;
+		font-size: var(--text-body);
 		font-weight: var(--weight-strong);
 		text-overflow: ellipsis;
 		white-space: nowrap;

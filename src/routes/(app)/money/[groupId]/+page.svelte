@@ -164,11 +164,11 @@
 	}
 
 	.headline {
-		font-size: 1.5rem;
-		line-height: 1.15;
+		font-size: var(--text-page-title);
+		line-height: 1.1;
 		font-family: var(--font-display);
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
 	}
 
 	.headline.owed {

@@ -112,8 +112,9 @@
 	}
 
 	.headline {
-		font-size: 1.375rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-display-m);
+		letter-spacing: var(--tracking-display-m);
+		font-family: var(--font-display);
 	}
 </style>

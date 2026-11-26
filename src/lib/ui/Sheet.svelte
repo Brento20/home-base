@@ -111,8 +111,11 @@
 
 	h2 {
 		margin: 0;
-		font-size: 1.25rem;
-		font-weight: var(--weight-strong);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-display-m);
+		font-family: var(--font-display);
+		letter-spacing: var(--tracking-display-m);
+		line-height: 1.2;
 	}
 
 	.close {

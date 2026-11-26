@@ -496,10 +496,11 @@
 	.empty-title {
 		padding-right: 72px;
 		font-family: var(--font-display);
-		font-size: 1.375rem;
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-display-m);
+		letter-spacing: var(--tracking-display-m);
 		color: var(--colour-text-muted);
+		line-height: 1.2;
 	}
 
 	.empty-action {

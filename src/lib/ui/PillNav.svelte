@@ -123,7 +123,7 @@
 		flex-direction: column;
 		gap: 4px;
 		height: 52px;
-		font-size: 11px;
+		font-size: var(--text-micro);
 		font-weight: var(--weight-medium);
 		line-height: 1;
 		letter-spacing: var(--tracking-label);

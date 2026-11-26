@@ -163,10 +163,10 @@
 	h1 {
 		margin-top: 8px;
 		font-size: var(--text-event-title);
-		line-height: 1.08;
+		line-height: 1.05;
 		font-family: var(--font-display);
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
 		overflow-wrap: anywhere;
 	}
 

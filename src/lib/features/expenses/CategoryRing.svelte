@@ -152,10 +152,11 @@
 
 	.middle-total {
 		margin: 2px 0;
-		font-size: 1.75rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-page-title);
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
 		font-variant-numeric: tabular-nums;
+		font-family: var(--font-display);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

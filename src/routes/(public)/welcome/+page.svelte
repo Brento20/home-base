@@ -54,9 +54,10 @@
 		margin-top: var(--space-m);
 		font-size: clamp(2.125rem, 9vw, 2.75rem);
 		line-height: 1.06;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
 		text-wrap: balance;
+		font-family: var(--font-display);
 	}
 
 	.lead {

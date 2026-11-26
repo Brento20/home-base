@@ -148,7 +148,7 @@
 
 	h2 {
 		margin: 0;
-		font-size: 1.125rem;
+		font-size: var(--text-body);
 		font-weight: var(--weight-strong);
 		line-height: 1.3;
 	}

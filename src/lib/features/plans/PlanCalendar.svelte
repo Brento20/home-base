@@ -290,9 +290,10 @@
 	/* Smaller than the page title, so "Plans" stays the heading. */
 	.month {
 		margin: 0 0 0 4px;
-		font-size: 1.375rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-display-m);
+		letter-spacing: var(--tracking-display-m);
+		font-family: var(--font-display);
 	}
 
 	.month-actions {
@@ -357,7 +358,7 @@
 	}
 
 	.weekdays span {
-		font-size: 0.6875rem;
+		font-size: var(--text-micro);
 		font-weight: var(--weight-strong);
 		letter-spacing: 0.06em;
 		text-align: center;

@@ -41,10 +41,11 @@
 
 <style>
 	.what {
-		font-size: 1.5rem;
-		line-height: 1.2;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-page-title);
+		line-height: 1.15;
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
+		font-family: var(--font-display);
 	}
 
 	.when {

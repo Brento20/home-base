@@ -16,20 +16,37 @@
 	/* Type */
 	--font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 	/*
-	 * The display face, for page titles and the big numbers only (base.css has its @font-face):
-	 * Fraunces with its softest corners, warm and a bit homely next to Geist. Everything else
-	 * stays in Geist. Use the three together: family, weight and tracking.
+	 * Type: two voices, seven steps.
+	 *
+	 * Bricolage Grotesque (display, base.css has its @font-face) names the screen and its few
+	 * big moments: page titles, hero cards, the balance. Geist carries everything you read
+	 * through: rows, cards, fields, captions. A heading is never Geist and body text is never
+	 * Bricolage, so the two never compete.
+	 *
+	 * The steps run about 1.25 apart: 32 / 26 / 20 for display, 17 / 15 / 13 / 11 for text
+	 * (iOS's own body, subhead, footnote and caption sizes). Display type is tuned per step, as
+	 * a type designer would cut optical sizes: the bigger it gets, the lighter and tighter it
+	 * sets, so a 32px title doesn't shout and a 20px heading doesn't look spindly. Use a step's
+	 * size, weight and tracking together.
 	 */
-	--font-display: 'Fraunces Soft', 'Iowan Old Style', Georgia, serif;
-	--weight-display: 560;
-	--tracking-display: -0.012em;
-	--text-caption: 0.8125rem; /* 13px */
-	--text-small: 0.9375rem; /* 15px */
+	--font-display: 'Bricolage Display', var(--font-sans);
+	--text-event-title: 2rem; /* 32px, display XL: Today's date, a detail page's title, the next plan */
+	--text-page-title: 1.625rem; /* 26px, display L: page titles, hero cards, the balance */
+	--text-headline: 1.25rem; /* 20px, display M: section headings, sheets, empty states */
+	--weight-display-xl: 680;
+	--tracking-display-xl: -0.026em;
+	--weight-display-l: 700;
+	--tracking-display-l: -0.02em;
+	--weight-display-m: 710;
+	--tracking-display-m: -0.008em;
+	/* The middle step, for anything that just wants "the display face". */
+	--weight-display: var(--weight-display-l);
+	--tracking-display: var(--tracking-display-l);
+	--text-control-value: 1.625rem; /* 26px, the amount you're typing */
 	--text-body: 1.0625rem; /* 17px */
-	--text-headline: 1.25rem; /* 20px, section headings (iOS Title 3) */
-	--text-control-value: 1.625rem; /* 26px */
-	--text-page-title: 1.75rem; /* 28px */
-	--text-event-title: 2.125rem; /* 34px, the largest text on Today */
+	--text-small: 0.9375rem; /* 15px */
+	--text-caption: 0.8125rem; /* 13px */
+	--text-micro: 0.6875rem; /* 11px, chart axes and tab labels */
 	--weight-regular: 400;
 	--weight-medium: 500;
 	--weight-strong: 600;
@@ -56,7 +73,7 @@
 	/* Colour: text */
 	--colour-text: #f5ede6;
 	--colour-text-muted: rgb(245 237 230 / 0.66);
-	--colour-text-faint: rgb(245 237 230 / 0.45);
+	--colour-text-faint: rgb(245 237 230 / 0.48);
 	--colour-on-accent: #1a0f08;
 	/* Text on a filled ring or avatar (people's colours are light). */
 	--colour-on-ring: #14100d;

@@ -116,11 +116,11 @@
 
 	.title {
 		margin-top: 10px;
-		font-size: 1.625rem;
-		line-height: 1.08;
+		font-size: var(--text-page-title);
+		line-height: 1.1;
 		font-family: var(--font-display);
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
 		overflow-wrap: anywhere;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -132,6 +132,9 @@
 	/* The next plan reads largest, wherever the highlight is. */
 	.next .title {
 		font-size: var(--text-event-title);
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
+		line-height: 1.05;
 	}
 
 	.detail {

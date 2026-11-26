@@ -178,7 +178,9 @@
 	.section-title {
 		margin: 0 0 2px;
 		font-size: var(--text-headline);
-		font-weight: var(--weight-strong);
+		font-weight: var(--weight-display-m);
+		font-family: var(--font-display);
+		letter-spacing: var(--tracking-display-m);
 	}
 
 	.section-title.overdue {

@@ -5,16 +5,16 @@
 }
 
 /*
- * Fraunces (SIL Open Font License, static/fonts/fraunces-OFL.txt), cut down to what the app
- * uses: Latin, its softest corners (SOFT 100) and quirky shapes (WONK 1) fixed, weight 400-700
- * and optical size 24-96 left free, so titles get the display cut automatically. 57 KB.
+ * Bricolage Grotesque (SIL Open Font License, static/fonts/bricolage-OFL.txt), cut down to
+ * what the app uses: Latin, the display optical size (96, where its ink traps and quirks show)
+ * fixed, weight 500-750 left free. 38 KB.
  */
 @font-face {
-	font-family: 'Fraunces Soft';
+	font-family: 'Bricolage Display';
 	font-style: normal;
 	font-display: swap;
-	font-weight: 400 700;
-	src: url('/fonts/fraunces-soft.woff2') format('woff2-variations');
+	font-weight: 500 750;
+	src: url('/fonts/bricolage-display.woff2') format('woff2-variations');
 }
 
 html {
@@ -87,9 +87,9 @@ a {
 .page-title {
 	font-family: var(--font-display);
 	font-size: var(--text-page-title);
-	line-height: 1.12;
-	font-weight: var(--weight-display);
-	letter-spacing: var(--tracking-display);
+	line-height: 1.1;
+	font-weight: var(--weight-display-l);
+	letter-spacing: var(--tracking-display-l);
 }
 
 /* A bold section heading, with an optional tinted link on the right, as in Health's Summary. */
@@ -101,9 +101,11 @@ a {
 
 .section-heading {
 	font-size: var(--text-headline);
-	font-weight: var(--weight-strong);
-	letter-spacing: var(--tracking-tight);
+	font-weight: var(--weight-display-m);
+	letter-spacing: var(--tracking-display-m);
 	color: var(--colour-text);
+	font-family: var(--font-display);
+	line-height: 1.2;
 }
 
 .section-heading-link {

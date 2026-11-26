@@ -143,9 +143,10 @@
 		margin-top: 12px;
 		font-size: 3rem;
 		line-height: 1;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
 		font-variant-numeric: tabular-nums;
+		font-family: var(--font-display);
 	}
 
 	.week-label {

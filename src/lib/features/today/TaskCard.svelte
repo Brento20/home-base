@@ -203,10 +203,10 @@
 	.title {
 		margin-top: 10px;
 		font-family: var(--font-display);
-		font-size: 1.625rem;
-		line-height: 1.08;
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-size: var(--text-page-title);
+		line-height: 1.1;
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
 		overflow-wrap: anywhere;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;

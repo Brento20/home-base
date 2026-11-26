@@ -76,7 +76,7 @@
 	}
 
 	.count span {
-		font-size: 11px;
+		font-size: var(--text-micro);
 		color: var(--colour-text-muted);
 	}
 </style>

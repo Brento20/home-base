@@ -428,10 +428,11 @@
 
 	.period h2 {
 		flex: 1;
-		font-size: 1.25rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-headline);
+		font-weight: var(--weight-display-m);
+		letter-spacing: var(--tracking-display-m);
 		text-align: center;
+		font-family: var(--font-display);
 	}
 
 	.step {
@@ -484,8 +485,8 @@
 		font-size: var(--text-event-title);
 		line-height: 1.05;
 		font-family: var(--font-display);
-		font-weight: var(--weight-display);
-		letter-spacing: var(--tracking-display);
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -708,10 +709,11 @@
 
 	.versus-total {
 		margin-top: 2px;
-		font-size: 1.5rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-size: var(--text-page-title);
+		font-weight: var(--weight-display-l);
+		letter-spacing: var(--tracking-display-l);
 		font-variant-numeric: tabular-nums;
+		font-family: var(--font-display);
 	}
 
 	.versus-change {

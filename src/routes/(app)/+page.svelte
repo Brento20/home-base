@@ -50,7 +50,7 @@
 
 <header class="header">
 	<div class="heading">
-		<h1 class="page-title">
+		<h1 class="page-title today-date">
 			{heading.primary}
 			<span class="month">{heading.secondary}</span>
 		</h1>
@@ -144,9 +144,17 @@
 		width: min(82vw, 100% - 7vw);
 	}
 
+	/* The screen's one big moment: the day, in the largest step, the month a quieter weight. */
+	.today-date {
+		font-size: var(--text-event-title);
+		line-height: 1.04;
+		font-weight: var(--weight-display-xl);
+		letter-spacing: var(--tracking-display-xl);
+	}
+
 	.month {
 		display: block;
-		font-weight: var(--weight-regular);
+		font-weight: 500;
 		color: var(--colour-text-muted);
 	}
 
