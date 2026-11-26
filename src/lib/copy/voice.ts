@@ -1,6 +1,8 @@
 /**
  * home base's voice: warm, a bit cheeky, said the way you'd say it to the person you live with.
- * Prompts ask a question instead of naming a form ("What's the plan?", not "New plan").
+ * Forms ask a question instead of naming themselves ("What's the plan?", not "New plan"),
+ * because they really are asking you something. Pages you browse or read (a list, a report, the
+ * scores) get a plain name: a question on every screen turns from charming to formulaic fast.
  *
  * Every list here is a set of options. Headings and empty states take one at random per visit
  * (the first is the default, used on first load); placeholder reels scroll through a shuffled
@@ -26,9 +28,9 @@ export const HEADINGS = {
 	addExpense: ['What did it cost?', 'Who’s out of pocket?', 'Another one?'],
 	editExpense: ['Fix the numbers', 'Adjust the damage'],
 	settleUp: ['Squaring up?', 'Time to square up', 'Paying it back'],
-	reports: ['Where’s it all going?', 'Follow the money', 'The damage report'],
+	reports: ['Reports'],
 	postUpdate: ['What’s new at home?', 'Got news?', 'Spill the tea', 'Tell the house'],
-	scores: ['Who’s winning?', 'The leaderboard', 'Chore champions'],
+	scores: ['Scores'],
 	pastTasks: ['Done and dusted', 'Look what you did'],
 	pastLists: ['Ticked off', 'Done and dusted'],
 	setupProfile: ['Tell us about you', 'Who’s this, then?', 'Let’s meet you'],
@@ -42,7 +44,7 @@ export const HEADINGS = {
 	checkEmail: ['Check your inbox', 'Look out for an email'],
 	homeSettings: ['House rules', 'Home settings'],
 	groupSettings: ['Group settings', 'Tidy up the group'],
-	dinner: ['What’s for dinner?', 'What are we cooking?', 'Hungry yet?', 'Dinner, sorted'],
+	dinner: ['Dinner'],
 	newRecipe: ['Add a recipe', 'Share the secret recipe', 'What’s the recipe?'],
 	editRecipe: ['Tweak the recipe', 'Fix up the recipe']
 } as const;

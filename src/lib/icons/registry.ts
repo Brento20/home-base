@@ -287,7 +287,8 @@ export const MEANINGS: IconMeaning[] = [
 	{
 		id: 'cake',
 		category: 'food',
-		actions: ['bake'],
+		// "Bake" is only a verb here, not an action that names the cake: "Baked feta pasta" is
+		// a pasta, and "Bake a cake" still gets there on the subject.
 		entities: ['birthday cake', 'cupcake'],
 		subjects: ['cake', 'cupcake', 'muffin', 'dessert', 'brownie', 'cookie', 'biscuit', 'pavlova'],
 		verbs: ['bake', 'ice'],
@@ -531,7 +532,12 @@ export const MEANINGS: IconMeaning[] = [
 			'move house',
 			'moving day',
 			'house hunting',
-			'real estate'
+			'real estate',
+			'our place',
+			'my place',
+			'share house',
+			'sharehouse',
+			'housemates'
 		],
 		subjects: [
 			'house',

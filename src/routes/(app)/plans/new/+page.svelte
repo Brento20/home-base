@@ -49,9 +49,9 @@
 	<AssistBox
 		action="?/describe"
 		target=".plan-form"
-		label="Say it how you’d text it, and AI will fill in the day, time and place."
+		label="Say it how you’d text it, and the day, time and place fill themselves in."
 		placeholder="Dinner with Sam at Fratelli, Saturday 7"
-		submitLabel="Fill in with AI"
+		submitLabel="Fill it in"
 		busyLabel="Working out when and where…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		focusOnFail="#plan-title"

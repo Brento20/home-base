@@ -53,8 +53,9 @@
 	h1 {
 		font-size: var(--text-event-title);
 		line-height: 1.1;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-family: var(--font-display);
+		font-weight: var(--weight-display);
+		letter-spacing: var(--tracking-display);
 		text-wrap: balance;
 	}
 

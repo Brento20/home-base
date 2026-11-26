@@ -175,6 +175,11 @@ describe('reading', () => {
 		expect(read('Drinks with Sam').verb).toBeNull();
 	});
 
+	it('knows a household by what people call it', () => {
+		expect(pickIcon('Our Place')?.icon).toBe('household');
+		expect(pickIcon('Share house')?.icon).toBe('household');
+	});
+
 	it('stems words and their endings alike', () => {
 		expect(stem('parties')).toBe(stem('party'));
 		expect(stem('running')).toBe(stem('run'));
@@ -192,5 +197,12 @@ describe('registry', () => {
 	it('gives each icon one entry', () => {
 		const ids = MEANINGS.map((meaning) => meaning.id);
 		expect(new Set(ids).size).toBe(ids.length);
+	});
+});
+
+describe('baking', () => {
+	it('is a cake when there is one, and not when the dish is something else', () => {
+		expect(pickIcon('Bake a cake')?.icon).toBe('cake');
+		expect(pickIcon('Baked feta and cherry tomato pasta', 'dinner')?.icon).toBe('cooking-pot');
 	});
 });

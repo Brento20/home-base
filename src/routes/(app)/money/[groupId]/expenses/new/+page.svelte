@@ -30,13 +30,13 @@
 	<AssistBox
 		action="?/receipt"
 		target=".expense-form"
-		label="Got a receipt? Snap it and AI will fill in the total, what it was and the day."
+		label="Got a receipt? Snap it to fill in the total, what it was and the day."
 		photo="only"
-		submitLabel="Scan a receipt with AI"
+		submitLabel="Scan a receipt"
 		busyLabel="Reading the receipt…"
 		photoBusyLabel="Reading the receipt…"
 		outcome={form && 'assist' in form ? form.assist : null}
-		filledNote="Filled in with AI from the receipt. Who paid and the split are as usual."
+		filledNote="Filled in from the receipt. Who paid and the split are as usual."
 		focusOnFail="#expense-amount"
 	/>
 {/if}

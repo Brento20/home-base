@@ -118,8 +118,9 @@
 		margin-top: 10px;
 		font-size: 1.625rem;
 		line-height: 1.08;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-family: var(--font-display);
+		font-weight: var(--weight-display);
+		letter-spacing: var(--tracking-display);
 		overflow-wrap: anywhere;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;

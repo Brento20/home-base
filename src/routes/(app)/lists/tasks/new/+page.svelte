@@ -39,9 +39,9 @@
 	<AssistBox
 		action="?/describe"
 		target=".task-form"
-		label="Say it how you’d text it, and AI will fill in who, when and how often."
+		label="Say it how you’d text it, and who, when and how often fill themselves in."
 		placeholder="Chris to take the bins out every Tuesday"
-		submitLabel="Fill in with AI"
+		submitLabel="Fill it in"
 		busyLabel="Working out who, when and how often…"
 		outcome={form && 'assist' in form ? form.assist : null}
 		focusOnFail="#task-form-title"

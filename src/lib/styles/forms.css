@@ -199,6 +199,11 @@ legend.field-label {
 	transition-timing-function: var(--ease-out);
 }
 
+/* A form whose save button is docked (SaveDock.svelte): its end clears the dock. */
+.form-stack.docked {
+	padding-bottom: 84px;
+}
+
 .form-actions {
 	display: flex;
 	align-items: center;

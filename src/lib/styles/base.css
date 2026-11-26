@@ -4,6 +4,19 @@
 	box-sizing: border-box;
 }
 
+/*
+ * Fraunces (SIL Open Font License, static/fonts/fraunces-OFL.txt), cut down to what the app
+ * uses: Latin, its softest corners (SOFT 100) and quirky shapes (WONK 1) fixed, weight 400-700
+ * and optical size 24-96 left free, so titles get the display cut automatically. 57 KB.
+ */
+@font-face {
+	font-family: 'Fraunces Soft';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400 700;
+	src: url('/fonts/fraunces-soft.woff2') format('woff2-variations');
+}
+
 html {
 	background: var(--colour-ground);
 	color-scheme: dark;
@@ -72,10 +85,11 @@ a {
 
 /* The screen's big title (PageHeader, Today's date). */
 .page-title {
+	font-family: var(--font-display);
 	font-size: var(--text-page-title);
 	line-height: 1.12;
-	font-weight: var(--weight-strong);
-	letter-spacing: var(--tracking-tight);
+	font-weight: var(--weight-display);
+	letter-spacing: var(--tracking-display);
 }
 
 /* A bold section heading, with an optional tinted link on the right, as in Health's Summary. */

@@ -1,9 +1,12 @@
 <script lang="ts">
 	/**
-	 * A recipe row in the library: the home's photo of it (or a quiet bowl when there isn't one),
+	 * A recipe row in the library: the home's photo of it (or, without one, the dish's own icon
+	 * etched into a glass tile: a pizza, an egg, a pot; meaning.ts picks),
 	 * the name and your stars, then one quiet line of time, diet and nutrition. Rows sit in one
 	 * list with hairlines between them, like the rest of the app's lists.
 	 */
+	import IconEtching from '#lib/icons/IconEtching.svelte';
+	import { pickIcon } from '#lib/icons/meaning.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { formatMinutes, type RecipeSummary } from './recipe.js';
 	import Stars from './Stars.svelte';
@@ -14,6 +17,12 @@
 	}
 
 	let { recipe, stars }: Props = $props();
+	// The dish if it's recognisable (a pizza, a pot for a curry), else what's in it: an egg, a
+	// carrot for anything vegetarian, a knife and fork for the rest.
+	const motif = $derived(
+		pickIcon(recipe.title, 'dinner')?.icon ??
+			(recipe.proteins[0] === 'egg' ? 'egg' : recipe.isVegetarian ? 'carrot' : 'utensils')
+	);
 	const diet = $derived(recipe.isVegan ? 'Vegan' : recipe.isVegetarian ? 'Vegetarian' : null);
 	// Short enough for one line on a phone; the recipe page says it's per serve.
 	const nutrition = $derived(
@@ -27,7 +36,9 @@
 	{#if recipe.photoUrl}
 		<img class="thumb" src={recipe.photoUrl} alt="" loading="lazy" decoding="async" />
 	{:else}
-		<span class="thumb empty" aria-hidden="true"><Icon name="dinner" size={22} /></span>
+		<span class="thumb empty" aria-hidden="true"
+			><span class="etched"><IconEtching icon={motif} /></span></span
+		>
 	{/if}
 	<span class="body">
 		<span class="top">
@@ -72,10 +83,17 @@
 		box-shadow: inset 0 0 0 var(--hairline) var(--colour-separator);
 	}
 
+	/* Etched more boldly than a card's corner drawing: here it's the whole picture. */
 	.thumb.empty {
 		display: grid;
 		place-items: center;
-		color: var(--colour-text-faint);
+		background: linear-gradient(160deg, var(--colour-fill-strong), var(--colour-fill));
+		--motif-colour: var(--colour-text);
+		--motif-opacity: 0.34;
+	}
+
+	.etched {
+		width: 30px;
 	}
 
 	.body {

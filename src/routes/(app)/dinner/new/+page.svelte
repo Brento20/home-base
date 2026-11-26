@@ -12,9 +12,9 @@
 	const heading = pick(HEADINGS.newRecipe);
 
 	const FILLED_FROM = {
-		link: 'Filled in with AI from the link.',
-		text: 'Filled in with AI from what you pasted.',
-		photo: 'Filled in with AI from your photo.'
+		link: 'Filled in from the link.',
+		text: 'Filled in from what you pasted.',
+		photo: 'Filled in from your photo.'
 	};
 	// When a site won't hand its page over, say so, and the two ways that always work.
 	const failedNote = $derived.by(() => {
@@ -47,11 +47,11 @@
 	<AssistBox
 		action="?/import"
 		target=".recipe-form"
-		label="Got it somewhere else? Paste a link or the recipe, or snap a cookbook page, and AI will fill in the form."
+		label="Got it somewhere else? Paste a link or the recipe, or snap a cookbook page, to fill in the form."
 		placeholder="https://… or paste the recipe"
 		multiline
 		photo="optional"
-		submitLabel="Fill in with AI"
+		submitLabel="Fill it in"
 		busyLabel="Reading your recipe…"
 		linkBusyLabel="Reading the recipe page…"
 		photoBusyLabel="Reading the cookbook page…"

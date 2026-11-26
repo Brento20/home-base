@@ -1,12 +1,14 @@
 <script lang="ts">
 	/**
 	 * The frame every add and edit form shares (plans, tasks): the fields stacked with the same
-	 * spacing, one save button at the foot that says "Saving…" while it works, and what you typed
+	 * spacing, one save button docked above the tab bar (SaveDock) that says "Saving…" while it
+	 * works, and what you typed
 	 * kept if the server sends it back with a problem. Each form brings its own fields. Nothing
 	 * is saved until the button is pressed, so leaving the page never leaves half a thing behind.
 	 */
 	import type { Snippet } from 'svelte';
 	import { enhance } from '$app/forms';
+	import SaveDock from './SaveDock.svelte';
 
 	interface Props {
 		action: string;
@@ -24,7 +26,7 @@
 	novalidate
 	method="POST"
 	{action}
-	class="form-stack {name}"
+	class="form-stack docked {name}"
 	use:enhance={() => {
 		saving = true;
 		return async ({ update }) => {
@@ -35,7 +37,5 @@
 >
 	{@render children()}
 
-	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
-	</div>
+	<SaveDock label={submitLabel} {saving} />
 </form>

@@ -164,8 +164,9 @@
 		margin-top: 8px;
 		font-size: var(--text-event-title);
 		line-height: 1.08;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-family: var(--font-display);
+		font-weight: var(--weight-display);
+		letter-spacing: var(--tracking-display);
 		overflow-wrap: anywhere;
 	}
 

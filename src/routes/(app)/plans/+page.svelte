@@ -1,4 +1,5 @@
 <script lang="ts">
+	import IconEtching from '#lib/icons/IconEtching.svelte';
 	import { untrack } from 'svelte';
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
@@ -143,6 +144,7 @@
 	<Reveal of={list} placeholder={[92, 92, 92, 92]} radius={22} label="Loading plans">
 		{#if groups.length === 0}
 			<div class="empty">
+				<span class="empty-motif"><IconEtching icon="calendar" /></span>
 				<p>{emptyLine}</p>
 				<a class="button-quiet" href="/plans/import">Import from Apple Calendar</a>
 			</div>
@@ -223,6 +225,14 @@
 		align-items: flex-start;
 		gap: var(--space-s);
 		color: var(--colour-text-muted);
+	}
+
+	/* Empty screens get the cards' etched drawing, bolder, as their picture. */
+	.empty-motif {
+		width: 64px;
+		margin-bottom: var(--space-xs);
+		--motif-colour: var(--colour-text);
+		--motif-opacity: 0.22;
 	}
 
 	.footer {

@@ -764,6 +764,9 @@ test('Recurring bills: repeat an expense, see it under Repeats, pause and stop i
 	await open(page, '/money/sample-group-place/expenses/new');
 	await page.locator('#expense-amount').fill('24.99');
 	await page.locator('input[name="description"]').fill(`Streaming ${run}`);
+	// Repeats are behind their chip, with the category and the day.
+	await expect(page.locator('label[for="expense-pick-date"]')).toContainText('Today');
+	await page.locator('label[for="expense-pick-repeat"]').click();
 	await page.locator('label.choice-pill', { hasText: 'Monthly' }).click();
 	await expect(page.getByText(/Adds itself every month from this date/)).toBeVisible();
 	await page.locator('.expense-form button.button-primary').click();
@@ -907,5 +910,25 @@ test('Recipe photos: add one to a library recipe, see it in the list, then remov
 	await page.getByRole('button', { name: 'Remove photo' }).click();
 	await page.getByRole('button', { name: 'Tap again to remove it' }).click();
 	await expect(page.locator('.hero')).toHaveCount(0);
+	expect(errors).toEqual([]);
+});
+
+test('Add expense: the category guesses itself until you pick one, and Save stays in reach', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/money/sample-group-place/expenses/new');
+	const chip = page.locator('label[for="expense-pick-category"]');
+	await page.locator('input[name="description"]').fill('Opal top up');
+	await expect(chip).toContainText('Transport');
+	await page.locator('input[name="description"]').fill('Dumplings in Haymarket');
+	await expect(chip).toContainText('Eating out');
+	// Pick one yourself and it stays put.
+	await chip.click();
+	await page.locator('label.choice-pill', { hasText: 'Other' }).click();
+	await page.locator('input[name="description"]').fill('Uber Eats');
+	await expect(page.locator('input[name="category"][value="other"]')).toBeChecked();
+	// The save button is docked, on screen without scrolling.
+	await expect(page.locator('.expense-form button.button-primary')).toBeInViewport();
 	expect(errors).toEqual([]);
 });

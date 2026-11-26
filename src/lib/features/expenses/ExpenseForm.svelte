@@ -2,16 +2,23 @@
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/**
-	 * Add or edit an expense in the order you'd say it: who paid, how much, and how it's divided.
-	 * Underneath, the result reads like the balance does ("Chris will owe you $10.00"), worked out
-	 * with the same split code the server checks with. What it was for, the category and the date
-	 * come last.
+	 * Add or edit an expense in the order you'd say it: how much, what for, who paid and how it's
+	 * divided. Underneath, the result reads like the balance does ("Chris will owe you $10.00"),
+	 * worked out with the same split code the server checks with.
+	 *
+	 * The rest is edited down to one row of chips, each showing what it's set to: the category
+	 * (guessed from what it was for as you type, on a new expense), the day ("Today") and
+	 * "+ Repeat". Tap one to change it. Chips are labels of hidden checkboxes and CSS shows the
+	 * field (forms.css), so it works before any script loads; closed fields still post.
 	 */
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Avatar from '#lib/ui/Avatar.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
+	import SaveDock from '#lib/ui/SaveDock.svelte';
+	import { formatDayLabel } from '#lib/time.js';
 	import type { FieldErrors, Profile } from '#lib/types.js';
-	import { CATEGORIES } from './categories.js';
+	import { CATEGORIES, categoryColour, categoryLabel, guessCategory } from './categories.js';
 	import { nameOf } from './describe.js';
 	import type { ExpenseField, ExpenseFormValues } from './form.js';
 	import { currencySymbol, formatMoney, parseMoney } from './money.js';
@@ -67,6 +74,20 @@
 	let category = $state(untrack(() => values.category));
 	let spentOn = $state(untrack(() => values.spentOn));
 	let saving = $state(false);
+
+	// A new expense (nothing typed yet) guesses its category from what it was for, until you
+	// pick one yourself. An edit, or a receipt fill, keeps the category it came with.
+	const guessing = untrack(() => !values.description && !repeatOnly);
+	const startCategory = untrack(() => values.category);
+	let picked = $state(false);
+	$effect(() => {
+		if (!guessing || picked) return;
+		category = guessCategory(description) ?? startCategory;
+	});
+
+	// Open from the start only when there's something to fix there.
+	const dateOpen = untrack(() => Boolean(errors.spentOn));
+	const repeatOpen = untrack(() => startRepeat !== 'none');
 
 	const totalCents = $derived(parseMoney(amount) ?? 0);
 	const ordered = $derived(people.filter((person) => included.includes(person.id)));
@@ -128,7 +149,7 @@
 	novalidate
 	method="POST"
 	{action}
-	class="form-stack expense-form"
+	class="form-stack docked expense-form"
 	use:enhance={() => {
 		saving = true;
 		return async ({ update }) => {
@@ -137,20 +158,6 @@
 		};
 	}}
 >
-	<fieldset class="field">
-		<legend class="field-label">Who paid</legend>
-		<div class="choice-pills">
-			{#each people as person (person.id)}
-				<label class="choice-pill">
-					<input type="radio" name="paidBy" value={person.id} bind:group={paidBy} />
-					<Avatar {person} size={22} dot />
-					{label(person.id)}
-				</label>
-			{/each}
-		</div>
-		{#if errors.paidBy}<span class="field-error">{errors.paidBy}</span>{/if}
-	</fieldset>
-
 	<label class="field">
 		<span class="field-label">Total paid</span>
 		<span class="money-input total">
@@ -169,6 +176,35 @@
 		</span>
 		{#if errors.amount}<span class="field-error">{errors.amount}</span>{/if}
 	</label>
+
+	<label class="field">
+		<span class="field-label">What was it for?</span>
+		<input
+			class="field-input"
+			name="description"
+			bind:value={description}
+			maxlength="80"
+			placeholder={PLACEHOLDERS.expense[0]}
+			use:placeholderReel={PLACEHOLDERS.expense}
+			required
+			aria-invalid={errors.description ? 'true' : undefined}
+		/>
+		{#if errors.description}<span class="field-error">{errors.description}</span>{/if}
+	</label>
+
+	<fieldset class="field">
+		<legend class="field-label">Who paid</legend>
+		<div class="choice-pills">
+			{#each people as person (person.id)}
+				<label class="choice-pill">
+					<input type="radio" name="paidBy" value={person.id} bind:group={paidBy} />
+					<Avatar {person} size={22} dot />
+					{label(person.id)}
+				</label>
+			{/each}
+		</div>
+		{#if errors.paidBy}<span class="field-error">{errors.paidBy}</span>{/if}
+	</fieldset>
 
 	<fieldset class="field">
 		<legend class="field-label">How it’s divided</legend>
@@ -237,27 +273,18 @@
 		</div>
 	</fieldset>
 
-	<label class="field">
-		<span class="field-label">What was it for?</span>
-		<input
-			class="field-input"
-			name="description"
-			bind:value={description}
-			maxlength="80"
-			placeholder={PLACEHOLDERS.expense[0]}
-			use:placeholderReel={PLACEHOLDERS.expense}
-			required
-			aria-invalid={errors.description ? 'true' : undefined}
-		/>
-		{#if errors.description}<span class="field-error">{errors.description}</span>{/if}
-	</label>
-
-	<fieldset class="field">
+	<fieldset class="field extra category">
 		<legend class="field-label">Category</legend>
 		<div class="choice-pills">
 			{#each CATEGORIES as option (option.key)}
 				<label class="choice-pill">
-					<input type="radio" name="category" value={option.key} bind:group={category} />
+					<input
+						type="radio"
+						name="category"
+						value={option.key}
+						bind:group={category}
+						onchange={() => (picked = true)}
+					/>
 					<span class="swatch" style:--swatch={option.colour}></span>
 					{option.label}
 				</label>
@@ -265,7 +292,7 @@
 		</div>
 	</fieldset>
 
-	<label class="field date">
+	<label class="field date" class:extra={!repeatOnly}>
 		<span class="field-label">{repeatOnly ? 'Next bill' : 'Date'}</span>
 		<input
 			class="field-input"
@@ -279,7 +306,7 @@
 	</label>
 
 	{#if showRepeat || repeatOnly}
-		<fieldset class="field">
+		<fieldset class="field repeat" class:extra={!repeatOnly}>
 			<legend class="field-label">Repeats</legend>
 			<div class="choice-pills">
 				{#if !repeatOnly}
@@ -304,12 +331,40 @@
 		</fieldset>
 	{/if}
 
-	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
+	<!-- No name on these: they only show and hide fields, and aren't sent with the form. -->
+	<div class="extras">
+		<input class="extra-toggle" type="checkbox" id="expense-pick-category" />
+		<label class="extra-chip" for="expense-pick-category">
+			<span class="swatch" style:--swatch={categoryColour(category)}></span>
+			{categoryLabel(category)}
+		</label>
+		{#if !repeatOnly}
+			<input class="extra-toggle" type="checkbox" id="expense-pick-date" checked={dateOpen} />
+			<label class="extra-chip" for="expense-pick-date">
+				<Icon name="calendar" size={16} />
+				{spentOn ? formatDayLabel(spentOn) : 'Date'}
+			</label>
+		{/if}
+		{#if showRepeat && !repeatOnly}
+			<input class="extra-toggle" type="checkbox" id="expense-pick-repeat" checked={repeatOpen} />
+			<label class="extra-chip" for="expense-pick-repeat"
+				><Icon name="plus" size={16} /> Repeat</label
+			>
+		{/if}
 	</div>
+
+	<SaveDock label={submitLabel} {saving} />
 </form>
 
 <style>
+	/* Tucked until their chip is tapped (chip styles: forms.css). A chip can't be closed again,
+	   as on the task form. */
+	:global(.expense-form:has(#expense-pick-category:not(:checked)) .category),
+	:global(.expense-form:has(#expense-pick-date:not(:checked)) .date),
+	:global(.expense-form:has(#expense-pick-repeat:not(:checked)) .repeat) {
+		display: none;
+	}
+
 	.swatch {
 		width: 10px;
 		height: 10px;

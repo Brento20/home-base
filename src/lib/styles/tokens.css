@@ -15,6 +15,14 @@
 :root {
 	/* Type */
 	--font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	/*
+	 * The display face, for page titles and the big numbers only (base.css has its @font-face):
+	 * Fraunces with its softest corners, warm and a bit homely next to Geist. Everything else
+	 * stays in Geist. Use the three together: family, weight and tracking.
+	 */
+	--font-display: 'Fraunces Soft', 'Iowan Old Style', Georgia, serif;
+	--weight-display: 560;
+	--tracking-display: -0.012em;
 	--text-caption: 0.8125rem; /* 13px */
 	--text-small: 0.9375rem; /* 15px */
 	--text-body: 1.0625rem; /* 17px */

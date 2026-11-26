@@ -1,4 +1,5 @@
 <script lang="ts">
+	import IconEtching from '#lib/icons/IconEtching.svelte';
 	import GroupCard from '#lib/features/expenses/GroupCard.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import RoundButton from '#lib/ui/RoundButton.svelte';
@@ -29,6 +30,7 @@
 <Reveal of={screen} placeholder={[84, 84]} gap={14} label="Loading money">
 	{#snippet children({ groups })}
 		{#if groups.length === 0}
+			<span class="empty-motif"><IconEtching icon="split-expense" /></span>
 			<p class="empty">
 				Make a group for costs you share, like rent and groceries. Everyone in it can add expenses
 				and see who owes whom.
@@ -52,6 +54,15 @@
 </Reveal>
 
 <style>
+	/* Empty screens get the cards' etched drawing, bolder, as their picture. */
+	.empty-motif {
+		display: block;
+		width: 64px;
+		margin-bottom: var(--space-m);
+		--motif-colour: var(--colour-text);
+		--motif-opacity: 0.22;
+	}
+
 	.empty {
 		max-width: 32ch;
 		margin-bottom: var(--space-l);

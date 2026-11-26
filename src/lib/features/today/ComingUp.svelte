@@ -1,4 +1,5 @@
 <script lang="ts">
+	import IconEtching from '#lib/icons/IconEtching.svelte';
 	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
 	import { pick } from '#lib/copy/pick.js';
 	import { EMPTY } from '#lib/copy/voice.js';
@@ -149,6 +150,7 @@
 
 {#if visible.length === 0}
 	<a class="empty" href="/plans/new">
+		<span class="empty-motif"><IconEtching icon="calendar" /></span>
 		<span class="empty-title">{emptyTitle}</span>
 		<span class="empty-action">{emptyAction}</span>
 	</a>
@@ -470,6 +472,8 @@
 	}
 
 	.empty {
+		position: relative;
+		isolation: isolate;
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
@@ -480,10 +484,21 @@
 		color: inherit;
 	}
 
+	/* The same etching as a plan card's, so an empty day still looks like the cards it's missing. */
+	.empty-motif {
+		position: absolute;
+		right: 20px;
+		bottom: 16px;
+		z-index: -1;
+		width: 72px;
+	}
+
 	.empty-title {
+		padding-right: 72px;
+		font-family: var(--font-display);
 		font-size: 1.375rem;
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-weight: var(--weight-display);
+		letter-spacing: var(--tracking-display);
 		color: var(--colour-text-muted);
 	}
 

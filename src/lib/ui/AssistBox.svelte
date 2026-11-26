@@ -4,9 +4,11 @@
 	 * to check and save. It's a separate little form posting to its own action, so the real form
 	 * always works by hand too.
 	 *
-	 * Following Apple's guidance for generative features: it's marked as AI (the spectrum sparkle
-	 * and the word), says specifically what it's doing while it works, shows which fields it
-	 * filled (the spectrum ring, ai.css), reminds you to check them, and offers Undo. When it
+	 * The way in is plain: it says what you'll get ("Scan a receipt", "Fill it in"), not how,
+	 * because a sparkle and "AI" on every button reads as a gimmick. Where the AI's work lands it
+	 * is honest about it, as Apple's guidance for generative features asks: it says specifically
+	 * what it's doing while it works (the spectrum ring spins), shows which fields it filled (the
+	 * same ring, ai.css), says AI can get things wrong and to check them, and offers Undo. When it
 	 * can't manage, it says so with a fun line and the real form gets the focus.
 	 *
 	 * The page's action returns `{ assist: 'filled', ... }` or `{ assist: 'failed', ... }`;
@@ -67,7 +69,7 @@
 		photoBusyLabel = 'Reading your photo…',
 		linkBusyLabel = 'Reading the page…',
 		outcome = null,
-		filledNote = 'Filled in with AI.',
+		filledNote = 'Filled in for you.',
 		failedNote,
 		focusOnFail,
 		initial = '',
@@ -148,7 +150,7 @@
 	}}
 	aria-busy={busy}
 >
-	<p class="label"><Icon name="sparkle" size={16} /> {label}</p>
+	<p class="label">{label}</p>
 
 	{#if photo !== 'only'}
 		<div class="box">
@@ -182,7 +184,7 @@
 				class:tucked={busy && photo === 'optional'}
 				aria-label={busy && photo === 'optional' ? (chosen ? 'Photo added' : 'Photo') : undefined}
 			>
-				<Icon name={photo === 'only' ? 'sparkle' : 'camera'} size={18} />
+				<Icon name="camera" size={18} />
 				<span class="text"
 					>{#if photo === 'only'}{busy ? working : submitLabel}{:else}{chosen
 							? 'Photo added'
@@ -199,7 +201,6 @@
 		{/if}
 		{#if photo !== 'only'}
 			<button class="button-secondary go" class:ai-busy={busy} disabled={!ready || busy}>
-				<Icon name="sparkle" size={18} />
 				<span class="text">{busy ? working : submitLabel}</span>
 			</button>
 		{/if}
@@ -232,17 +233,9 @@
 	}
 
 	.label {
-		display: flex;
-		align-items: flex-start;
-		gap: 6px;
 		margin: 0;
 		font-size: var(--text-small);
 		color: var(--colour-text-muted);
-	}
-
-	.label :global(svg) {
-		flex: none;
-		margin-top: 2px;
 	}
 
 	.box textarea,

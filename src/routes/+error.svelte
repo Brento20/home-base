@@ -38,8 +38,9 @@
 
 	h1 {
 		font-size: var(--text-page-title);
-		font-weight: var(--weight-strong);
-		letter-spacing: var(--tracking-tight);
+		font-family: var(--font-display);
+		font-weight: var(--weight-display);
+		letter-spacing: var(--tracking-display);
 	}
 
 	.message {

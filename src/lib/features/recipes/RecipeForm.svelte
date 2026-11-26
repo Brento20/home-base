@@ -8,6 +8,7 @@
 	import { RECIPE_TITLE } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import Icon from '#lib/ui/Icon.svelte';
+	import SaveDock from '#lib/ui/SaveDock.svelte';
 	import { PROTEIN_OPTIONS as PROTEINS, proteinLabel, type RecipeFormValues } from './recipe.js';
 	import RecipePhotoField from './RecipePhotoField.svelte';
 
@@ -72,7 +73,7 @@
 	method="POST"
 	enctype="multipart/form-data"
 	{action}
-	class="form-stack recipe-form"
+	class="form-stack docked recipe-form"
 	use:enhance={({ formData }) => {
 		saving = true;
 		// The shrunk copy, never the original from the camera roll.
@@ -85,15 +86,6 @@
 		};
 	}}
 >
-	<RecipePhotoField
-		current={photo}
-		adopt={adoptPhoto}
-		error={errors.photo}
-		bind:photo={chosenPhoto}
-		bind:removed={photoRemoved}
-		bind:reading={readingPhoto}
-	/>
-
 	<label class="field">
 		<span class="field-label">What’s it called?</span>
 		<input
@@ -109,6 +101,16 @@
 		/>
 		{#if errors.title}<span class="field-error">{errors.title}</span>{/if}
 	</label>
+
+	<!-- After the name: what it is comes first, how it looks second. -->
+	<RecipePhotoField
+		current={photo}
+		adopt={adoptPhoto}
+		error={errors.photo}
+		bind:photo={chosenPhoto}
+		bind:removed={photoRemoved}
+		bind:reading={readingPhoto}
+	/>
 
 	<div class="field-row numbers">
 		<label class="field">
@@ -314,11 +316,7 @@
 		</p>
 	{/if}
 
-	<div class="form-actions">
-		<button class="button-primary" disabled={saving || readingPhoto}
-			>{saving ? 'Saving…' : submitLabel}</button
-		>
-	</div>
+	<SaveDock label={submitLabel} {saving} disabled={readingPhoto} />
 </form>
 
 <style>
