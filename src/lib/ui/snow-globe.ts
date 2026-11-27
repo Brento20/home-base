@@ -44,6 +44,8 @@ interface Flake {
 	/** Resting on the tab bar rather than the floor, this far above its top edge. */
 	ledge: boolean;
 	lift: number;
+	/** How much of it shows right now, easing towards 1 in the open or SHELTERED behind a card. */
+	shade: number;
 }
 
 /** The close-up flake: the snowflake icon, near the glass, turning as it drifts. */
@@ -54,6 +56,8 @@ interface Hero {
 	vy: number;
 	/** Across, in CSS pixels. */
 	size: number;
+	/** 0 for the smallest (furthest off), 1 for the biggest (right up at the lens). */
+	near: number;
 	/** Its turn in the screen's plane, and how fast (radians a second). */
 	angle: number;
 	spin: number;
@@ -64,6 +68,7 @@ interface Hero {
 	tumble: { from: number; to: number; at: number } | null;
 	nextTumble: number;
 	age: number;
+	shade: number;
 	fade: number;
 	leaving: boolean;
 	phase: number;
@@ -88,6 +93,13 @@ const SHELTERS =
 	'.glass-slot, .grouped, .roster, .nudge, .status, .field-input, .segmented, .choice-pill, .tab-bar';
 /** How much of a flake shows behind a card. */
 const SHELTERED = 0.16;
+/**
+ * A flake doesn't blink out at a card's edge: it dims over this many pixels inside the edge,
+ * like going behind frosted glass, and the dimming itself eases over about a quarter second
+ * (SHADE_EASE a second), so a card scrolling under a resting flake is a dissolve too.
+ */
+const SHELTER_FEATHER = 22;
+const SHADE_EASE = 4.5;
 
 /** Pixels per second squared for a near flake falling straight down. */
 const FALL = 130;
@@ -114,9 +126,15 @@ export const LEDGE_STYLES = {
 } as const;
 export type LedgeStyle = keyof typeof LEDGE_STYLES;
 
-/** Seconds between close-up flakes (from one leaving to the next arriving), and their size. */
-const HERO_GAP = [16, 30] as const;
-const HERO_SIZE = [30, 60] as const;
+/**
+ * Seconds between close-up flakes (from one leaving to the next arriving), and their size.
+ * Sizes lean small, with the odd one huge (HERO_SKEW): half are under about 50px, a quarter
+ * over about 85px, and now and then one is a third of the screen across. The bigger it is, the nearer the lens it's meant to
+ * be, so it's softer, fainter and moves faster (`near`).
+ */
+const HERO_GAP = [6, 14] as const;
+const HERO_SIZE = [16, 130] as const;
+const HERO_SKEW = 1.8;
 const HERO_LIFE = 14;
 const HERO_PATH = [...GLYPHS.snowflake.matchAll(/ d="([^"]+)"/g)]
 	.map((match) => match[1])
@@ -204,7 +222,7 @@ export class SnowGlobe {
 	start() {
 		this.resize();
 		this.seed();
-		this.heroAt = this.options.heroSoon ? 1.2 : rand(10, 22);
+		this.heroAt = this.options.heroSoon ? 1.2 : rand(4, 9);
 		this.scrollY = window.scrollY;
 		const on = <K extends keyof WindowEventMap>(
 			type: K,
@@ -339,6 +357,7 @@ export class SnowGlobe {
 			swayRate: rand(0.7, 1.2),
 			rest: 0,
 			fade: anywhere ? 1 : 0,
+			shade: 1,
 			ledge: false,
 			lift: 0
 		};
@@ -474,7 +493,7 @@ export class SnowGlobe {
 			// snow at 30 made it step visibly.
 			this.sinceDraw += dt;
 			if (this.sinceDraw >= 1 / 62) {
-				this.draw();
+				this.draw(this.sinceDraw);
 				this.sinceDraw = 0;
 			}
 			if (this.stopping && this.opacity <= 0) {
@@ -627,8 +646,10 @@ export class SnowGlobe {
 		hero.age += dt;
 		const { x: gx, y: gy } = this.gravity;
 		// Heavier and slower than the rest: it's near the glass, so it lingers.
-		const ax = gx * FALL * 0.28 + Math.sin(this.time * 0.45 + hero.phase) * 12;
-		const ay = gy * FALL * 0.28 + Math.cos(this.time * 0.35 + hero.phase) * 5;
+		// Nearer ones cross the screen faster, as close things do.
+		const pace = 0.7 + hero.near * 0.9;
+		const ax = (gx * FALL * 0.28 + Math.sin(this.time * 0.45 + hero.phase) * 12) * pace;
+		const ay = (gy * FALL * 0.28 + Math.cos(this.time * 0.35 + hero.phase) * 5) * pace;
 		const drag = Math.exp(-dt * DRAG * 0.9);
 		hero.vx = (hero.vx + ax * dt) * drag;
 		hero.vy = (hero.vy + ay * dt) * drag - kick * 0.6;
@@ -672,7 +693,9 @@ export class SnowGlobe {
 		const { x: gx, y: gy } = this.unitGravity();
 		const cx = this.width / 2;
 		const cy = this.height / 2;
-		const size = rand(HERO_SIZE[0], HERO_SIZE[1]);
+		const near = Math.random() ** HERO_SKEW;
+		const size = HERO_SIZE[0] + (HERO_SIZE[1] - HERO_SIZE[0]) * near;
+		const pace = 0.7 + near * 0.9;
 		// In from the edge opposite "down", somewhere in the middle stretch of it.
 		const reach = Math.abs(gx) * cx + Math.abs(gy) * cy + size * 0.6;
 		const across =
@@ -680,9 +703,10 @@ export class SnowGlobe {
 		return {
 			x: cx - gx * reach - gy * across,
 			y: cy - gy * reach + gx * across,
-			vx: gx * 14 + rand(-6, 6),
-			vy: gy * 14,
+			vx: (gx * 14 + rand(-6, 6)) * pace,
+			vy: gy * 14 * pace,
 			size,
+			near,
 			angle: Math.random() * Math.PI * 2,
 			spin: (Math.random() < 0.5 ? -1 : 1) * rand(0.15, 0.3),
 			axis: Math.random() * Math.PI,
@@ -691,6 +715,7 @@ export class SnowGlobe {
 			nextTumble: rand(2, 4.5),
 			age: 0,
 			fade: 0,
+			shade: 1,
 			leaving: false,
 			phase: Math.random() * Math.PI * 2
 		};
@@ -726,7 +751,9 @@ export class SnowGlobe {
 		}
 		// A wide soft pass for the out-of-focus bloom, then a finer one for its shape.
 		paint.shadowColor = 'rgba(255, 255, 255, 0.9)';
-		paint.shadowBlur = 5 * scale;
+		// Big ones are nearer the lens, so further out of focus.
+		const focus = 1 + Math.max(0, key - 50) / 45;
+		paint.shadowBlur = 5 * scale * focus;
 		paint.strokeStyle = 'rgba(255, 255, 255, 0.28)';
 		paint.lineWidth = 3.4;
 		paint.stroke(path);
@@ -763,14 +790,28 @@ export class SnowGlobe {
 		}
 	}
 
-	private sheltered(x: number, y: number) {
-		for (const box of this.shelters)
-			if (x > box.left && x < box.right && y > box.top && y < box.bottom) return true;
-		return false;
+	/** How much shows here: 1 in the open, down to SHELTERED once well inside a card. */
+	private shelterAt(x: number, y: number, feather = SHELTER_FEATHER) {
+		let inside = 0;
+		for (const box of this.shelters) {
+			const edge = Math.min(x - box.left, box.right - x, y - box.top, box.bottom - y);
+			if (edge > 0) inside = Math.max(inside, Math.min(1, edge / feather));
+			if (inside === 1) break;
+		}
+		// Smoothstep, so it eases off the edge rather than starting at a crease.
+		const eased = inside * inside * (3 - 2 * inside);
+		return 1 - eased * (1 - SHELTERED);
 	}
 
-	private draw() {
+	/** Eases a flake's shade towards what its spot calls for. */
+	private shade(item: { shade: number }, target: number, ease: number) {
+		item.shade += (target - item.shade) * ease;
+		return item.shade;
+	}
+
+	private draw(dt = 1 / 60) {
 		const paint = this.context;
+		const ease = 1 - Math.exp(-dt * SHADE_EASE);
 		if (this.sheltersStale) this.findShelters();
 		paint.clearRect(0, 0, this.width, this.height);
 		paint.globalAlpha = 1;
@@ -789,11 +830,8 @@ export class SnowGlobe {
 				strip.drawImage(sprite, flake.x - size / 2, y - size / 2, size, size);
 				continue;
 			}
-			const alpha =
-				flake.alpha *
-				flake.fade *
-				this.opacity *
-				(this.sheltered(flake.x, flake.y) ? SHELTERED : 1);
+			const shade = this.shade(flake, this.shelterAt(flake.x, flake.y), ease);
+			const alpha = flake.alpha * flake.fade * this.opacity * shade;
 			if (alpha < 0.01) continue;
 			const sprite = this.sprite(flake.radius);
 			const size = sprite.width / this.ratio;
@@ -802,7 +840,7 @@ export class SnowGlobe {
 		}
 		if (strip) strip.globalAlpha = 1;
 		paint.globalAlpha = 1;
-		this.drawHero();
+		this.drawHero(ease);
 	}
 
 	/**
@@ -858,15 +896,23 @@ export class SnowGlobe {
 	 * (full face on, a sliver edge on), on top of its turn in the screen's plane. Edge on, it
 	 * catches the light for a moment.
 	 */
-	private drawHero() {
+	private drawHero(ease: number) {
 		const hero = this.hero;
 		if (!hero) return;
 		const wobble = Math.sin(this.time * 0.8 + hero.phase) * 0.28;
 		const facing = Math.cos(hero.turn + wobble);
 		const squash = Math.sign(facing || 1) * Math.max(0.06, Math.abs(facing));
 		const glint = Math.max(0, 1 - Math.abs(facing) / 0.3);
-		let alpha = (this.options.light ? 0.78 : 0.6) * hero.fade * this.opacity * (1 + glint * 0.55);
-		if (this.sheltered(hero.x, hero.y)) alpha *= SHELTERED;
+		// Small and far off reads crisper; huge and near the lens is a fainter blur.
+		const depth = 1.15 - hero.near * 0.5;
+		let alpha =
+			(this.options.light ? 0.78 : 0.6) * depth * hero.fade * this.opacity * (1 + glint * 0.55);
+		// A big flake takes a wider feather, so it slides behind a card as a whole.
+		alpha *= this.shade(
+			hero,
+			this.shelterAt(hero.x, hero.y, SHELTER_FEATHER + hero.size * 0.5),
+			ease
+		);
 		if (alpha < 0.01) return;
 		const sprite = this.heroSprite(hero.size);
 		const size = sprite.width / this.ratio;
