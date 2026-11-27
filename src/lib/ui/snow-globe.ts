@@ -47,6 +47,9 @@ interface Flake {
 	lift: number;
 	/** When it landed on the bar, so clumps stack in order (later ones on top). */
 	order: number;
+	/** Clumping snow: when it landed (it sinks into the snow over MERGE seconds) and how far its snow spreads beyond its own size (px), so no two mounds are the same shape. */
+	landed: number;
+	mound: number;
 	/** How much of it shows right now, easing towards 1 in the open or SHELTERED behind a card. */
 	shade: number;
 }
@@ -138,10 +141,17 @@ export const LEDGE_STYLES = {
 		pile: 9,
 		rest: [30, 70],
 		drift: 0,
-		clump: { stick: [0.28, 0.96], grip: 0.32, melt: 6 }
+		clump: { stick: [0.16, 0.97], grip: 0.32, melt: 6 }
 	}
 } as const;
 export type LedgeStyle = keyof typeof LEDGE_STYLES;
+/** Clumping snow's field: sampled every FIELD_STEP px, reaching FIELD_OVERHANG past the flat top. */
+const FIELD_STEP = 1.5;
+const FIELD_OVERHANG = 10;
+/** Seconds a landed flake takes to sink into the snow (its sprite fades as its snow builds). */
+const MERGE = 0.9;
+/** Snow thinner than this (px) doesn't show: drifts end in soft edges with bare bar between. */
+const FIELD_FILM = 0.9;
 type LedgeStyleValue = (typeof LEDGE_STYLES)[LedgeStyle];
 
 /**
@@ -381,6 +391,8 @@ export class SnowGlobe {
 			shade: 1,
 			ledge: false,
 			order: 0,
+			landed: 0,
+			mound: 0,
 			lift: 0
 		};
 		if (anywhere) {
@@ -465,13 +477,17 @@ export class SnowGlobe {
 		this.scrollKick += delta;
 	}
 
-	/** A mouse or finger passing through stirs the flakes near it. */
+	/**
+	 * A mouse or finger passing through stirs the flakes near it. Not the snow lying on the tab
+	 * bar: reaching for a tab used to sweep it all off, which flicked on every tab change.
+	 */
 	private onPointer(event: PointerEvent) {
 		if (event.pointerType === 'touch' && this.sensed) return;
 		const dx = event.movementX || 0;
 		const dy = event.movementY || 0;
 		if (!dx && !dy) return;
 		for (const flake of this.flakes) {
+			if (flake.ledge) continue;
 			const distance = Math.hypot(flake.x - event.clientX, flake.y - event.clientY);
 			if (distance > 90) continue;
 			const push = (1 - distance / 90) * 9 * flake.depth;
@@ -634,11 +650,13 @@ export class SnowGlobe {
 				const fullness = onLedge / Math.max(1, ledgeRoom);
 				flake.ledge = true;
 				flake.order = ++this.ledgeOrder;
+				flake.landed = this.time;
+				flake.mound = rand(0, 3);
 				flake.rest = rand(style.rest[0], style.rest[1]);
 				// Piling up a touch as it fills, never more than a few pixels. (Clumping snow
-				// works out its own height as it stacks: `restack`.)
+				// lands on the surface of the snow there: `settle`.)
 				flake.lift = style.clump
-					? this.heightAt(flake.x, flake.radius, ledge) + flake.radius * 0.6
+					? this.heightAt(flake.x, flake.radius, ledge)
 					: flake.radius * rand(0.35, 0.7) + fullness * rand(0, style.pile);
 				flake.y = ledge.top - flake.lift;
 				flake.vx = flake.vy = 0;
@@ -661,7 +679,7 @@ export class SnowGlobe {
 			else if (flake.y > this.height + margin) flake.y -= this.height + margin * 2;
 		}
 		this.onLedge = onLedge;
-		if (style.clump && this.ledge) this.restack(this.ledge, style.pile, dt);
+		if (style.clump && this.ledge) this.settle(this.ledge, style.pile);
 		this.stepHero(dt, kick, down, floor);
 	}
 
@@ -673,52 +691,85 @@ export class SnowGlobe {
 	private sticks(flake: Flake, ledge: { left: number; right: number }, style: LedgeStyleValue) {
 		if (!style.clump) return true;
 		let here = this.heightAt(flake.x, flake.radius, ledge);
-		if (here >= style.pile) {
+		if (here >= style.pile * 0.9) {
 			const left = this.heightAt(flake.x - 6, flake.radius, ledge);
 			const right = this.heightAt(flake.x + 6, flake.radius, ledge);
 			const lower = Math.min(left, right);
-			if (lower >= style.pile) return false;
+			if (lower >= style.pile * 0.9) return false;
 			flake.x += left <= right ? -6 : 6;
 			here = lower;
 		}
 		const [bare, onSnow] = style.clump.stick;
-		return Math.random() < bare + (onSnow - bare) * Math.min(1, here / 2.5);
+		return Math.random() < bare + (onSnow - bare) * Math.min(1, here / 1.5);
 	}
 
-	/** The snow's height under a flake: the highest point across its width. */
+	/** Where the snow field starts: a little past the bar's flat top, so mounds round off. */
+	private fieldLeft(ledge: { left: number }) {
+		return ledge.left - FIELD_OVERHANG;
+	}
+
+	/** The snow's surface height at x: the top of whatever's lying there. */
 	private heightAt(x: number, radius: number, ledge: { left: number }) {
 		const heights = this.ledgeHeights;
-		const from = Math.max(0, Math.floor((x - radius - ledge.left) / 2));
-		const to = Math.min(heights.length - 1, Math.ceil((x + radius - ledge.left) / 2));
+		const left = this.fieldLeft(ledge);
+		const from = Math.max(0, Math.floor((x - radius * 0.5 - left) / FIELD_STEP));
+		const to = Math.min(heights.length - 1, Math.ceil((x + radius * 0.5 - left) / FIELD_STEP));
 		let top = 0;
 		for (let i = from; i <= to; i += 1) top = Math.max(top, heights[i]);
 		return top;
 	}
 
 	/**
-	 * Stacks the bar's snow in the order it landed, each flake sitting on what's under it, so
-	 * a mound sinks as its lower flakes melt or slide away. Each flake leaves a small rounded
-	 * hump in the height map, and melting ones shrink, as snow does.
+	 * The bar's snow as one soft body, rebuilt each frame. Every flake lying there adds its
+	 * share of snow as a gentle bell (wider for bigger flakes), so neighbours melt together into
+	 * one smooth mound instead of a row of humps. Tall mounds round off rather than grow spires
+	 * (a tanh cap at `pile`), the ends taper away past the bar's flat top, and two blur passes
+	 * keep the outline smooth. A new flake eases its snow in over MERGE seconds as it sinks in,
+	 * and a melting one gives it back.
 	 */
-	private restack(ledge: { left: number; right: number }, pile: number, dt: number) {
-		const count = Math.ceil((ledge.right - ledge.left) / 2) + 1;
+	private settle(ledge: { left: number; right: number }, pile: number) {
+		const left = this.fieldLeft(ledge);
+		const span = ledge.right - ledge.left + FIELD_OVERHANG * 2;
+		const count = Math.ceil(span / FIELD_STEP) + 1;
 		if (this.ledgeHeights.length !== count) this.ledgeHeights = new Float32Array(count);
 		const heights = this.ledgeHeights;
 		heights.fill(0);
-		const resting = this.flakes.filter((flake) => flake.ledge).sort((a, b) => a.order - b.order);
-		const sink = 1 - Math.exp(-dt * 6);
-		for (const flake of resting) {
-			const radius = flake.radius * (0.55 + 0.45 * flake.fade);
-			const under = this.heightAt(flake.x, radius * 0.8, ledge);
-			const lift = Math.min(pile + radius, under + radius * 0.6);
-			flake.lift += (lift - flake.lift) * sink;
-			const top = flake.lift + radius * 0.55;
-			const from = Math.max(0, Math.floor((flake.x - radius * 2.4 - ledge.left) / 2));
-			const to = Math.min(count - 1, Math.ceil((flake.x + radius * 2.4 - ledge.left) / 2));
+		for (const flake of this.flakes) {
+			if (!flake.ledge) continue;
+			const merged = Math.min(1, (this.time - flake.landed) / MERGE);
+			const share = flake.fade * (0.25 + 0.75 * merged);
+			if (share <= 0) continue;
+			const spread = 2.5 + flake.radius * 1.5 + flake.mound;
+			// Its snow (about the flake's area, a little fluffed up) spread under a bell.
+			const peak = (Math.PI * flake.radius * flake.radius * 2.3 * share) / (spread * 2.5);
+			const from = Math.max(0, Math.floor((flake.x - spread * 2.6 - left) / FIELD_STEP));
+			const to = Math.min(count - 1, Math.ceil((flake.x + spread * 2.6 - left) / FIELD_STEP));
 			for (let i = from; i <= to; i += 1) {
-				const away = (ledge.left + i * 2 - flake.x) / (radius * 2.4);
-				heights[i] = Math.max(heights[i], top * (1 - away * away));
+				const away = (left + i * FIELD_STEP - flake.x) / spread;
+				heights[i] += peak * Math.exp(-0.5 * away * away);
 			}
+		}
+		// Smooth, cap softly, and taper the ends.
+		for (let pass = 0; pass < 2; pass += 1) {
+			let before = heights[0];
+			for (let i = 1; i < count - 1; i += 1) {
+				const here = heights[i];
+				heights[i] = before * 0.25 + here * 0.5 + heights[i + 1] * 0.25;
+				before = here;
+			}
+		}
+		for (let i = 0; i < count; i += 1) {
+			const x = left + i * FIELD_STEP;
+			const edge = Math.min(x - (ledge.left - FIELD_OVERHANG), ledge.right + FIELD_OVERHANG - x);
+			const taper = Math.min(1, Math.max(0, edge / (FIELD_OVERHANG * 2)));
+			// The thinnest film is cut away, so there's bare bar between drifts, not a skin.
+			const deep = Math.max(0, heights[i] - FIELD_FILM);
+			heights[i] = pile * Math.tanh(deep / pile) * taper * taper * (3 - 2 * taper);
+		}
+		// Each flake rides on the surface, so the sparkles sit on the snow as it sinks.
+		for (const flake of this.flakes) {
+			if (!flake.ledge) continue;
+			flake.lift = this.heightAt(flake.x, flake.radius, ledge) * 0.92;
 		}
 	}
 
@@ -910,12 +961,18 @@ export class SnowGlobe {
 		for (const flake of this.flakes) {
 			if (flake.ledge && strip && this.ledge) {
 				// In front of the bar, on its own strip: the bar covers the page canvas here.
-				const alpha = flake.alpha * flake.fade * this.opacity;
+				let alpha = flake.alpha * flake.fade * this.opacity;
+				const clumping = LEDGE_STYLES[this.ledgeStyle].clump;
+				if (clumping) {
+					// It sinks into the snow as it lands; after that, only a glint now and then,
+					// like light catching a crystal on the crust.
+					const merged = Math.min(1, (this.time - flake.landed) / MERGE);
+					const glint = Math.max(0, Math.sin(this.time * 1.3 + flake.phase * 3)) ** 12;
+					alpha *= 1 - merged + merged * glint * 0.7;
+				}
 				if (alpha < 0.01) continue;
 				const sprite = this.sprite(flake.radius);
-				// Clumping snow shrinks as it melts rather than only fading.
-				const melting = LEDGE_STYLES[this.ledgeStyle].clump ? 0.55 + 0.45 * flake.fade : 1;
-				const size = (sprite.width / this.ratio) * melting;
+				const size = (sprite.width / this.ratio) * (clumping ? 0.8 : 1);
 				const y = flake.y - this.stripTop;
 				strip.globalAlpha = Math.min(1, alpha * 1.15);
 				strip.drawImage(sprite, flake.x - size / 2, y - size / 2, size, size);
@@ -985,34 +1042,61 @@ export class SnowGlobe {
 	}
 
 	/**
-	 * Clumping snow's body: the stacked height map, filled soft white just under the flakes'
-	 * tops, so a clump reads as one mound with flakes on its crust rather than a pile of dots.
+	 * Clumping snow's body, from the field `settle` builds: a smooth outline (quadratic curves
+	 * through the samples), lit from above, a little cooler and denser where it meets the bar,
+	 * with a bright crust along the top where it's deep enough to have one.
 	 */
 	private drawClumps(strip: CanvasRenderingContext2D, ledge: { left: number; top: number }) {
 		const heights = this.ledgeHeights;
-		if (!heights.length || !heights.some((height) => height > 0.5)) return;
-		const base = ledge.top - this.stripTop + 1;
-		strip.beginPath();
-		strip.moveTo(ledge.left - 2, base);
-		for (let i = 0; i < heights.length; i += 1) {
-			// Averaged with its neighbours, so the outline is a soft curve, not steps.
-			const near = ((heights[i - 1] ?? 0) + heights[i] * 2 + (heights[i + 1] ?? 0)) / 4;
-			strip.lineTo(ledge.left + i * 2, base - near * 0.82);
+		let top = 0;
+		for (const height of heights) top = Math.max(top, height);
+		if (top < 0.3) return;
+		const left = this.fieldLeft(ledge);
+		const base = ledge.top - this.stripTop + 0.5;
+		const at = (i: number) => [left + i * FIELD_STEP, base - heights[i]] as const;
+		const outline = new Path2D();
+		const [x0, y0] = at(0);
+		outline.moveTo(x0, y0);
+		for (let i = 1; i < heights.length - 1; i += 1) {
+			const [x, y] = at(i);
+			const [nx, ny] = at(i + 1);
+			outline.quadraticCurveTo(x, y, (x + nx) / 2, (y + ny) / 2);
 		}
-		strip.lineTo(ledge.left + heights.length * 2, base);
-		strip.closePath();
-		const top = Math.max(...heights);
+		const [xl, yl] = at(heights.length - 1);
+		outline.lineTo(xl, yl);
+		const body = new Path2D(outline);
+		body.lineTo(xl, base);
+		body.lineTo(x0, base);
+		body.closePath();
+
+		const light = this.options.light;
 		const fill = strip.createLinearGradient(0, base - top, 0, base);
-		fill.addColorStop(0, `rgba(255, 255, 255, ${0.62 * this.opacity})`);
-		fill.addColorStop(1, `rgba(255, 255, 255, ${0.3 * this.opacity})`);
+		fill.addColorStop(0, `rgba(255, 255, 255, ${0.95 * this.opacity})`);
+		fill.addColorStop(0.55, `rgba(246, 249, 255, ${0.82 * this.opacity})`);
+		fill.addColorStop(1, `rgba(214, 224, 242, ${(light ? 0.9 : 0.7) * this.opacity})`);
 		strip.globalAlpha = 1;
+		strip.save();
+		strip.shadowColor = light ? 'rgba(96, 116, 150, 0.45)' : 'rgba(255, 255, 255, 0.35)';
+		strip.shadowBlur = light ? 3 : 5;
 		strip.fillStyle = fill;
-		strip.shadowColor = this.options.light
-			? 'rgba(116, 136, 166, 0.35)'
-			: 'rgba(255, 255, 255, 0.45)';
-		strip.shadowBlur = 4;
-		strip.fill();
-		strip.shadowBlur = 0;
+		strip.fill(body);
+		strip.restore();
+
+		// The crust: a fine bright line along the top, faded out where the snow's thin.
+		strip.save();
+		strip.clip(body);
+		const crust = strip.createLinearGradient(0, base - top, 0, base);
+		crust.addColorStop(0, `rgba(255, 255, 255, ${0.9 * this.opacity})`);
+		crust.addColorStop(Math.min(0.9, 2.5 / top), 'rgba(255, 255, 255, 0)');
+		strip.strokeStyle = crust;
+		strip.lineWidth = 1.6;
+		strip.stroke(outline);
+		strip.restore();
+		if (light) {
+			strip.strokeStyle = `rgba(110, 130, 165, ${0.35 * this.opacity})`;
+			strip.lineWidth = 0.75;
+			strip.stroke(outline);
+		}
 	}
 
 	/**

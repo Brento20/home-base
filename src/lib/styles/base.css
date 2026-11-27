@@ -264,6 +264,12 @@ html[data-nav] [data-still='fade-top'] {
 	view-transition-name: fade-top;
 }
 
+/* The snow lying on the tab bar sits in front of it, so it needs holding above it too, or the
+   bar's snapshot covers the bottom of the snow for the length of the transition. */
+html[data-nav] [data-still='snow-ledge'] {
+	view-transition-name: snow-ledge;
+}
+
 html[data-nav] [data-still='action-dock'] {
 	view-transition-name: action-dock;
 }
@@ -280,7 +286,10 @@ html[data-nav] [data-still='action-fade'] {
 ::view-transition-old(fade-bottom),
 ::view-transition-new(fade-bottom),
 ::view-transition-old(fade-top),
-::view-transition-new(fade-top) {
+::view-transition-new(fade-top),
+::view-transition-group(snow-ledge),
+::view-transition-old(snow-ledge),
+::view-transition-new(snow-ledge) {
 	animation: none;
 }
 
@@ -297,7 +306,8 @@ html[data-nav] [data-still='action-fade'] {
 /* Same screen both sides: just show the new one. */
 ::view-transition-old(tab-bar),
 ::view-transition-old(fade-bottom),
-::view-transition-old(fade-top) {
+::view-transition-old(fade-top),
+::view-transition-old(snow-ledge) {
 	display: none;
 }
 

@@ -75,7 +75,7 @@
 
 {#if active || fading}
 	<canvas class="snow" aria-hidden="true" bind:this={canvas}></canvas>
-	<canvas class="snow-ledge" aria-hidden="true" bind:this={ledge}></canvas>
+	<canvas class="snow-ledge" data-still="snow-ledge" aria-hidden="true" bind:this={ledge}></canvas>
 {/if}
 
 <style>
