@@ -9,6 +9,7 @@
 	import { untrack } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import {
 		mergeDinnerIngredients,
 		needAmount,
@@ -29,7 +30,7 @@
 	// What you've ticked or unticked yourself; everything else follows startsTicked.
 	const overrides = new SvelteMap<string, boolean>();
 	let remember = $state(true);
-	let saving = $state(false);
+	const saving = save({ reset: true });
 
 	const pantry = $derived(new Set(data.pantry));
 	const waiting = $derived(new Set(data.waiting));
@@ -68,17 +69,7 @@
 	</p>
 	<a class="button-secondary" href="/dinner">Plan a dinner</a>
 {:else}
-	<form
-		id="shop-form"
-		method="POST"
-		use:enhance={() => {
-			saving = true;
-			return async ({ update }) => {
-				await update();
-				saving = false;
-			};
-		}}
-	>
+	<form id="shop-form" method="POST" use:enhance={saving.enhance}>
 		<section aria-labelledby="dinners-heading">
 			<h2 class="group-title" id="dinners-heading">This week’s dinners</h2>
 			<ul class="grouped">
@@ -159,8 +150,16 @@
 	</form>
 
 	<ActionDock>
-		<button class="button-primary act shop-act" form="shop-form" disabled={saving || count === 0}>
-			{saving ? 'Adding…' : count === 0 ? 'Nothing to add' : `Add ${count} to ${data.shoppingName}`}
+		<button
+			class="button-primary act shop-act"
+			form="shop-form"
+			disabled={saving.busy || count === 0}
+		>
+			{saving.busy
+				? 'Adding…'
+				: count === 0
+					? 'Nothing to add'
+					: `Add ${count} to ${data.shoppingName}`}
 		</button>
 	</ActionDock>
 {/if}

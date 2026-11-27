@@ -9,6 +9,7 @@
 	 */
 	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import ActionDock from '#lib/ui/ActionDock.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -25,7 +26,15 @@
 	let { values, errors, cards = true }: Props = $props();
 	let input = $state<HTMLInputElement>();
 	let text = $derived(values?.title ?? '');
-	let saving = $state(false);
+	const saving = save({
+		reset: (result) => result.type === 'success',
+		answered: async (result) => {
+			if (result.type !== 'success') return;
+			text = '';
+			await tick();
+			input?.blur();
+		}
+	});
 	const typed = $derived(text.trim());
 	const planHref = $derived(`/plans/new?text=${encodeURIComponent(typed)}`);
 	const keyboard = keyboardHeight();
@@ -45,17 +54,7 @@
 	method="POST"
 	action="?/addTask"
 	aria-label="New task or plan"
-	use:enhance={() => {
-		saving = true;
-		return async ({ result, update }) => {
-			const added = result.type === 'success';
-			await update({ reset: added });
-			saving = false;
-			if (added) text = '';
-			await tick();
-			input?.blur();
-		};
-	}}
+	use:enhance={saving.enhance}
 >
 	<div class="bar">
 		<GlassSurface radius={18} />
@@ -94,7 +93,7 @@
 			class="button-primary act add-bar-act"
 			form="add-bar-form"
 			aria-label="Add “{typed}” as a task"
-			disabled={saving}>Add task</button
+			disabled={saving.busy}>Add task</button
 		>
 	</ActionDock>
 {/if}

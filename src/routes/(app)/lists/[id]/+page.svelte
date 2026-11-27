@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import ListDetail from '#lib/features/lists/ListDetail.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -11,6 +12,8 @@
 	// Edit mode reveals remove buttons and rename; the resting view stays clean. Deleting the
 	// list sits at the foot of the page, as it does for a task.
 	let editing = $state(false);
+
+	const renaming = save();
 </script>
 
 <svelte:head>
@@ -44,14 +47,7 @@
 
 {#if editing}
 	<section class="manage" aria-label="Manage list">
-		<form
-			method="POST"
-			action="?/rename"
-			class="rename"
-			use:enhance={() =>
-				async ({ update }) =>
-					update({ reset: false })}
-		>
+		<form method="POST" action="?/rename" class="rename" use:enhance={renaming.enhance}>
 			<label class="field">
 				<span class="field-label">List name</span>
 				<span class="rename-row">

@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -16,7 +17,16 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.homeSettings);
-	let busy = $state<'rename' | 'invite' | 'place' | null>(null);
+	const renaming = save();
+	const inviting = save();
+	const revoking = save();
+	// Every date and amount on screen was drawn the old way, so a new place starts the app afresh.
+	const placing = save({
+		refresh: 'none',
+		answered: (result) => {
+			if (result.type === 'success') location.reload();
+		}
+	});
 
 	// Time zones grouped by region for the picker: "Australia" › "Sydney".
 	const zoneGroups = $derived.by(() => {
@@ -33,14 +43,6 @@
 		data.currencies.find((currency) => currency.code === code)?.name ?? code;
 
 	const alone = $derived(data.household.members.length === 1);
-
-	const submitting = (which: 'rename' | 'invite') => () => {
-		busy = which;
-		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: false });
-			busy = null;
-		};
-	};
 
 	// "Expires tomorrow", "Expires Saturday", "Expires Sat 29 Nov".
 	const expires = (instant: string) => {
@@ -76,22 +78,7 @@
 	<h2 id="place-heading" class="section-label caption-label">Where home is</h2>
 	{#if data.isOwner}
 		<GlassCard>
-			<form
-				method="POST"
-				action="?/place"
-				class="form-stack"
-				use:enhance={() => {
-					busy = 'place';
-					return async ({ result, update }) => {
-						// Every date and amount on screen was drawn the old way: start fresh.
-						if (result.type === 'success') location.reload();
-						else {
-							await update({ reset: false });
-							busy = null;
-						}
-					};
-				}}
-			>
+			<form method="POST" action="?/place" class="form-stack" use:enhance={placing.enhance}>
 				<label class="field">
 					<span class="field-label">Time zone</span>
 					<select class="field-input" name="timeZone" value={data.home.timeZone}>
@@ -119,8 +106,8 @@
 					>
 				</label>
 				{#if form?.place?.message}<p class="field-error" role="alert">{form.place.message}</p>{/if}
-				<button class="button-secondary" disabled={busy === 'place'}>
-					{busy === 'place' ? 'Saving…' : 'Save'}
+				<button class="button-secondary" disabled={placing.busy}>
+					{placing.busy ? 'Saving…' : 'Save'}
 				</button>
 			</form>
 		</GlassCard>
@@ -141,7 +128,7 @@
 
 		<div class="stack">
 			<GlassCard>
-				<form method="POST" action="?/invite" class="form-stack" use:enhance={submitting('invite')}>
+				<form method="POST" action="?/invite" class="form-stack" use:enhance={inviting.enhance}>
 					<label class="field">
 						<span class="field-label">Who it’s for</span>
 						<select class="field-input" name="uses">
@@ -152,8 +139,8 @@
 					{#if form?.invite?.message}<p class="field-error" role="alert">
 							{form.invite.message}
 						</p>{/if}
-					<button class="button-primary" disabled={busy === 'invite'}>
-						{busy === 'invite' ? 'Making a link…' : 'Create invite link'}
+					<button class="button-primary" disabled={inviting.busy}>
+						{inviting.busy ? 'Making a link…' : 'Create invite link'}
 					</button>
 				</form>
 
@@ -176,7 +163,7 @@
 									{placesLeft(invite.uses, invite.maxUses)}
 									<span class="invite-detail">Expires {expires(invite.expiresAt)}</span>
 								</span>
-								<form method="POST" action="?/revoke" use:enhance>
+								<form method="POST" action="?/revoke" use:enhance={revoking.enhance}>
 									<input type="hidden" name="id" value={invite.id} />
 									<button class="button-quiet danger">Revoke</button>
 								</form>
@@ -187,7 +174,7 @@
 			{/if}
 
 			<GlassCard>
-				<form method="POST" action="?/rename" class="form-stack" use:enhance={submitting('rename')}>
+				<form method="POST" action="?/rename" class="form-stack" use:enhance={renaming.enhance}>
 					<label class="field">
 						<span class="field-label">Home name</span>
 						<input
@@ -203,8 +190,8 @@
 						{:else if form?.rename && 'saved' in form.rename}<span class="field-hint">Saved.</span
 							>{:else}<span class="field-hint">Shown on invite links.</span>{/if}
 					</label>
-					<button class="button-secondary" disabled={busy === 'rename'}>
-						{busy === 'rename' ? 'Saving…' : 'Rename home'}
+					<button class="button-secondary" disabled={renaming.busy}>
+						{renaming.busy ? 'Saving…' : 'Rename home'}
 					</button>
 				</form>
 			</GlassCard>

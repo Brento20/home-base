@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -12,19 +13,12 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.groupSettings);
-	let busy = $state<'rename' | 'add' | null>(null);
+	const renaming = save();
+	const adding = save({ reset: (result) => result.type === 'success' });
 
 	const outsiders = $derived(
 		data.household.members.filter((person) => !data.group.memberIds.includes(person.id))
 	);
-
-	const submitting = (which: 'rename' | 'add') => () => {
-		busy = which;
-		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: which === 'add' });
-			busy = null;
-		};
-	};
 </script>
 
 <svelte:head>
@@ -41,7 +35,7 @@
 
 <div class="stack">
 	<GlassCard>
-		<form method="POST" action="?/rename" class="form-stack" use:enhance={submitting('rename')}>
+		<form method="POST" action="?/rename" class="form-stack" use:enhance={renaming.enhance}>
 			<label class="field">
 				<span class="field-label">Group name</span>
 				<input
@@ -55,8 +49,8 @@
 				{#if form?.rename?.message}<span class="field-error">{form.rename.message}</span>
 				{:else if form?.rename && 'saved' in form.rename}<span class="field-hint">Saved.</span>{/if}
 			</label>
-			<button class="button-secondary" disabled={busy === 'rename'}>
-				{busy === 'rename' ? 'Saving…' : 'Rename group'}
+			<button class="button-secondary" disabled={renaming.busy}>
+				{renaming.busy ? 'Saving…' : 'Rename group'}
 			</button>
 		</form>
 	</GlassCard>
@@ -75,7 +69,7 @@
 
 	{#if outsiders.length > 0}
 		<GlassCard>
-			<form method="POST" action="?/add" class="form-stack" use:enhance={submitting('add')}>
+			<form method="POST" action="?/add" class="form-stack" use:enhance={adding.enhance}>
 				<fieldset class="field">
 					<legend class="field-label">Add from your home</legend>
 					<div class="choice-pills">
@@ -89,8 +83,8 @@
 					</div>
 					{#if form?.add?.message}<span class="field-error">{form.add.message}</span>{/if}
 				</fieldset>
-				<button class="button-secondary" disabled={busy === 'add'}>
-					{busy === 'add' ? 'Adding…' : 'Add to group'}
+				<button class="button-secondary" disabled={adding.busy}>
+					{adding.busy ? 'Adding…' : 'Add to group'}
 				</button>
 			</form>
 		</GlassCard>

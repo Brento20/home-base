@@ -6,6 +6,7 @@
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { Profile, ShoppingList } from '#lib/types.js';
+	import { save, SaveEach } from '#lib/ui/save.svelte.js';
 	import ListItemRow from './ListItemRow.svelte';
 
 	interface Props {
@@ -17,12 +18,21 @@
 
 	let { list, people, editing, message }: Props = $props();
 
-	// Ticks shown instantly while the server confirms.
-	let pending = $state<Record<string, boolean>>({});
+	// Ticks show straight away and stay until the fresh list has them. Each item on its own, so a
+	// quick run of ticks never clears one another; their reloads are shared.
+	const ticks = new SaveEach<boolean>({
+		serial: true,
+		optimistic: ({ formData }) => formData.get('checked') === 'true'
+	});
+	const adding = save({ reset: (result) => result.type === 'success' });
+	const clearing = save();
 
 	const items = $derived(
 		list.items
-			.map((item) => (item.id in pending ? { ...item, checked: pending[item.id] } : item))
+			.map((item) => {
+				const checked = ticks.pending(item.id);
+				return checked === undefined ? item : { ...item, checked };
+			})
 			.sort((a, b) => Number(a.checked) - Number(b.checked))
 	);
 	const toGet = $derived(items.filter((item) => !item.checked));
@@ -30,11 +40,6 @@
 	const remaining = $derived(toGet.length);
 	// The Shopping list never moves to Past lists, so it has nothing to announce.
 	const allTicked = $derived(!list.pinned && items.length > 0 && remaining === 0);
-
-	function setPending(id: string, checked: boolean | null) {
-		if (checked === null) delete pending[id];
-		else pending[id] = checked;
-	}
 
 	const ringColourFor = (createdBy: string | null) =>
 		people.find((person) => person.id === createdBy)?.accentColour ?? 'var(--colour-text-faint)';
@@ -50,15 +55,7 @@
 	</div>
 {/if}
 
-<form
-	class="add"
-	method="POST"
-	action="?/add"
-	use:enhance={() =>
-		async ({ update }) => {
-			await update({ reset: true });
-		}}
->
+<form class="add" method="POST" action="?/add" use:enhance={adding.enhance}>
 	<GlassSurface radius={18} />
 	<label class="visually-hidden" for="new-item">Add to {list.name}</label>
 	<input
@@ -88,12 +85,7 @@
 {#if toGet.length}
 	<ul class="items">
 		{#each toGet as item (item.id)}
-			<ListItemRow
-				{item}
-				{editing}
-				ringColour={ringColourFor(item.createdBy)}
-				onoptimistic={setPending}
-			/>
+			<ListItemRow {item} {editing} ringColour={ringColourFor(item.createdBy)} {ticks} />
 		{/each}
 	</ul>
 {/if}
@@ -102,25 +94,13 @@
 {#if ticked.length}
 	<div class="ticked-head">
 		<p class="summary caption-label">{ticked.length} ticked</p>
-		<form
-			method="POST"
-			action="?/clearTicked"
-			use:enhance={() => {
-				ticked.forEach((item) => setPending(item.id, null));
-				return async ({ update }) => update();
-			}}
-		>
-			<button class="clear">Clear</button>
+		<form method="POST" action="?/clearTicked" use:enhance={clearing.enhance}>
+			<button class="clear" disabled={clearing.busy}>Clear</button>
 		</form>
 	</div>
 	<ul class="items done">
 		{#each ticked as item (item.id)}
-			<ListItemRow
-				{item}
-				{editing}
-				ringColour={ringColourFor(item.createdBy)}
-				onoptimistic={setPending}
-			/>
+			<ListItemRow {item} {editing} ringColour={ringColourFor(item.createdBy)} {ticks} />
 		{/each}
 	</ul>
 {/if}

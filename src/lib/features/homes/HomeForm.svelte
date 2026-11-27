@@ -3,6 +3,7 @@
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/** Naming a new home (Build a home). People join by invite link, not by name. */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import type { FieldErrors } from '#lib/types.js';
 
 	interface Props {
@@ -12,21 +13,10 @@
 	}
 
 	let { name = '', errors = {}, message = null }: Props = $props();
-	let submitting = $state(false);
+	const submitting = save();
 </script>
 
-<form
-	novalidate
-	method="POST"
-	class="form-stack"
-	use:enhance={() => {
-		submitting = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			submitting = false;
-		};
-	}}
->
+<form novalidate method="POST" class="form-stack" use:enhance={submitting.enhance}>
 	<label class="field">
 		<span class="field-label">Home name</span>
 		<input
@@ -46,7 +36,7 @@
 
 	{#if message}<p class="form-message" role="alert">{message}</p>{/if}
 
-	<button class="button-primary" disabled={submitting}>
-		{submitting ? 'Building…' : 'Build home'}
+	<button class="button-primary" disabled={submitting.busy}>
+		{submitting.busy ? 'Building…' : 'Build home'}
 	</button>
 </form>

@@ -13,6 +13,7 @@
 	 */
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import SaveDock from '#lib/ui/SaveDock.svelte';
@@ -73,7 +74,7 @@
 	let description = $state(untrack(() => values.description));
 	let category = $state(untrack(() => values.category));
 	let spentOn = $state(untrack(() => values.spentOn));
-	let saving = $state(false);
+	const saving = save();
 
 	// A new expense (nothing typed yet) guesses its category from what it was for, until you
 	// pick one yourself. An edit, or a receipt fill, keeps the category it came with.
@@ -150,13 +151,7 @@
 	method="POST"
 	{action}
 	class="form-stack docked expense-form"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
+	use:enhance={saving.enhance}
 >
 	<label class="field">
 		<span class="field-label">Total paid</span>
@@ -353,7 +348,7 @@
 		{/if}
 	</div>
 
-	<SaveDock label={submitLabel} {saving} />
+	<SaveDock label={submitLabel} saving={saving.busy} />
 </form>
 
 <style>

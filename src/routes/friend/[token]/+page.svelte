@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -7,7 +8,7 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let adding = $state(false);
+	const adding = save({ reset: true });
 
 	const link = $derived(data.link);
 	const usable = $derived(Boolean(link?.usable || link?.alreadyFriends));
@@ -59,19 +60,9 @@
 	<GlassCard padding="var(--space-m)">
 		<div class="actions">
 			{#if canAccept}
-				<form
-					method="POST"
-					action="?/accept"
-					use:enhance={() => {
-						adding = true;
-						return async ({ update }) => {
-							await update();
-							adding = false;
-						};
-					}}
-				>
-					<button class="button-primary button-block" disabled={adding}>
-						{adding ? 'Adding…' : `Add ${link!.name} as a friend`}
+				<form method="POST" action="?/accept" use:enhance={adding.enhance}>
+					<button class="button-primary button-block" disabled={adding.busy}>
+						{adding.busy ? 'Adding…' : `Add ${link!.name} as a friend`}
 					</button>
 				</form>
 				{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}

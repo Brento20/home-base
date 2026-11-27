@@ -10,6 +10,7 @@
 	 * - Manage friends: requests and links you've sent, and people you've blocked.
 	 */
 	import { enhance } from '$app/forms';
+	import { save, saveForm } from '#lib/ui/save.svelte.js';
 	import PostcardList from '#lib/features/friends/PostcardList.svelte';
 	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import { filledFields } from '#lib/features/friends/public-profile.js';
@@ -22,7 +23,7 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let making = $state(false);
+	const making = save();
 	let copied = $state(false);
 
 	const incoming = $derived(data.requests.filter((request) => request.incoming));
@@ -62,6 +63,14 @@
 	const facts = $derived([{ icon: 'home' as const, text: data.household.name }]);
 	const nameOf = (id: string | null) =>
 		data.friends.find((friend) => friend.id === id)?.name ?? null;
+
+	// A new code: the old one's “Copied” goes.
+	const swapping = save({
+		reset: true,
+		start: () => {
+			copied = false;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -99,7 +108,7 @@
 								<span class="grouped-sub">{request.homeName ?? 'Not in a home yet'}</span>
 							</span>
 						</a>
-						<form class="request-answer" method="POST" action="?/answer" use:enhance>
+						<form class="request-answer" method="POST" action="?/answer" use:enhance={saveForm}>
 							<input type="hidden" name="person" value={request.id} />
 							<button class="button-quiet" name="accept" value="no">Decline</button>
 							<button class="button-primary small" name="accept" value="yes">Accept</button>
@@ -190,7 +199,7 @@
 		<h2 id="add-heading" class="group-title">Add a friend</h2>
 		<GlassCard>
 			<div class="form-stack">
-				<form method="POST" action="?/requestCode" class="code-form" use:enhance>
+				<form method="POST" action="?/requestCode" class="code-form" use:enhance={saveForm}>
 					<label class="field">
 						<span class="field-label">Their friend code</span>
 						<span class="code-row">
@@ -223,15 +232,7 @@
 						<button class="button-quiet" type="button" onclick={copyCode}
 							>{copied ? 'Copied' : 'Copy'}</button
 						>
-						<form
-							method="POST"
-							action="?/newCode"
-							use:enhance={() =>
-								async ({ update }) => {
-									copied = false;
-									await update();
-								}}
-						>
+						<form method="POST" action="?/newCode" use:enhance={swapping.enhance}>
 							<button class="button-quiet">New code</button>
 						</form>
 					</span>
@@ -240,25 +241,14 @@
 					</span>
 				</div>
 
-				<form
-					method="POST"
-					action="?/link"
-					class="link-form"
-					use:enhance={() => {
-						making = true;
-						return async ({ update }) => {
-							await update({ reset: false });
-							making = false;
-						};
-					}}
-				>
+				<form method="POST" action="?/link" class="link-form" use:enhance={making.enhance}>
 					<span class="field-label">Not on home base yet?</span>
 					<p class="explain">
 						Send them a friend link. It works for one person and lasts two weeks.
 					</p>
 					{#if form?.link?.message}<p class="field-error" role="alert">{form.link.message}</p>{/if}
-					<button class="button-secondary" disabled={making}>
-						{making ? 'Making a link…' : 'Make a friend link'}
+					<button class="button-secondary" disabled={making.busy}>
+						{making.busy ? 'Making a link…' : 'Make a friend link'}
 					</button>
 				</form>
 			</div>

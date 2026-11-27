@@ -8,6 +8,7 @@
 	 */
 	import type { Snippet } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import SaveDock from './SaveDock.svelte';
 
 	interface Props {
@@ -19,7 +20,7 @@
 	}
 
 	let { action, submitLabel, class: name = '', children }: Props = $props();
-	let saving = $state(false);
+	const saving = save();
 </script>
 
 <form
@@ -27,15 +28,9 @@
 	method="POST"
 	{action}
 	class="form-stack docked {name}"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
+	use:enhance={saving.enhance}
 >
 	{@render children()}
 
-	<SaveDock label={submitLabel} {saving} />
+	<SaveDock label={submitLabel} saving={saving.busy} />
 </form>

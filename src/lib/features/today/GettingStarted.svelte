@@ -4,6 +4,7 @@
 	 * (getting-started.ts); the close button hides the card for good.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import type { StartStep } from './getting-started.js';
 
@@ -21,7 +22,7 @@
 			<h2 id="start-heading" class="caption-label">Getting started</h2>
 			<p class="progress">{done} of {steps.length} done</p>
 		</div>
-		<form method="POST" action="?/dismissStart" use:enhance>
+		<form method="POST" action="?/dismissStart" use:enhance={saveForm}>
 			<button class="close" aria-label="Hide getting started"
 				><Icon name="close" size={16} /></button
 			>

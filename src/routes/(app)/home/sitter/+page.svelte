@@ -7,6 +7,7 @@
 	 */
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save, saveForm } from '#lib/ui/save.svelte.js';
 	import {
 		SITTER_LABEL_MAX,
 		SITTER_MAX_DAYS,
@@ -20,7 +21,7 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let making = $state(false);
+	const making = save();
 
 	// What was filled in, if it bounced back with a problem.
 	const sent = untrack(() => form?.create?.values);
@@ -60,18 +61,7 @@
 
 <div class="stack">
 	<GlassCard>
-		<form
-			method="POST"
-			action="?/create"
-			class="form-stack"
-			use:enhance={() => {
-				making = true;
-				return async ({ update }) => {
-					await update({ reset: false });
-					making = false;
-				};
-			}}
-		>
+		<form method="POST" action="?/create" class="form-stack" use:enhance={making.enhance}>
 			<label class="field">
 				<span class="field-label">Who it’s for</span>
 				<input
@@ -141,8 +131,8 @@
 
 			{#if form?.create?.message}<p class="field-error" role="alert">{form.create.message}</p>{/if}
 
-			<button class="button-primary" disabled={making}>
-				{making ? 'Making a link…' : 'Make a sitter link'}
+			<button class="button-primary" disabled={making.busy}>
+				{making.busy ? 'Making a link…' : 'Make a sitter link'}
 			</button>
 		</form>
 		{#if form?.create?.link}
@@ -168,7 +158,7 @@
 									: ''}</span
 							>
 						</span>
-						<form method="POST" action="?/revoke" use:enhance>
+						<form method="POST" action="?/revoke" use:enhance={saveForm}>
 							<input type="hidden" name="id" value={link.id} />
 							<button class="button-quiet danger">Stop</button>
 						</form>

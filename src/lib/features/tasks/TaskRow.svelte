@@ -5,6 +5,7 @@
 	 */
 	import { describeRepeat, repeatLabel } from './repeat.js';
 	import { enhance } from '$app/forms';
+	import { pause, save } from '#lib/ui/save.svelte.js';
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { arrive, changed, leave } from '#lib/ui/motion.js';
@@ -25,9 +26,18 @@
 
 	let { task, people, today, action, openHref, hideDue = false }: Props = $props();
 
-	// Ticked straight away; the row leaves for Past tasks once the server confirms.
-	let ticking = $state(false);
 	let pops = $state(0);
+	// Ticked straight away, and it stays ticked until the fresh list (without it) is showing.
+	const ticks = save({
+		optimistic: () => true,
+		answered: async (result) => {
+			if (result.type !== 'success') return;
+			// Let the point land before the row moves to Past tasks.
+			pops += 1;
+			await pause(650);
+		}
+	});
+	const ticking = $derived(ticks.pending === true);
 
 	const assignee = $derived(people.find((person) => person.id === task.assigneeId));
 	const overdue = $derived(task.dueOn !== null && task.dueOn < today);
@@ -52,22 +62,7 @@
 	use:changed={`${task.title}|${task.assigneeId}|${task.dueOn}|${task.dueTime}|${task.repeat}`}
 >
 	<!-- Only the circle ticks it off; the rest of the row opens the task. -->
-	<form
-		method="POST"
-		{action}
-		use:enhance={() => {
-			ticking = true;
-			return async ({ result, update }) => {
-				if (result.type === 'success') {
-					// Let the point land before the row moves to Past tasks.
-					pops += 1;
-					await new Promise((resolve) => setTimeout(resolve, 650));
-				}
-				await update({ reset: false });
-				ticking = false;
-			};
-		}}
-	>
+	<form method="POST" {action} use:enhance={ticks.enhance}>
 		<input type="hidden" name="taskId" value={task.id} />
 		<input type="hidden" name="title" value={task.title} />
 		<input type="hidden" name="done" value="true" />

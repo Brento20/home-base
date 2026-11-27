@@ -186,30 +186,21 @@ export async function listRecentPostcards(locals: App.Locals, limit = 6): Promis
 
 export const POSTCARD_REPLY_MAX = 1000;
 
-/** Gives a reaction, swaps it for another, or takes it back if it's the one you gave. */
-export async function togglePostcardReaction(locals: App.Locals, id: string, reaction: string) {
-	if (!isReaction(reaction)) error(400, 'Unknown reaction.');
+/** Sets your reaction to a postcard (one each); 'none' takes it back. As setReaction in feed. */
+export async function setPostcardReaction(locals: App.Locals, id: string, reaction: string) {
+	if (reaction !== 'none' && !isReaction(reaction)) error(400, 'Unknown reaction.');
 	const me = myId(locals);
 
 	if (!locals.supabase) {
 		const card = await getPostcard(locals, id);
-		const mine = card.reactions.find((entry) => entry.profileId === me);
 		card.reactions = card.reactions.filter((entry) => entry.profileId !== me);
-		if (mine?.reaction !== reaction)
+		if (reaction !== 'none')
 			card.reactions.push({ profileId: me, reaction, name: sampleAccount.nickname });
 		return;
 	}
 
-	const { data: current, error: readError } = await locals.supabase
-		.from('postcard_reactions')
-		.select('reaction')
-		.eq('postcard_id', id)
-		.eq('profile_id', me)
-		.maybeSingle();
-	if (readError) dbError(readError);
-
 	const { error: writeError } =
-		current?.reaction === reaction
+		reaction === 'none'
 			? await locals.supabase
 					.from('postcard_reactions')
 					.delete()

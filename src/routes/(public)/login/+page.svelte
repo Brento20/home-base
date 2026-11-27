@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PasswordField from '#lib/ui/PasswordField.svelte';
@@ -12,7 +13,7 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.signIn);
-	let submitting = $state(false);
+	const submitting = save();
 </script>
 
 <svelte:head>
@@ -33,17 +34,7 @@
 	{:else}
 		{#if data.notice && !form}<p class="form-success" role="status">{data.notice}</p>{/if}
 		<GlassCard>
-			<form
-				method="POST"
-				class="form-stack"
-				use:enhance={() => {
-					submitting = true;
-					return async ({ update }) => {
-						await update({ reset: false });
-						submitting = false;
-					};
-				}}
-			>
+			<form method="POST" class="form-stack" use:enhance={submitting.enhance}>
 				<label class="field">
 					<span class="field-label">Email</span>
 					<input
@@ -57,8 +48,8 @@
 				</label>
 				<PasswordField label="Password" autocomplete="current-password" />
 				{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}
-				<button class="button-primary" disabled={submitting}>
-					{submitting ? 'Signing in…' : 'Sign in'}
+				<button class="button-primary" disabled={submitting.busy}>
+					{submitting.busy ? 'Signing in…' : 'Sign in'}
 				</button>
 				<a class="button-quiet forgot" href="/forgot">Forgot your password?</a>
 			</form>

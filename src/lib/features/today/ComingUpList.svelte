@@ -7,6 +7,7 @@
 	 * the accent, as on the cards.
 	 */
 	import { enhance } from '$app/forms';
+	import { pause, SaveEach } from '#lib/ui/save.svelte.js';
 	import { describePlanWhen } from '#lib/features/plans/describe.js';
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
@@ -26,9 +27,19 @@
 
 	let { items, people, today, ondone }: Props = $props();
 
-	/** Ticked here and waiting to leave, and the +1 to show on each. */
-	let ticking = $state<string[]>([]);
+	/** The +1 to show on each. */
 	let pops = $state<Record<string, number>>({});
+	// Ticked straight away, each row on its own; it leaves once its +1 has landed.
+	const ticks = new SaveEach({
+		optimistic: () => true,
+		answered: async (result, { key: id }) => {
+			if (result.type !== 'success') return;
+			pops = { ...pops, [id]: (pops[id] ?? 0) + 1 };
+			// The +1 lands before the row leaves, as on the card.
+			await pause(700);
+			ondone?.(id);
+		}
+	});
 
 	const nameOf = (id: string | null) =>
 		people.find((person) => person.id === id)?.displayName ?? 'Anyone';
@@ -55,7 +66,7 @@
 				{@const task = item.task}
 				{@const due = taskWhen(task, today)}
 				{@const dinner = Boolean(task.recipe)}
-				<div class="grouped-row" class:done={ticking.includes(task.id)}>
+				<div class="grouped-row" class:done={ticks.pending(task.id) === true}>
 					<a
 						class="link cover"
 						href={dinner ? `/dinner/cook/${task.id}` : `/lists/tasks/${task.id}`}
@@ -77,24 +88,7 @@
 						</span>
 					</a>
 					{#if canFinish(task, today)}
-						<form
-							method="POST"
-							action="?/completeTask"
-							use:enhance={() => {
-								ticking = [...ticking, task.id];
-								return async ({ result, update }) => {
-									if (result.type === 'success') {
-										pops = { ...pops, [task.id]: (pops[task.id] ?? 0) + 1 };
-										// The +1 lands before the row leaves, as on the card.
-										await new Promise((resolve) => setTimeout(resolve, 700));
-										ondone?.(task.id);
-									} else {
-										ticking = ticking.filter((id) => id !== task.id);
-									}
-									await update({ reset: false });
-								};
-							}}
-						>
+						<form method="POST" action="?/completeTask" use:enhance={ticks.for(task.id)}>
 							<input type="hidden" name="taskId" value={task.id} />
 							<input type="hidden" name="title" value={task.title} />
 							<PointPop count={pops[task.id] ?? 0} />
@@ -104,7 +98,7 @@
 								aria-label={dinner
 									? `Mark ${task.title} as cooked, earns a point`
 									: `Tick off ${task.title}, earns a point`}
-								disabled={ticking.includes(task.id)}><Icon name="check" size={16} /></button
+								disabled={ticks.busy(task.id)}><Icon name="check" size={16} /></button
 							>
 						</form>
 					{/if}

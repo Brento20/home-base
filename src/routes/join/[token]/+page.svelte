@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import SoloScreen from '#lib/ui/SoloScreen.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let joining = $state(false);
+	const joining = save({ reset: true });
 
 	const invite = $derived(data.invite?.usable ? data.invite : null);
 	const lead = $derived.by(() => {
@@ -35,19 +36,9 @@
 			{:else if data.stage === 'profile'}
 				<a class="button-primary button-block" href="/setup/profile">Set up your profile</a>
 			{:else}
-				<form
-					method="POST"
-					action="?/accept"
-					use:enhance={() => {
-						joining = true;
-						return async ({ update }) => {
-							await update();
-							joining = false;
-						};
-					}}
-				>
-					<button class="button-primary button-block" disabled={joining}>
-						{joining ? 'Joining…' : `Join ${invite.homeName}`}
+				<form method="POST" action="?/accept" use:enhance={joining.enhance}>
+					<button class="button-primary button-block" disabled={joining.busy}>
+						{joining.busy ? 'Joining…' : `Join ${invite.homeName}`}
 					</button>
 				</form>
 				{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}

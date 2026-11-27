@@ -7,6 +7,7 @@
 	 */
 	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -22,22 +23,18 @@
 	let input = $state<HTMLInputElement>();
 	// What's typed; a failed add from the server puts back what was sent.
 	let title = $derived(values?.title ?? '');
+	const adding = save({
+		reset: (result) => result.type === 'success',
+		answered: async (result) => {
+			if (result.type === 'success') title = '';
+			await tick();
+			input?.focus();
+		}
+	});
 	const more = $derived(`/lists/tasks/new?title=${encodeURIComponent(title.trim())}`);
 </script>
 
-<form
-	class="task-add"
-	method="POST"
-	action="?/add"
-	use:enhance={() =>
-		async ({ result, update }) => {
-			const added = result.type === 'success';
-			await update({ reset: added });
-			if (added) title = '';
-			await tick();
-			input?.focus();
-		}}
->
+<form class="task-add" method="POST" action="?/add" use:enhance={adding.enhance}>
 	<div class="title-row">
 		<GlassSurface radius={18} />
 		<label class="visually-hidden" for="task-title">Quick add a task</label>

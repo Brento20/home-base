@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { page } from '$app/state';
 	import Icon from '#lib/ui/Icon.svelte';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -13,7 +14,7 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.newPassword);
-	let submitting = $state(false);
+	const submitting = save({ reset: true });
 
 	// From Edit your profile, back goes there; from a reset email, back to Today.
 	const fromProfile = $derived(page.url.searchParams.get('from') === 'profile');
@@ -30,17 +31,7 @@
 		>
 	{/snippet}
 	<GlassCard>
-		<form
-			method="POST"
-			class="form-stack"
-			use:enhance={() => {
-				submitting = true;
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
+		<form method="POST" class="form-stack" use:enhance={submitting.enhance}>
 			<PasswordField
 				label="New password"
 				autocomplete="new-password"
@@ -48,8 +39,8 @@
 				error={form?.message}
 				hint="At least 10 characters."
 			/>
-			<button class="button-primary" disabled={submitting}>
-				{submitting ? 'Saving…' : 'Save password'}
+			<button class="button-primary" disabled={submitting.busy}>
+				{submitting.busy ? 'Saving…' : 'Save password'}
 			</button>
 		</form>
 	</GlassCard>

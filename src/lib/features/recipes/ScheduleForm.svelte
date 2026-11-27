@@ -4,6 +4,7 @@
 	 * Sheet from a recipe, the cook view and the "Did you make it?" card.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import AssigneeChoice from '#lib/features/tasks/AssigneeChoice.svelte';
 	import { addDays } from '#lib/time.js';
 	import type { Profile } from '#lib/types.js';
@@ -37,27 +38,18 @@
 	const currentDay = $derived(day ?? initialDay);
 
 	let errors = $state<Record<string, string>>({});
-	let saving = $state(false);
+	// The sheet shows its own errors; a success hands over to the page (onsaved) and reloads.
+	const saving = save({
+		quiet: true,
+		answered: (result) => {
+			errors =
+				result.type === 'failure' ? ((result.data?.errors as Record<string, string>) ?? {}) : {};
+			if (result.type === 'success') onsaved(result.data);
+		}
+	});
 </script>
 
-<form
-	method="POST"
-	{action}
-	class="form-stack"
-	use:enhance={() => {
-		saving = true;
-		return async ({ result, update }) => {
-			saving = false;
-			if (result.type === 'failure') {
-				errors = (result.data?.errors as Record<string, string>) ?? {};
-				return;
-			}
-			errors = {};
-			if (result.type === 'success') onsaved(result.data);
-			await update({ reset: false, invalidateAll: true });
-		};
-	}}
->
+<form method="POST" {action} class="form-stack" use:enhance={saving.enhance}>
 	{#each Object.entries(hidden) as [name, value] (name)}
 		<input type="hidden" {name} {value} />
 	{/each}
@@ -114,8 +106,8 @@
 		error={errors.assigneeId}
 	/>
 
-	<button class="button-primary button-block" disabled={saving}>
-		{saving ? 'Saving…' : submitLabel}
+	<button class="button-primary button-block" disabled={saving.busy}>
+		{saving.busy ? 'Saving…' : submitLabel}
 	</button>
 </form>
 

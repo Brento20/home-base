@@ -4,6 +4,7 @@
 	 * form; ticking it off and deleting are here, as everywhere else.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import LinkedText from '#lib/features/plans/LinkedText.svelte';
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
@@ -35,7 +36,7 @@
 	const repeats = $derived(repeatLabel(task.repeat));
 	const doneOn = $derived(task.completedAt ? zonedParts(new Date(task.completedAt)).date : null);
 
-	let working = $state(false);
+	const working = save();
 </script>
 
 <svelte:head>
@@ -104,22 +105,16 @@
 	<form
 		method="POST"
 		action={task.completedAt ? '?/reopen' : '?/complete'}
-		use:enhance={() => {
-			working = true;
-			return async ({ update }) => {
-				await update({ reset: false });
-				working = false;
-			};
-		}}
+		use:enhance={working.enhance}
 	>
 		{#if task.completedAt}
-			<button class="button-secondary" disabled={working}>
-				{working ? 'Putting it back…' : 'Put it back on the list'}
+			<button class="button-secondary" disabled={working.busy}>
+				{working.busy ? 'Putting it back…' : 'Put it back on the list'}
 			</button>
 		{:else}
-			<button class="button-primary" disabled={working}>
+			<button class="button-primary" disabled={working.busy}>
 				<Icon name="check" size={18} />
-				{working ? 'Ticking off…' : 'Tick it off'}
+				{working.busy ? 'Ticking off…' : 'Tick it off'}
 			</button>
 		{/if}
 	</form>

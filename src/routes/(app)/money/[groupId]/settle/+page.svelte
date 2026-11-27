@@ -3,6 +3,7 @@
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { describeDebt } from '#lib/features/expenses/describe.js';
 	import { centsToInput, currencySymbol } from '#lib/features/expenses/money.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
@@ -21,7 +22,7 @@
 	let paidBy = $state(start?.paidBy ?? suggested?.from ?? '');
 	let paidTo = $state(start?.paidTo ?? suggested?.to ?? '');
 	let amount = $state(start?.amount ?? (suggested ? centsToInput(suggested.cents) : ''));
-	let saving = $state(false);
+	const saving = save();
 
 	function use(debt: Debt) {
 		paidBy = debt.from;
@@ -63,17 +64,7 @@
 	</div>
 {/if}
 
-<form
-	method="POST"
-	class="form-stack"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
->
+<form method="POST" class="form-stack" use:enhance={saving.enhance}>
 	<fieldset class="field">
 		<legend class="field-label">Who paid</legend>
 		<div class="choice-pills">
@@ -133,8 +124,8 @@
 	{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}
 
 	<div class="form-actions">
-		<button class="button-primary" disabled={saving}
-			>{saving ? 'Saving…' : 'Record repayment'}</button
+		<button class="button-primary" disabled={saving.busy}
+			>{saving.busy ? 'Saving…' : 'Record repayment'}</button
 		>
 	</div>
 </form>

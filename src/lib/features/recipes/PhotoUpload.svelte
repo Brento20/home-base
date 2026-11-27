@@ -7,6 +7,7 @@
 	 */
 	import type { Snippet } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { shrinkPhoto } from '#lib/ui/photo.js';
 
 	interface Props {
@@ -34,6 +35,22 @@
 	let input = $state<HTMLInputElement>();
 	let photo: File | null = null;
 
+	const uploading = save({
+		reset: true,
+		start: ({ formData }) => {
+			formData.delete('photo');
+			if (photo) formData.set('photo', photo);
+		},
+		after: (result) => {
+			busy = false;
+			photo = null;
+			if (result.type === 'success') onsaved?.();
+			else if (result.type === 'failure')
+				onproblem?.(String(result.data?.photoError ?? 'That photo didn’t save. Try again.'));
+			else if (result.type === 'error') onproblem?.('That photo didn’t save. Try again.');
+		}
+	});
+
 	async function choose() {
 		const file = input?.files?.[0];
 		if (!file) return;
@@ -55,19 +72,7 @@
 	{action}
 	enctype="multipart/form-data"
 	class="photo-upload"
-	use:enhance={({ formData }) => {
-		formData.delete('photo');
-		if (photo) formData.set('photo', photo);
-		return async ({ result, update }) => {
-			await update({ reset: true, invalidateAll: true });
-			busy = false;
-			photo = null;
-			if (result.type === 'success') onsaved?.();
-			else if (result.type === 'failure')
-				onproblem?.(String(result.data?.photoError ?? 'That photo didn’t save. Try again.'));
-			else if (result.type === 'error') onproblem?.('That photo didn’t save. Try again.');
-		};
-	}}
+	use:enhance={uploading.enhance}
 >
 	<label class="{className} pick" aria-label={label} aria-busy={busy}>
 		{@render children()}

@@ -7,7 +7,7 @@ import {
 	parsePostcardReply,
 	POSTCARD_REPLY_MAX,
 	removePostcard,
-	togglePostcardReaction
+	setPostcardReaction
 } from '#lib/features/friends/postcards.server.js';
 import { myId } from '#lib/features/household/household.server.js';
 import type { Actions, PageServerLoad } from './$types';
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 export const actions: Actions = {
 	react: async ({ request, locals, params }) => {
 		const reaction = String((await request.formData()).get('reaction') ?? '');
-		await togglePostcardReaction(locals, params.id, reaction);
+		await setPostcardReaction(locals, params.id, reaction);
 	},
 
 	reply: async ({ request, locals, params }) => {

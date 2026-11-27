@@ -5,6 +5,7 @@
 	 * behind chips, like a plan's place and note, so the form starts short.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { RECIPE_TITLE } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -65,7 +66,14 @@
 		['notes', 'Note'],
 		['nutrition', 'Nutrition']
 	] as const;
-	let saving = $state(false);
+	const saving = save({
+		start: ({ formData }) => {
+			// The shrunk copy, never the original from the camera roll.
+			formData.delete('photo');
+			if (chosenPhoto) formData.set('photo', chosenPhoto);
+			else if (photoRemoved) formData.set('removePhoto', '1');
+		}
+	});
 </script>
 
 <form
@@ -74,17 +82,7 @@
 	enctype="multipart/form-data"
 	{action}
 	class="form-stack docked recipe-form"
-	use:enhance={({ formData }) => {
-		saving = true;
-		// The shrunk copy, never the original from the camera roll.
-		formData.delete('photo');
-		if (chosenPhoto) formData.set('photo', chosenPhoto);
-		else if (photoRemoved) formData.set('removePhoto', '1');
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
+	use:enhance={saving.enhance}
 >
 	<label class="field">
 		<span class="field-label">What’s it called?</span>
@@ -316,7 +314,7 @@
 		</p>
 	{/if}
 
-	<SaveDock label={submitLabel} {saving} disabled={readingPhoto} />
+	<SaveDock label={submitLabel} saving={saving.busy} disabled={readingPhoto} />
 </form>
 
 <style>

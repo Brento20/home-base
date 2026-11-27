@@ -5,6 +5,7 @@
 	 * notes, recipes, expenses and repayments all use it, so deleting feels the same everywhere.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 
 	interface Props {
 		/** Form action, e.g. "?/delete". */
@@ -29,7 +30,7 @@
 	}
 </script>
 
-<form class="confirm-delete" method="POST" {action} use:enhance>
+<form class="confirm-delete" method="POST" {action} use:enhance={saveForm}>
 	<button class="delete" class:armed onclick={arm} aria-live="polite">
 		{armed ? confirmLabel : label}
 	</button>

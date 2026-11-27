@@ -5,6 +5,7 @@
 	 * right), with New list as the panel's last row, and Past lists on its own below.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import ShoppingCard from '#lib/features/lists/ShoppingCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { kept } from '#lib/ui/kept.svelte.js';
@@ -91,7 +92,7 @@
 					</li>
 				{/each}
 				<li>
-					<form class="grouped-row new-list" method="POST" action="?/create" use:enhance>
+					<form class="grouped-row new-list" method="POST" action="?/create" use:enhance={saveForm}>
 						<span class="grouped-icon new-icon"><Icon name="plus" size={16} /></span>
 						<label class="visually-hidden" for="new-list-name">New list name</label>
 						<input

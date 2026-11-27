@@ -286,29 +286,25 @@ export async function deleteReply(locals: App.Locals, postId: string, replyId: s
  * Tapping a reaction sets it; tapping the one you already gave takes it back. Everyone has one
  * reaction per post, so picking another replaces yours.
  */
-export async function toggleReaction(locals: App.Locals, postId: string, reaction: string) {
-	if (!isReaction(reaction)) error(400, 'Unknown reaction.');
+/**
+ * Sets your reaction to a post: one each, so a new one replaces the old, and 'none' takes it
+ * back. The browser sends the reaction it wants rather than "flip it", so two quick taps can't
+ * cross over and leave the opposite of what's on screen.
+ */
+export async function setReaction(locals: App.Locals, postId: string, reaction: string) {
+	if (reaction !== 'none' && !isReaction(reaction)) error(400, 'Unknown reaction.');
 	const me = myId(locals);
 	const { supabase } = locals;
 
 	if (!supabase) {
 		const post = await getPost(locals, postId);
-		const mine = post.reactions.find((entry) => entry.profileId === me);
 		post.reactions = post.reactions.filter((entry) => entry.profileId !== me);
-		if (mine?.reaction !== reaction) post.reactions.push({ profileId: me, reaction });
+		if (reaction !== 'none') post.reactions.push({ profileId: me, reaction });
 		return;
 	}
 
-	const { data: current, error: readError } = await supabase
-		.from('feed_reactions')
-		.select('reaction')
-		.eq('post_id', postId)
-		.eq('profile_id', me)
-		.maybeSingle();
-	if (readError) dbError(readError);
-
 	const { error: writeError } =
-		current?.reaction === reaction
+		reaction === 'none'
 			? await supabase.from('feed_reactions').delete().eq('post_id', postId).eq('profile_id', me)
 			: await supabase
 					.from('feed_reactions')
