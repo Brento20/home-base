@@ -7,6 +7,7 @@
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import LinkedText from '#lib/features/plans/LinkedText.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import { formatPostTime } from '#lib/time.js';
@@ -43,7 +44,18 @@
 		entry.authorId === me ? 'You' : personFor(entry).displayName;
 
 	let reply = $state('');
-	let sending = $state(false);
+	const sending = save({
+		reset: true,
+		start: () => Boolean(reply.trim()),
+		after: (result) => {
+			if (result.type !== 'success') return;
+			reply = '';
+			requestAnimationFrame(() =>
+				list?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+			);
+		}
+	});
+	const removing = save();
 	let armedReply = $state<string | null>(null);
 	let list = $state<HTMLElement>();
 </script>
@@ -67,7 +79,7 @@
 						</p>
 						<p class="reply-text"><LinkedText text={entry.body} /></p>
 						{#if entry.authorId === me}
-							<form method="POST" action="?/deleteReply" use:enhance>
+							<form method="POST" action="?/deleteReply" use:enhance={removing.enhance}>
 								<input type="hidden" name="replyId" value={entry.id} />
 								<button
 									class="reply-delete"
@@ -87,25 +99,7 @@
 		</ol>
 	{/if}
 
-	<form
-		class="reply-form"
-		method="POST"
-		action="?/reply"
-		use:enhance={({ cancel }) => {
-			if (!reply.trim()) return cancel();
-			sending = true;
-			return async ({ result, update }) => {
-				await update();
-				sending = false;
-				if (result.type === 'success') {
-					reply = '';
-					requestAnimationFrame(() =>
-						list?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-					);
-				}
-			};
-		}}
-	>
+	<form class="reply-form" method="POST" action="?/reply" use:enhance={sending.enhance}>
 		<label class="visually-hidden" for="reply">Reply</label>
 		<textarea
 			id="reply"
@@ -117,8 +111,8 @@
 			use:placeholderReel={PLACEHOLDERS.reply}
 			bind:value={reply}
 			aria-invalid={problem ? 'true' : undefined}></textarea>
-		<button class="button-primary send" disabled={sending || !reply.trim()}>
-			{sending ? 'Sending…' : 'Send'}
+		<button class="button-primary send" disabled={sending.busy || !reply.trim()}>
+			{sending.busy ? 'Sending…' : 'Send'}
 		</button>
 		{#if problem}<span class="field-error">{problem}</span>{/if}
 	</form>

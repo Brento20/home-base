@@ -1,5 +1,5 @@
-import { invalidate, refreshAll } from '$app/navigation';
 import { LIVE_DATA } from '#lib/live-data.js';
+import { refresh as reload } from './save.svelte.js';
 
 /**
  * Keeps everyone's phones in step without a realtime connection: reloads everything when the
@@ -20,7 +20,9 @@ export function startLiveRefresh(intervalMs = 60_000, onLoaded: (done: () => voi
 		if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 		running = true;
 		try {
-			await (fromForeground ? refreshAll() : invalidate(LIVE_DATA));
+			// Shared with saves' reloads, and only done once streamed data has landed too, so
+			// `running` covers the whole refresh and two can't overlap.
+			await reload(fromForeground ? 'all' : [LIVE_DATA]);
 			lastRefresh = Date.now();
 		} finally {
 			running = false;

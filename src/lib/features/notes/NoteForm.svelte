@@ -3,6 +3,7 @@
 	import { placeholderReel } from '#lib/ui/placeholder-reel.js';
 	/** Title, text and the Hide until tapped option, for adding or editing a home note. */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import type { FieldErrors } from '#lib/types.js';
 
 	interface Props {
@@ -17,22 +18,10 @@
 	let { action, values, errors = {}, submitLabel, examples }: Props = $props();
 	const titleExamples = $derived(examples?.title ?? PLACEHOLDERS.noteTitle);
 	const bodyExamples = $derived(examples?.body ?? PLACEHOLDERS.noteBody);
-	let saving = $state(false);
+	const saving = save();
 </script>
 
-<form
-	novalidate
-	method="POST"
-	{action}
-	class="form-stack"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
->
+<form novalidate method="POST" {action} class="form-stack" use:enhance={saving.enhance}>
 	<label class="field">
 		<span class="field-label">Call it</span>
 		<input
@@ -73,7 +62,9 @@
 	</div>
 
 	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Saving…' : submitLabel}</button>
+		<button class="button-primary" disabled={saving.busy}
+			>{saving.busy ? 'Saving…' : submitLabel}</button
+		>
 	</div>
 </form>
 

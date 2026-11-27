@@ -6,6 +6,7 @@
 	import { untrack } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { describeIngredient, isPantryStaple, scaleIngredients, type Recipe } from './recipe.js';
 
 	interface Props {
@@ -30,21 +31,17 @@
 		else chosen.delete(index);
 	}
 
-	let saving = $state(false);
+	// The sheet says how it went itself (onsaved); nothing else on the page changes.
+	const saving = save({
+		quiet: true,
+		refresh: 'none',
+		answered: (result) => {
+			if (result.type === 'success') onsaved(result.data);
+		}
+	});
 </script>
 
-<form
-	method="POST"
-	action="?/shop"
-	use:enhance={() => {
-		saving = true;
-		return async ({ result, update }) => {
-			saving = false;
-			if (result.type === 'success') onsaved(result.data);
-			await update({ reset: false, invalidateAll: false });
-		};
-	}}
->
+<form method="POST" action="?/shop" use:enhance={saving.enhance}>
 	<input type="hidden" name="servings" value={servings} />
 	<p class="intro">
 		A new list called <strong>{recipe.title}</strong>, for {servings}
@@ -72,8 +69,8 @@
 		{/each}
 	</ul>
 
-	<button class="button-primary button-block" disabled={saving || chosen.size === 0}>
-		{saving
+	<button class="button-primary button-block" disabled={saving.busy || chosen.size === 0}>
+		{saving.busy
 			? 'Adding…'
 			: chosen.size === 0
 				? 'Nothing to add'

@@ -7,6 +7,7 @@
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { describeDaysAway, formatLongDate } from '#lib/time.js';
 	import type { PageProps } from './$types';
@@ -72,7 +73,7 @@
 			<h2 id="guests-heading" class="detail-label caption-label">Who’s going</h2>
 			{#each summary as line (line)}<p class="summary-line">{line}</p>{/each}
 
-			<form class="answer" method="POST" action="?/respond" use:enhance>
+			<form class="answer" method="POST" action="?/respond" use:enhance={saveForm}>
 				<span class="answer-label">Are you going?</span>
 				<div class="answer-buttons">
 					<button
@@ -98,7 +99,7 @@
 						{home.name}{home.host ? (plan.invitedBy ? ' · their plan' : ' · your plan') : ''}
 					</h3>
 					{#if !plan.invitedBy && !home.host}
-						<form method="POST" action="?/uninvite" use:enhance>
+						<form method="POST" action="?/uninvite" use:enhance={saveForm}>
 							<input
 								type="hidden"
 								name="home"
@@ -129,7 +130,7 @@
 								</span>
 							</a>
 							{#if person.canAdd}
-								<form method="POST" action="?/addFriend" use:enhance>
+								<form method="POST" action="?/addFriend" use:enhance={saveForm}>
 									<input type="hidden" name="person" value={person.id} />
 									<button class="button-quiet add">Add friend</button>
 								</form>
@@ -155,7 +156,7 @@
 						<span class="grouped-label"
 							>{friend.name}<span class="grouped-sub">{friend.homeName}</span></span
 						>
-						<form method="POST" action="?/invite" use:enhance>
+						<form method="POST" action="?/invite" use:enhance={saveForm}>
 							<input type="hidden" name="friend" value={friend.id} />
 							<button class="button-quiet add">Invite</button>
 						</form>

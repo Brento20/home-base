@@ -8,6 +8,7 @@
 	 */
 	import { untrack, type Snippet } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { shrinkPhoto } from '#lib/ui/photo.js';
 	import type { FieldErrors } from '#lib/types.js';
@@ -44,7 +45,14 @@
 	let preview = $state<string | null>(null);
 	let photoProblem = $state<string | null>(null);
 	let reading = $state(false);
-	let saving = $state(false);
+	const saving = save({
+		start: ({ formData }) => {
+			if (empty) return false;
+			// Send the shrunk copy, never the original from the camera roll.
+			formData.delete('photo');
+			if (photo) formData.set('photo', photo);
+		}
+	});
 	let fileInput = $state<HTMLInputElement>();
 
 	const empty = $derived(!body.trim() && !photo);
@@ -74,22 +82,7 @@
 	}
 </script>
 
-<form
-	method="POST"
-	enctype="multipart/form-data"
-	class="composer"
-	use:enhance={({ formData, cancel }) => {
-		if (empty) return cancel();
-		saving = true;
-		// Send the shrunk copy, never the original from the camera roll.
-		formData.delete('photo');
-		if (photo) formData.set('photo', photo);
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
->
+<form method="POST" enctype="multipart/form-data" class="composer" use:enhance={saving.enhance}>
 	{@render fields?.()}
 
 	<label class="field">
@@ -133,8 +126,8 @@
 				onchange={choose}
 			/>
 		</label>
-		<button class="button-primary post" disabled={empty || saving || reading}>
-			{saving ? busyLabel : submitLabel}
+		<button class="button-primary post" disabled={empty || saving.busy || reading}>
+			{saving.busy ? busyLabel : submitLabel}
 		</button>
 	</div>
 </form>

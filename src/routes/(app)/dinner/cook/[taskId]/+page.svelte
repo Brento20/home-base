@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import IngredientList from '#lib/features/recipes/IngredientList.svelte';
 	import MethodSteps from '#lib/features/recipes/MethodSteps.svelte';
 	import ScheduleForm from '#lib/features/recipes/ScheduleForm.svelte';
@@ -23,7 +24,6 @@
 	const when = $derived(formatDinnerWhen(task.dueOn!, task.dueTime, data.today));
 
 	let rescheduling = $state(false);
-	let busy = $state(false);
 
 	// Skip takes two taps: the first asks, the second takes the dinner off the calendar.
 	let skipArmed = $state(false);
@@ -36,13 +36,8 @@
 		skipTimer = setTimeout(() => (skipArmed = false), 4000);
 	}
 
-	const submit = () => {
-		busy = true;
-		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: false });
-			busy = false;
-		};
-	};
+	// Every answer here shares one save: any of them in flight holds the others.
+	const answering = save();
 </script>
 
 <svelte:head>
@@ -81,7 +76,7 @@
 				Cooked{cookedBy ? ` by ${cookedBy.id === data.me.id ? 'you' : cookedBy.displayName}` : ''}.
 				How was it?
 			</p>
-			<form method="POST" action="?/rate" use:enhance={submit}>
+			<form method="POST" action="?/rate" use:enhance={answering.enhance}>
 				<Stars value={data.stars} name="stars" label={recipe.title} size={24} autosubmit />
 			</form>
 		</section>
@@ -104,12 +99,12 @@
 
 {#if !task.completedAt}
 	<ActionDock>
-		<form method="POST" action="?/skip" use:enhance={submit}>
+		<form method="POST" action="?/skip" use:enhance={answering.enhance}>
 			<button
 				class="button-quiet skip"
 				class:armed={skipArmed}
 				onclick={armSkip}
-				disabled={busy}
+				disabled={answering.busy}
 				aria-live="polite"
 			>
 				{skipArmed ? 'Skip it?' : 'Skip'}
@@ -118,8 +113,8 @@
 		<button type="button" class="button-secondary act" onclick={() => (rescheduling = true)}>
 			Reschedule
 		</button>
-		<form method="POST" action="?/cooked" class="grow" use:enhance={submit}>
-			<button class="button-primary act" disabled={busy}>
+		<form method="POST" action="?/cooked" class="grow" use:enhance={answering.enhance}>
+			<button class="button-primary act" disabled={answering.busy}>
 				<Icon name="check" size={18} /> Mark as cooked
 			</button>
 		</form>

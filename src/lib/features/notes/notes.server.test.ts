@@ -76,7 +76,8 @@ describe('secret notes in the database', () => {
 		const rows = [row('old', 'door 4512', true), row('plain', 'hello', false)];
 		const notes = await listNotes(locals(rows));
 		expect(notes.find((note) => note.id === 'old')?.body).toBe('door 4512');
-		expect(rows[0].body).toMatch(/^enc:v1:/);
+		// Sealed after the page has gone (src/lib/server/background.ts), not before it's drawn.
+		await vi.waitFor(() => expect(rows[0].body).toMatch(/^enc:v1:/));
 		expect(rows[1].body).toBe('hello');
 	});
 

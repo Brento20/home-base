@@ -7,6 +7,7 @@
 	 * The chosen photo is shrunk in the browser before it's sent.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import { resizePhoto } from '#lib/ui/photo.js';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -88,6 +89,18 @@
 		removePhoto = Boolean(account.avatarUrl);
 		if (fileInput) fileInput.value = '';
 	}
+
+	const sending = save({
+		start: ({ formData }) => {
+			// Send the shrunk copy, never the original from the camera roll.
+			formData.delete('photo');
+			if (photo) formData.set('photo', photo);
+		}
+	});
+	// Shared with a Save button the page keeps elsewhere (bind:saving).
+	$effect.pre(() => {
+		saving = sending.busy;
+	});
 </script>
 
 <form
@@ -96,16 +109,7 @@
 	method="POST"
 	enctype="multipart/form-data"
 	class="form-stack"
-	use:enhance={({ formData }) => {
-		saving = true;
-		// Send the shrunk copy, never the original from the camera roll.
-		formData.delete('photo');
-		if (photo) formData.set('photo', photo);
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
+	use:enhance={sending.enhance}
 >
 	{#if showProfile}
 		<div class="photo">

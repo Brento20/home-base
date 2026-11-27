@@ -6,6 +6,7 @@
 	 * dish's photo, or offers to add one: right after cooking is when there's one to take.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import { formatDinnerWhen, formatTimeOfDay } from '#lib/time.js';
@@ -44,14 +45,8 @@
 	const nameOf = (person: Profile) => (person.id === meId ? 'you' : person.displayName);
 
 	let rescheduling = $state(false);
-	let busy = $state(false);
-	const submit = () => {
-		busy = true;
-		return async ({ update }: { update: (options?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: false });
-			busy = false;
-		};
-	};
+	// Every answer here shares one save: any of them in flight holds the others.
+	const answering = save();
 </script>
 
 <section class="prompt" class:with-photo={kind === 'rate' && photoUrl} aria-live="polite">
@@ -67,15 +62,15 @@
 					? `${cookedBy.id === meId ? 'You' : cookedBy.displayName} cooked it ${day}.`
 					: `Cooked ${day}.`}
 			</p>
-			<form method="POST" action="?/rate" class="rate" use:enhance={submit}>
+			<form method="POST" action="?/rate" class="rate" use:enhance={answering.enhance}>
 				<input type="hidden" name="taskId" value={task.id} />
 				<input type="hidden" name="recipeId" value={task.recipeId} />
 				<Stars value={stars} name="stars" label={task.recipe!.title} size={26} autosubmit />
 			</form>
 			<div class="after">
-				<form method="POST" action="?/dismiss" use:enhance={submit}>
+				<form method="POST" action="?/dismiss" use:enhance={answering.enhance}>
 					<input type="hidden" name="taskId" value={task.id} />
-					<button class="button-quiet later" disabled={busy}>Not now</button>
+					<button class="button-quiet later" disabled={answering.busy}>Not now</button>
 				</form>
 				{#if !photoUrl && task.recipeId}
 					<PhotoUpload
@@ -100,16 +95,16 @@
 					: ''}.
 			</p>
 			<div class="choices">
-				<form method="POST" action="?/cooked" use:enhance={submit}>
+				<form method="POST" action="?/cooked" use:enhance={answering.enhance}>
 					<input type="hidden" name="taskId" value={task.id} />
-					<button class="button-primary small" disabled={busy}>Yes</button>
+					<button class="button-primary small" disabled={answering.busy}>Yes</button>
 				</form>
 				<button type="button" class="button-secondary small" onclick={() => (rescheduling = true)}>
 					Reschedule
 				</button>
-				<form method="POST" action="?/skip" use:enhance={submit}>
+				<form method="POST" action="?/skip" use:enhance={answering.enhance}>
 					<input type="hidden" name="taskId" value={task.id} />
-					<button class="button-quiet" disabled={busy}>Skip</button>
+					<button class="button-quiet" disabled={answering.busy}>Skip</button>
 				</form>
 			</div>
 		{/if}

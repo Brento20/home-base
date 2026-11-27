@@ -4,6 +4,7 @@
 	 * friend links nobody's opened yet (both can be cancelled), and people you've blocked.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import { formatDayLabel, todayISO } from '#lib/time.js';
@@ -49,7 +50,7 @@
 							{request.name}
 							<span class="grouped-sub">Waiting for them to answer</span>
 						</span>
-						<form method="POST" action="?/cancel" use:enhance>
+						<form method="POST" action="?/cancel" use:enhance={saveForm}>
 							<input type="hidden" name="person" value={request.id} />
 							<button class="button-quiet danger">Cancel</button>
 						</form>
@@ -69,7 +70,7 @@
 							Friend link
 							<span class="grouped-sub">Expires {expires(link.expiresAt)}</span>
 						</span>
-						<form method="POST" action="?/revoke" use:enhance>
+						<form method="POST" action="?/revoke" use:enhance={saveForm}>
 							<input type="hidden" name="id" value={link.id} />
 							<button class="button-quiet danger">Cancel</button>
 						</form>
@@ -86,7 +87,7 @@
 				{#each data.blocked as person (person.id)}
 					<li class="grouped-row">
 						<span class="grouped-label">{person.name}</span>
-						<form method="POST" action="?/unblock" use:enhance>
+						<form method="POST" action="?/unblock" use:enhance={saveForm}>
 							<input type="hidden" name="id" value={person.id} />
 							<button class="button-quiet">Unblock</button>
 						</form>

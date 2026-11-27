@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
@@ -8,7 +9,7 @@
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
-	let opening = $state(false);
+	const opening = save();
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.joinHome);
@@ -27,18 +28,7 @@
 	{/snippet}
 
 	<GlassCard>
-		<form
-			novalidate
-			method="POST"
-			class="form-stack"
-			use:enhance={() => {
-				opening = true;
-				return async ({ update }) => {
-					await update({ reset: false });
-					opening = false;
-				};
-			}}
-		>
+		<form novalidate method="POST" class="form-stack" use:enhance={opening.enhance}>
 			<label class="field">
 				<span class="field-label">Invite link</span>
 				<input
@@ -55,8 +45,8 @@
 				/>
 				{#if form?.errors?.link}<span class="field-error">{form.errors.link}</span>{/if}
 			</label>
-			<button class="button-primary" disabled={opening}
-				>{opening ? 'Opening…' : 'Open invite'}</button
+			<button class="button-primary" disabled={opening.busy}
+				>{opening.busy ? 'Opening…' : 'Open invite'}</button
 			>
 		</form>
 	</GlassCard>

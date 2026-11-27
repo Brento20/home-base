@@ -20,6 +20,7 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { page } from '$app/state';
 	import { formatDinnerWhen } from '#lib/time.js';
 	import type { PageProps } from './$types';
@@ -104,6 +105,14 @@
 			'View'
 		);
 	}
+
+	const removingPhoto = save({
+		reset: true,
+		after: () => {
+			removeArmed = false;
+			sheet = null;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -241,16 +250,7 @@
 			<Icon name="camera" size={18} />
 			{photoBusy ? 'Saving…' : 'Choose a new photo'}
 		</PhotoUpload>
-		<form
-			method="POST"
-			action="?/removePhoto"
-			use:enhance={() =>
-				async ({ update }) => {
-					await update();
-					removeArmed = false;
-					sheet = null;
-				}}
-		>
+		<form method="POST" action="?/removePhoto" use:enhance={removingPhoto.enhance}>
 			<button class="remove-photo" class:armed={removeArmed} onclick={armRemove} aria-live="polite">
 				{removeArmed ? 'Tap again to remove it' : 'Remove photo'}
 			</button>

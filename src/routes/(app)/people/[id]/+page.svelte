@@ -4,6 +4,7 @@
 	 * with anyone, and a friend request: send one, or answer theirs.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import ProfileHeader from '#lib/features/friends/ProfileHeader.svelte';
 	import PublicFieldsCard from '#lib/features/friends/PublicFieldsCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -47,17 +48,17 @@
 		<section class="friendship" aria-label="Friend request">
 			{#if person.requestReceived}
 				<p class="explain">{person.name} wants to be friends.</p>
-				<form class="answer" method="POST" action="?/answer" use:enhance>
+				<form class="answer" method="POST" action="?/answer" use:enhance={saveForm}>
 					<button class="button-secondary" name="accept" value="no">Decline</button>
 					<button class="button-primary" name="accept" value="yes">Accept</button>
 				</form>
 			{:else if person.requestSent}
 				<p class="explain">Request sent. You’ll be friends once {person.name} accepts.</p>
-				<form method="POST" action="?/cancel" use:enhance>
+				<form method="POST" action="?/cancel" use:enhance={saveForm}>
 					<button class="button-quiet danger">Cancel request</button>
 				</form>
 			{:else}
-				<form method="POST" action="?/request" use:enhance>
+				<form method="POST" action="?/request" use:enhance={saveForm}>
 					<button class="button-primary button-block">Send friend request</button>
 				</form>
 				<p class="hint">

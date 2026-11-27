@@ -4,6 +4,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -13,7 +14,7 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.newGroup);
-	let saving = $state(false);
+	const saving = save();
 
 	const others = $derived(data.household.members.filter((person) => person.id !== data.me.id));
 	// Everyone else in the home is ticked to start with; most groups are the whole home.
@@ -30,17 +31,7 @@
 	{/snippet}
 </PageHeader>
 
-<form
-	method="POST"
-	class="form-stack"
-	use:enhance={() => {
-		saving = true;
-		return async ({ update }) => {
-			await update({ reset: false });
-			saving = false;
-		};
-	}}
->
+<form method="POST" class="form-stack" use:enhance={saving.enhance}>
 	<label class="field">
 		<span class="field-label">Group name</span>
 		<input
@@ -86,7 +77,9 @@
 	{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}
 
 	<div class="form-actions">
-		<button class="button-primary" disabled={saving}>{saving ? 'Making…' : 'Make group'}</button>
+		<button class="button-primary" disabled={saving.busy}
+			>{saving.busy ? 'Making…' : 'Make group'}</button
+		>
 	</div>
 </form>
 

@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { NOTES_KEY } from '$app/env/private';
 import { dbError } from '#lib/server/db.js';
+import { background } from '#lib/server/background.js';
 import { isSealed, seal, sealingKey, unseal } from '#lib/server/sealed.js';
 import { getHouseholdId } from '#lib/features/household/household.server.js';
 import { sampleNotes } from '#lib/server/sample-data.js';
@@ -114,7 +115,8 @@ export async function listNotes(locals: App.Locals): Promise<HomeNote[]> {
 
 	if (readError) dbError(readError);
 	const rows = (data ?? []) as NoteRow[];
-	await sealOldNotes(locals, rows, householdId);
+	// Usually nothing to do; when there is, it's done after the page has gone, not before.
+	background('sealing old notes', sealOldNotes(locals, rows, householdId));
 	return Promise.all(rows.map((row) => toNote(row, householdId)));
 }
 

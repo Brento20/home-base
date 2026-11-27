@@ -4,6 +4,7 @@
 	 * already added stays as it was). Pause it for a while, or stop it for good.
 	 */
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import ExpenseForm from '#lib/features/expenses/ExpenseForm.svelte';
 	import { frequencyLabel } from '#lib/features/expenses/recurring.js';
 	import ConfirmDelete from '#lib/ui/ConfirmDelete.svelte';
@@ -35,7 +36,7 @@
 			{frequencyLabel(data.bill.frequency)}. Next on {formatDayLabel(data.bill.nextOn, todayISO())}.
 		{/if}
 	</p>
-	<form method="POST" action="?/pause" use:enhance>
+	<form method="POST" action="?/pause" use:enhance={saveForm}>
 		<button class="button-secondary">{data.bill.paused ? 'Resume' : 'Pause'}</button>
 	</form>
 </div>

@@ -6,6 +6,7 @@
 	import { repeatLabel } from '#lib/features/tasks/repeat.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import { enhance } from '$app/forms';
+	import { pause, save } from '#lib/ui/save.svelte.js';
 	import PointPop from '#lib/features/points/PointPop.svelte';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -26,8 +27,18 @@
 
 	let { task, people, today, highlighted = false, label, ondone }: Props = $props();
 
-	let done = $state(false);
 	let pops = $state(0);
+	// Done straight away; the card leaves once the point has landed.
+	const finishing = save({
+		optimistic: () => true,
+		answered: async (result) => {
+			if (result.type !== 'success') return;
+			pops += 1;
+			await pause(700);
+			ondone?.(task.id);
+		}
+	});
+	const done = $derived(finishing.pending === true);
 
 	const assignee = $derived(people.find((person) => person.id === task.assigneeId));
 	const dinner = $derived(Boolean(task.recipe));
@@ -62,24 +73,7 @@
 				{/if}
 				{assignee ? assignee.displayName : 'Anyone'}{dinner ? ' cooking' : ''}
 			</span>
-			{#if canFinish}<form
-					method="POST"
-					action="?/completeTask"
-					use:enhance={() => {
-						done = true;
-						return async ({ result, update }) => {
-							if (result.type === 'success') {
-								// Show the point landing before the card leaves the row.
-								pops += 1;
-								await new Promise((resolve) => setTimeout(resolve, 700));
-								ondone?.(task.id);
-							} else {
-								done = false;
-							}
-							await update({ reset: false });
-						};
-					}}
-				>
+			{#if canFinish}<form method="POST" action="?/completeTask" use:enhance={finishing.enhance}>
 					<input type="hidden" name="taskId" value={task.id} />
 					<input type="hidden" name="title" value={task.title} />
 					<PointPop count={pops} />

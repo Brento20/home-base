@@ -3,6 +3,7 @@
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { describeRepeat } from '#lib/features/tasks/repeat.js';
 	import { enhance } from '$app/forms';
+	import { saveForm } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import { formatClock, formatDayLabel, zonedParts } from '#lib/time.js';
@@ -62,7 +63,7 @@
 									· {describeRepeat(task.repeat)}{/if}
 							</span>
 						</span>
-						<form method="POST" action="?/undo" use:enhance>
+						<form method="POST" action="?/undo" use:enhance={saveForm}>
 							<input type="hidden" name="taskId" value={task.id} />
 							<button class="undo">Undo</button>
 						</form>

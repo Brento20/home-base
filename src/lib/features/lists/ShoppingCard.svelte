@@ -6,6 +6,7 @@
 	 * header opens the full list.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { PLACEHOLDERS } from '#lib/copy/voice.js';
 	import GlassSurface from '#lib/ui/GlassSurface.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -22,6 +23,40 @@
 	let added = $state<string[]>([]);
 	let message = $state('');
 	let timer: ReturnType<typeof setTimeout> | undefined;
+
+	const say = (words: string) => {
+		message = words;
+		clearTimeout(timer);
+		timer = setTimeout(() => (message = ''), 2000);
+	};
+
+	// Each name shows straight away and stays until the fresh data has it (or it failed).
+	const adding = save<string>({
+		// Stay put (this posts to the list's page) and keep the keyboard up.
+		navigate: false,
+		start: ({ formData }) => {
+			const name = String(formData.get('name') ?? '').trim();
+			if (!name) return false;
+			added = [name, ...added];
+			if (input) input.value = '';
+		},
+		optimistic: ({ formData }) => String(formData.get('name') ?? '').trim(),
+		answered: (result, { value: name = '' }) => {
+			if (result.type === 'failure' || result.type === 'error') {
+				if (input && !input.value) input.value = name;
+				say('That didn’t add. Try again?');
+			} else if (result.type === 'success' && result.data?.already) {
+				say(`${name} is already on the list`);
+			} else {
+				say(`Added ${name}`);
+			}
+		},
+		after: (_, { value: name }) => {
+			const at = added.indexOf(name ?? '');
+			if (at >= 0) added = added.toSpliced(at, 1);
+			input?.focus();
+		}
+	});
 
 	// Names just added show straight away, until the fresh data arrives with them in.
 	const upNext = $derived([...added, ...list.upNext]);
@@ -49,33 +84,7 @@
 			class="quick-add"
 			method="POST"
 			action="/lists/{list.id}?/add"
-			use:enhance={({ formData, cancel }) => {
-				const name = String(formData.get('name') ?? '').trim();
-				if (!name) {
-					cancel();
-					return;
-				}
-				added = [name, ...added];
-				if (input) input.value = '';
-				return async ({ result, update }) => {
-					if (result.type === 'failure' || result.type === 'error') {
-						added = added.filter((entry) => entry !== name);
-						if (input) input.value = name;
-						message = 'That didn’t add. Try again?';
-					} else if (result.type === 'success' && result.data?.already) {
-						message = `${name} is already on the list`;
-					} else {
-						message = `Added ${name}`;
-					}
-					clearTimeout(timer);
-					timer = setTimeout(() => (message = ''), 2000);
-					// Stay put (this posts to the list's page) and keep the keyboard up.
-					await update({ reset: false, invalidateAll: true, navigate: false });
-					// The fresh data has it now (or it failed): stop showing our own copy.
-					added = added.filter((entry) => entry !== name);
-					input?.focus();
-				};
-			}}
+			use:enhance={adding.enhance}
 		>
 			<label class="visually-hidden" for="quick-add-{list.id}">Add to {list.name}</label>
 			<input

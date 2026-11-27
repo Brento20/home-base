@@ -1,7 +1,8 @@
 import { fail, type Cookies } from '@sveltejs/kit';
 import { listGroups } from '#lib/features/expenses/expenses.server.js';
 import { settleNudge } from '#lib/features/expenses/nudge.js';
-import { addDueRecurring } from '#lib/features/expenses/recurring.server.js';
+import { addDueRecurring, billsDueCheck } from '#lib/features/expenses/recurring.server.js';
+import { background } from '#lib/server/background.js';
 import { FEED_PAGE, hasAnyPost, listFeed } from '#lib/features/feed/feed.server.js';
 import { listActiveLists } from '#lib/features/lists/lists.server.js';
 import { listUpcomingPlans, pickComingUp, plansYoureIn } from '#lib/features/plans/plans.server.js';
@@ -23,13 +24,17 @@ import { LIVE_DATA } from '#lib/live-data.js';
 import { graceFor, soonOrLater, unwrap } from '#lib/server/soon.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, parent, cookies, depends, isDataRequest }) => {
+export const load: PageServerLoad = async ({ locals, cookies, depends, isDataRequest }) => {
 	// Reloaded every minute while it's showing (live-refresh.ts), without the shared layout.
 	depends(LIVE_DATA);
 	// The feed is below the fold, so it never holds the screen up: the posts follow a moment
 	// later. Just the newest few: older ones load from /feed/older as you scroll.
 	const feed = listFeed(locals).then((page) => ({ ...page, pageSize: FEED_PAGE }));
 	feed.catch(() => {}); // a failure shows in the page; don't let it go unhandled here
+
+	// Bills that have come due go in, once a day from this phone, after the page has gone (the
+	// balance catches up on the next refresh). Never on the way to drawing Today.
+	if (billsDueCheck(cookies)) background('adding due bills', addDueRecurring(locals));
 
 	const starting = !cookies.get(START_COOKIE);
 	const screen = (async () => {
@@ -42,9 +47,9 @@ export const load: PageServerLoad = async ({ locals, parent, cookies, depends, i
 			listGroups(locals),
 			// Only a new home's getting-started card needs to know.
 			starting ? hasAnyPost(locals) : true,
-			parent(),
-			// Bills that have come due go in (balances catch up on the next refresh, a minute on).
-			addDueRecurring(locals)
+			// Read with the profile (hooks.server.ts), so this costs nothing. Not parent(): that
+			// would rerun the shared layout on the server with every minute's refresh.
+			getHousehold(locals)
 		]);
 		// Invites you've said no to stay in Plans, but not on Today or in the line under the date.
 		const plans = plansYoureIn(allPlans);

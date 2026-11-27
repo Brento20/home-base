@@ -7,7 +7,7 @@ import {
 	getPost,
 	parseReplyForm,
 	REPLY_BODY_MAX,
-	toggleReaction
+	setReaction
 } from '#lib/features/feed/feed.server.js';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, params }) => ({
 export const actions: Actions = {
 	react: async ({ request, locals, params }) => {
 		const reaction = String((await request.formData()).get('reaction') ?? '');
-		await toggleReaction(locals, params.id, reaction);
+		await setReaction(locals, params.id, reaction);
 	},
 
 	reply: async ({ request, locals, params }) => {

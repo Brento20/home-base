@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import GlassCard from '#lib/ui/GlassCard.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import SoloScreen from '#lib/ui/SoloScreen.svelte';
@@ -12,7 +13,7 @@
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const sentHeading = pick(HEADINGS.checkEmail);
 	const heading = pick(HEADINGS.forgotPassword);
-	let submitting = $state(false);
+	const submitting = save();
 </script>
 
 <svelte:head>
@@ -33,17 +34,7 @@
 		{/snippet}
 
 		<GlassCard>
-			<form
-				method="POST"
-				class="form-stack"
-				use:enhance={() => {
-					submitting = true;
-					return async ({ update }) => {
-						await update({ reset: false });
-						submitting = false;
-					};
-				}}
-			>
+			<form method="POST" class="form-stack" use:enhance={submitting.enhance}>
 				<label class="field">
 					<span class="field-label">Email</span>
 					<input
@@ -56,8 +47,8 @@
 					/>
 				</label>
 				{#if form?.message}<p class="form-message" role="alert">{form.message}</p>{/if}
-				<button class="button-primary" disabled={submitting}>
-					{submitting ? 'Sending…' : 'Send the link'}
+				<button class="button-primary" disabled={submitting.busy}>
+					{submitting.busy ? 'Sending…' : 'Send the link'}
 				</button>
 			</form>
 		</GlassCard>

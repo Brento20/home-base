@@ -1,6 +1,7 @@
 <script lang="ts">
 	/** Everyone's stars for a recipe: yours to tap (saves straight away), the others' to see. */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import type { Profile } from '#lib/types.js';
 	import Stars from './Stars.svelte';
@@ -17,17 +18,12 @@
 	const starsFor = (profileId: string) =>
 		ratings.find((rating) => rating.profileId === profileId)?.stars ?? null;
 	const others = $derived(people.filter((person) => person.id !== meId));
+
+	const rating = save();
 </script>
 
 <div class="ratings">
-	<form
-		method="POST"
-		action="?/rate"
-		class="rating mine"
-		use:enhance={() =>
-			async ({ update }) =>
-				update({ reset: false })}
-	>
+	<form method="POST" action="?/rate" class="rating mine" use:enhance={rating.enhance}>
 		<span class="who">Your rating</span>
 		<Stars value={starsFor(meId)} name="stars" label={title} size={22} autosubmit />
 	</form>

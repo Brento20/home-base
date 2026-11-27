@@ -3,6 +3,7 @@ import { getGroup, parseExpenseForm } from '#lib/features/expenses/expenses.serv
 import { expenseFormValues } from '#lib/features/expenses/form.js';
 import { isFrequency } from '#lib/features/expenses/recurring.js';
 import {
+	forgetBillsCheck,
 	getRecurring,
 	setRecurringPaused,
 	stopRecurring,
@@ -26,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 
 export const actions: Actions = {
 	/** Changes what it adds and how often, from the next bill on. */
-	save: async ({ request, locals, params }) => {
+	save: async ({ request, locals, params, cookies }) => {
 		const group = await getGroup(locals, params.groupId);
 		const bill = await getRecurring(locals, group.id, params.billId);
 		const form = await request.formData();
@@ -38,12 +39,16 @@ export const actions: Actions = {
 
 		const { message } = await updateRecurring(locals, bill, input, repeat);
 		if (message) return fail(400, { values, errors: { split: message } });
+		// Its next date may be today: the group's page checks for due bills again.
+		forgetBillsCheck(cookies);
 		redirect(303, `/money/${group.id}`);
 	},
 
-	pause: async ({ locals, params }) => {
+	pause: async ({ locals, params, cookies }) => {
 		const bill = await getRecurring(locals, params.groupId, params.billId);
 		await setRecurringPaused(locals, bill, !bill.paused);
+		// Back on, it may have dates that came due while it was paused.
+		if (bill.paused) forgetBillsCheck(cookies);
 	},
 
 	/** Stops it repeating; what it already added stays. */

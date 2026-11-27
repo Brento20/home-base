@@ -5,6 +5,7 @@
 	 */
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/ui/Icon.svelte';
+	import { save, type SaveEach } from '#lib/ui/save.svelte.js';
 	import type { ListItem } from '#lib/types.js';
 
 	interface Props {
@@ -13,16 +14,26 @@
 		ringColour: string;
 		/** Edit mode shows a remove button instead of ticking. */
 		editing?: boolean;
-		onoptimistic: (id: string, checked: boolean | null) => void;
+		/** The list's ticks: each item's shows straight away (ListDetail). */
+		ticks: SaveEach<boolean>;
 	}
 
-	let { item, ringColour, editing = false, onoptimistic }: Props = $props();
-	let removing = $state(false);
+	let { item, ringColour, editing = false, ticks }: Props = $props();
 	let renaming = $state(false);
 	let draft = $state('');
 
+	const removing = save();
+	// The new name shows as soon as you're done typing, until the fresh list has it.
+	const renamed = save<string>({
+		optimistic: ({ formData }) => String(formData.get('name') ?? '').trim(),
+		start: () => {
+			renaming = false;
+		}
+	});
+	const name = $derived(renamed.pending ?? item.name);
+
 	function startRename() {
-		draft = item.name;
+		draft = name;
 		renaming = true;
 	}
 
@@ -34,53 +45,32 @@
 	// Leaving the field saves a change; an empty or unchanged name just puts it back.
 	function finish(event: FocusEvent) {
 		const form = (event.currentTarget as HTMLInputElement).form;
-		if (draft.trim() && draft.trim() !== item.name) form?.requestSubmit();
+		if (draft.trim() && draft.trim() !== name) form?.requestSubmit();
 		else renaming = false;
 	}
 </script>
 
-<li class="item-row" class:removing>
+<li class="item-row" class:removing={removing.busy}>
 	{#if editing}
 		<span class="item static">
 			<span class="ring" class:checked={item.checked} style:--ring-colour={ringColour}>
 				{#if item.checked}<Icon name="check" size={14} />{/if}
 			</span>
-			<span class="name" class:checked={item.checked}>{item.name}</span>
+			<span class="name" class:checked={item.checked}>{name}</span>
 		</span>
-		<form
-			method="POST"
-			action="?/deleteItem"
-			use:enhance={() => {
-				removing = true;
-				return async ({ update }) => {
-					await update({ reset: false });
-					removing = false;
-				};
-			}}
-		>
+		<form method="POST" action="?/deleteItem" use:enhance={removing.enhance}>
 			<input type="hidden" name="itemId" value={item.id} />
-			<button class="remove" aria-label="Remove {item.name}"><Icon name="close" size={16} /></button
-			>
+			<button class="remove" aria-label="Remove {name}"><Icon name="close" size={16} /></button>
 		</form>
 	{:else}
-		<form
-			method="POST"
-			action="?/setChecked"
-			use:enhance={() => {
-				onoptimistic(item.id, !item.checked);
-				return async ({ update }) => {
-					await update({ reset: false });
-					onoptimistic(item.id, null);
-				};
-			}}
-		>
+		<form method="POST" action="?/setChecked" use:enhance={ticks.for(item.id)}>
 			<input type="hidden" name="itemId" value={item.id} />
 			<input type="hidden" name="checked" value={String(!item.checked)} />
 			<button
 				class="tick"
 				data-haptic
 				aria-pressed={item.checked}
-				aria-label={item.checked ? `Untick ${item.name}` : `Tick off ${item.name}`}
+				aria-label={item.checked ? `Untick ${name}` : `Tick off ${name}`}
 			>
 				<span class="ring" class:checked={item.checked} style:--ring-colour={ringColour}>
 					{#if item.checked}<Icon name="check" size={14} />{/if}
@@ -88,17 +78,7 @@
 			</button>
 		</form>
 		{#if renaming}
-			<form
-				class="rename"
-				method="POST"
-				action="?/renameItem"
-				use:enhance={() => {
-					return async ({ update }) => {
-						await update({ reset: false });
-						renaming = false;
-					};
-				}}
-			>
+			<form class="rename" method="POST" action="?/renameItem" use:enhance={renamed.enhance}>
 				<input type="hidden" name="itemId" value={item.id} />
 				<input
 					class="name-input"
@@ -116,8 +96,8 @@
 				/>
 			</form>
 		{:else}
-			<button class="name-button" aria-label="Rename {item.name}" onclick={startRename}>
-				<span class="name" class:checked={item.checked}>{item.name}</span>
+			<button class="name-button" aria-label="Rename {name}" onclick={startRename}>
+				<span class="name" class:checked={item.checked}>{name}</span>
 			</button>
 		{/if}
 	{/if}

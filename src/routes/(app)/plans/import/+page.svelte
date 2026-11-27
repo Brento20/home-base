@@ -2,6 +2,7 @@
 	import { pick } from '#lib/copy/pick.js';
 	import { HEADINGS } from '#lib/copy/voice.js';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
@@ -10,7 +11,7 @@
 
 	// A fresh way of asking each visit (src/lib/copy/voice.ts).
 	const heading = pick(HEADINGS.importCalendar);
-	let importing = $state(false);
+	const importing = save({ reset: true });
 
 	const months = $derived(Math.round(data.recurringWindowDays / 30));
 </script>
@@ -45,7 +46,7 @@
 	<div class="intro">
 		<p>
 			Copy upcoming events from an Apple Calendar export into Plans. It’s a one-time copy: later
-			changes in Calendar won’t show up here, but importing the same file again won’t add
+			changes in Calendar won’t show up here, but importing.busy the same file again won’t add
 			duplicates.
 		</p>
 		<p class="muted">
@@ -58,13 +59,7 @@
 		method="POST"
 		enctype="multipart/form-data"
 		class="form-stack"
-		use:enhance={() => {
-			importing = true;
-			return async ({ update }) => {
-				await update();
-				importing = false;
-			};
-		}}
+		use:enhance={importing.enhance}
 	>
 		<label class="field">
 			<span class="field-label">Calendar file</span>
@@ -78,8 +73,8 @@
 		</label>
 		{#if form && 'message' in form}<p class="field-error" role="alert">{form.message}</p>{/if}
 		<div class="form-actions">
-			<button class="button-primary" disabled={importing}
-				>{importing ? 'Importing…' : 'Import'}</button
+			<button class="button-primary" disabled={importing.busy}
+				>{importing.busy ? 'Importing…' : 'Import'}</button
 			>
 		</div>
 	</form>

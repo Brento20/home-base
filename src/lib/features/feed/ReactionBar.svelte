@@ -1,11 +1,16 @@
 <script lang="ts">
 	/**
 	 * The reactions under a post. Tapping one gives it; tapping yours again takes it back; one each.
-	 * The change shows straight away and the server confirms it, so it feels instant on a slow line.
+	 * The change shows straight away and stays: nothing reloads for a reaction (the save only
+	 * sends it), so the screen can't flick back. The next refresh brings everyone else's.
+	 *
+	 * Each button posts the reaction it would leave you with ('none' to take yours back), so two
+	 * quick taps mean exactly what they look like, and taps are sent one at a time, in order.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import type { FeedPost, FeedReaction, Profile } from '#lib/types.js';
-	import { summariseReactions } from './reactions.js';
+	import { isReaction, summariseReactions } from './reactions.js';
 
 	interface Props {
 		post: FeedPost;
@@ -17,38 +22,45 @@
 
 	let { post, people, me, action = `/feed/${post.id}?/react` }: Props = $props();
 
-	// What you just tapped, shown until the server's answer arrives (null = took it back).
-	let pending = $state<{ reaction: FeedReaction | null } | null>(null);
+	const asReaction = (value: FormDataEntryValue | null): FeedReaction | null =>
+		typeof value === 'string' && isReaction(value) ? value : null;
 
+	// Your reaction as the server has it, kept until fresh data for this post arrives. Tied to
+	// the post's reactions list rather than the post: a card may pass a fresh copy of the post
+	// on every render, but the list only changes when new data does.
+	let saved = $state<{ for: FeedPost['reactions']; reaction: FeedReaction | null } | null>(null);
+
+	const reacting = save<FeedReaction | null>({
+		serial: true,
+		refresh: 'none',
+		// Stay on this screen: the action lives on the post's page.
+		navigate: false,
+		optimistic: ({ formData }) => asReaction(formData.get('reaction')),
+		after: (result, { value }) => {
+			if (result.type === 'success' && value !== undefined)
+				saved = { for: post.reactions, reaction: value };
+		}
+	});
+
+	const mine = $derived(
+		reacting.pending !== undefined
+			? { reaction: reacting.pending }
+			: saved?.for === post.reactions
+				? { reaction: saved.reaction }
+				: null
+	);
 	const shown = $derived.by(() => {
-		if (!pending) return post;
+		if (!mine) return post;
 		const others = post.reactions.filter((entry) => entry.profileId !== me);
-		const reaction = pending.reaction;
 		return {
 			...post,
-			reactions: reaction ? [...others, { profileId: me, reaction }] : others
+			reactions: mine.reaction ? [...others, { profileId: me, reaction: mine.reaction }] : others
 		};
 	});
 	const reactions = $derived(summariseReactions(shown, people, me));
 </script>
 
-<form
-	class="reactions"
-	method="POST"
-	{action}
-	use:enhance={({ submitter }) => {
-		const tapped = (submitter as HTMLButtonElement | null)?.value as FeedReaction | undefined;
-		if (tapped) {
-			const current = reactions.find((reaction) => reaction.mine)?.key ?? null;
-			pending = { reaction: current === tapped ? null : tapped };
-		}
-		return async ({ update }) => {
-			// Stay on this page: the action lives on the post's page, and SvelteKit would go there.
-			await update({ reset: false, navigate: false });
-			pending = null;
-		};
-	}}
->
+<form class="reactions" method="POST" {action} use:enhance={reacting.enhance}>
 	{#each reactions as reaction (reaction.key)}
 		<button
 			class="reaction"
@@ -56,7 +68,7 @@
 			class:mine={reaction.mine}
 			class:given={reaction.count > 0}
 			name="reaction"
-			value={reaction.key}
+			value={reaction.mine ? 'none' : reaction.key}
 			aria-pressed={reaction.mine}
 			aria-label={reaction.count > 0 ? `${reaction.label}: ${reaction.who}` : reaction.label}
 		>

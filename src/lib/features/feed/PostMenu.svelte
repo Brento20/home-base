@@ -4,6 +4,7 @@
 	 * taps instead of a browser confirm dialog.
 	 */
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 
 	interface Props {
@@ -27,6 +28,9 @@
 	function onWindowPointer(event: PointerEvent) {
 		if (open && menu && !menu.contains(event.target as Node)) close();
 	}
+
+	// From Today, stay on Today; from the post's page, the action redirects home.
+	const removing = save({ navigate: false, answered: () => close() });
 </script>
 
 <svelte:window
@@ -57,13 +61,7 @@
 					action="/feed/{postId}?/delete{afterDelete
 						? `&then=${encodeURIComponent(afterDelete)}`
 						: ''}"
-					use:enhance={() => {
-						return async ({ update }) => {
-							close();
-							// From Today, stay on Today; from the post's page, the action redirects home.
-							await update({ navigate: false });
-						};
-					}}
+					use:enhance={removing.enhance}
 				>
 					<button
 						class="item danger"

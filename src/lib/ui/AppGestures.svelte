@@ -10,7 +10,8 @@
 	 * left alone. All listeners are passive, so scrolling is never held up.
 	 */
 	import { onMount } from 'svelte';
-	import { afterNavigate, goto, preloadData, refreshAll } from '$app/navigation';
+	import { afterNavigate, goto, preloadData } from '$app/navigation';
+	import { refresh as reload } from './save.svelte.js';
 	import { page } from '$app/state';
 	import Icon from './Icon.svelte';
 	import { GESTURE, rubber, swipeAction, type SwipeAction } from './gestures.js';
@@ -152,10 +153,15 @@
 					refresh = 'refreshing';
 					pull = GESTURE.pullArm;
 					if (!reduced.matches) place(0, pull * 0.9, true);
-					// Long enough to see it happen, however quick the network is.
-					await Promise.all([refreshAll(), new Promise((done) => setTimeout(done, 700))]);
-					refresh = 'done';
-					await new Promise((done) => setTimeout(done, 450));
+					// Long enough to see it happen, however quick the network is. "Done" only once the
+					// fresh data is on screen (streamed parts too); offline, the bead still goes away.
+					try {
+						await Promise.all([reload('all'), new Promise((done) => setTimeout(done, 700))]);
+						refresh = 'done';
+						await new Promise((done) => setTimeout(done, 450));
+					} catch {
+						// Couldn't reach the server: the offline pill says so (AppStatus).
+					}
 				}
 				refresh = 'idle';
 				pull = 0;

@@ -7,6 +7,7 @@
 	 */
 	import { onDestroy } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import Icon from '#lib/ui/Icon.svelte';
 
 	interface Props {
@@ -31,20 +32,19 @@
 	});
 
 	onDestroy(() => clearTimeout(timer));
+
+	const undoing = save({
+		start: () => {
+			shown = false;
+		}
+	});
 </script>
 
 {#if shown}
 	<div class="undo-toast" role="status" data-still="undo-toast">
 		<Icon name="check" size={16} />
 		<span class="message one-line">{message}</span>
-		<form
-			method="POST"
-			{action}
-			use:enhance={() => {
-				shown = false;
-				return async ({ update }) => update({ reset: false });
-			}}
-		>
+		<form method="POST" {action} use:enhance={undoing.enhance}>
 			{#each Object.entries(fields) as [name, value] (name)}
 				<input type="hidden" {name} {value} />
 			{/each}
