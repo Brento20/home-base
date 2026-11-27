@@ -24,7 +24,7 @@ export interface DisplayPrefs {
 	todayCardLayout: 'cards' | 'list';
 	/** A gentle note on Today once you owe more than this many dollars; 0 is off. */
 	settleNudge: NudgeAmount;
-	/** December's snow globe behind the page: tilt to move the snow, shake to swirl it. */
+	/** The snow globe behind the page, late November to Christmas: tilt to move the snow, shake to swirl it. */
 	snowGlobe: boolean;
 }
 

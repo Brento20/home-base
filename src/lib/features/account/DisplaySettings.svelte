@@ -10,7 +10,7 @@
 	import { askForMotion, motionAnswer, motionNeedsAsking } from '#lib/ui/snow-globe.js';
 	import {
 		endPreview,
-		isDecember,
+		isSnowSeason,
 		isPreviewing,
 		motionSensed,
 		previewSnow,
@@ -41,8 +41,8 @@
 	function toggleSnow(on: boolean) {
 		change('snowGlobe', on);
 		if (!on) return endPreview();
-		// A taste of it straight away, whatever the month.
-		if (!isDecember()) previewSnow();
+		// A taste of it straight away, whatever the date.
+		if (!isSnowSeason()) previewSnow();
 		// iOS only allows asking from a tap, so this has to happen right here.
 		if (motionNeedsAsking()) void askForMotion().then((answer) => (motion = answer));
 	}
@@ -54,12 +54,12 @@
 				? 'Off while Reduce glow effects is on.'
 				: prefs.snowGlobe && motion === 'denied' && !motionSensed()
 					? 'Motion access is off for home base, so the snow just falls. Allow it in your phone’s settings to tilt it.'
-					: isDecember()
+					: isSnowSeason()
 						? 'Tilt your phone to move the snow, shake it to swirl.'
-						: 'Snows through December. Tilt your phone to move it, shake it to swirl.'
+						: 'Snows from late November until Christmas. Tilt your phone to move it, shake it to swirl.'
 	);
 	const snowing = $derived(
-		prefs.snowGlobe && !prefs.reduceGlow && !reducedMotion && (isDecember() || isPreviewing())
+		prefs.snowGlobe && !prefs.reduceGlow && !reducedMotion && (isSnowSeason() || isPreviewing())
 	);
 
 	const NUDGES: { value: NudgeAmount; label: string }[] = [

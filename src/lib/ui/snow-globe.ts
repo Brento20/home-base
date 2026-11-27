@@ -1,5 +1,5 @@
 /**
- * The December snow globe: a canvas of small flakes behind the page that fall with the phone's
+ * The Christmas snow globe: a canvas of small flakes behind the page that fall with the phone's
  * real gravity. Tilt the phone and the snow drifts that way and gathers along whichever edge
  * is down; shake it and everything lifts into a slow swirl that settles again. Without a
  * motion sensor (a laptop, or motion access turned down) it just snows, and the pointer can

@@ -1,14 +1,14 @@
 <script lang="ts">
 	/**
-	 * The December snow globe behind every page, for anyone who's switched it on (Preferences).
+	 * The snow globe behind every page, late November to Christmas,, for anyone who's switched it on (Preferences).
 	 * It sits between the backdrop and the page (z-index -1, like the backdrop, but later), so
 	 * flakes drift behind the cards and melt into the edge fades. Off with Reduce Motion and with
-	 * Reduce glow effects, and only in December (or for a short preview from Preferences). The
+	 * Reduce glow effects, and only in the snow season (or for a short preview from Preferences). The
 	 * engine is snow-globe.ts.
 	 */
 	import type { DisplayPrefs } from '#lib/display.js';
 	import { askForMotion, motionAnswer, motionNeedsAsking, SnowGlobe } from './snow-globe.js';
-	import { isDecember, isPreviewing, markSensed, setGlobe } from './snow.svelte.js';
+	import { isSnowSeason, isPreviewing, markSensed, setGlobe } from './snow.svelte.js';
 
 	interface Props {
 		prefs: DisplayPrefs;
@@ -31,7 +31,7 @@
 	});
 
 	const active = $derived(
-		prefs.snowGlobe && !prefs.reduceGlow && !still && (isDecember() || isPreviewing())
+		prefs.snowGlobe && !prefs.reduceGlow && !still && (isSnowSeason() || isPreviewing())
 	);
 
 	$effect(() => {

@@ -57,7 +57,7 @@
 	use:drift
 ></div>
 
-<!-- December's snow, for anyone who's switched it on (Preferences). -->
+<!-- The Christmas snow, for anyone who's switched it on (Preferences). -->
 <SnowGlobe prefs={displayPrefs(data.display)} />
 
 <TabBar homeDot={data.requestsWaiting} />
