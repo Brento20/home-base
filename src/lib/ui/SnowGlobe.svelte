@@ -16,6 +16,8 @@
 
 	let { prefs }: Props = $props();
 	let canvas = $state<HTMLCanvasElement>();
+	/** A thin strip in front of the tab bar, for the snow that builds up on top of it. */
+	let ledge = $state<HTMLCanvasElement>();
 	let still = $state(false);
 	/** Switched off, but still fading out: the canvas stays until it's gone. */
 	let fading = $state(false);
@@ -37,7 +39,10 @@
 		const root = document.documentElement;
 		const globe = new SnowGlobe(canvas, {
 			light: root.dataset.mode === 'light',
-			onSensed: markSensed
+			onSensed: markSensed,
+			ledgeCanvas: ledge,
+			// Trying it out in Preferences: the close-up flake comes by straight away.
+			heroSoon: isPreviewing()
 		});
 		globe.start();
 		setGlobe(globe);
@@ -70,6 +75,7 @@
 
 {#if active || fading}
 	<canvas class="snow" aria-hidden="true" bind:this={canvas}></canvas>
+	<canvas class="snow-ledge" aria-hidden="true" bind:this={ledge}></canvas>
 {/if}
 
 <style>
@@ -79,6 +85,18 @@
 		z-index: -1;
 		width: 100%;
 		height: 100%;
+		pointer-events: none;
+	}
+
+	/* Moved to sit over the tab bar's top edge (snow-globe.ts); in front of the bar itself. */
+	.snow-ledge {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 31;
+		width: 100%;
+		height: 28px;
+		visibility: hidden;
 		pointer-events: none;
 	}
 </style>
