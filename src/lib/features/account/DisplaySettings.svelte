@@ -235,48 +235,6 @@
 		margin-top: var(--space-xl);
 	}
 
-	.switch-row {
-		position: relative;
-		cursor: pointer;
-	}
-
-	/* The iOS switch, as on a plan's "All day". */
-	.switch {
-		position: relative;
-		flex: none;
-		width: 50px;
-		height: 30px;
-		border-radius: var(--radius-pill);
-		background: var(--colour-fill-strong);
-		transition: background-color var(--duration-quick) var(--ease-out);
-	}
-
-	.switch::after {
-		content: '';
-		position: absolute;
-		top: 3px;
-		left: 3px;
-		width: 24px;
-		height: 24px;
-		border-radius: 50%;
-		background: #fff;
-		box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
-		transition: transform var(--duration-settle) var(--ease-spring);
-	}
-
-	input:checked + .switch {
-		background: var(--colour-accent);
-	}
-
-	input:checked + .switch::after {
-		transform: translateX(20px);
-	}
-
-	input:focus-visible + .switch {
-		outline: 2px solid var(--colour-accent);
-		outline-offset: 2px;
-	}
-
 	.shake {
 		width: 100%;
 		border: 0;
@@ -338,8 +296,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.switch,
-		.switch::after,
 		.segmented label {
 			transition: none;
 		}

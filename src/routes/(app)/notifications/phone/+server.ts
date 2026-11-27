@@ -4,7 +4,6 @@ import {
 	getPhone,
 	removePhone,
 	savePhone,
-	testPhone,
 	updatePhone
 } from '#lib/features/notifications/notifications.server.js';
 import type { RequestHandler } from './$types';
@@ -12,8 +11,7 @@ import type { RequestHandler } from './$types';
 /**
  * This phone's notifications, for the settings page's script (NotificationSettings.svelte):
  * POST turns them on with the browser's push subscription, PUT changes the kinds and quiet
- * hours, DELETE turns them off, PATCH sends a test to this phone, and a POST with only an
- * endpoint reads its settings back.
+ * hours, DELETE turns them off, and a POST with only an endpoint reads its settings back.
  */
 
 async function body(request: Request): Promise<Record<string, unknown>> {
@@ -69,11 +67,4 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 	const endpoint = text(input.endpoint, 1000);
 	if (endpoint) await removePhone(locals, endpoint);
 	return json({ settings: null });
-};
-
-export const PATCH: RequestHandler = async ({ request, locals }) => {
-	const input = await body(request);
-	const endpoint = text(input.endpoint, 1000);
-	if (!endpoint) error(400, 'No push address.');
-	return json({ result: await testPhone(locals, endpoint) });
 };

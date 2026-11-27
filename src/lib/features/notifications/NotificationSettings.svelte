@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * Notifications on this phone: a button to turn them on (iOS only asks from a tap, and only
-	 * in the app on the Home Screen), then which kinds this phone gets, quiet hours, a test, and
+	 * in the app on the Home Screen), then which kinds this phone gets, quiet hours, and
 	 * off. Each phone chooses for itself, so Chris's settings are Chris's.
 	 *
 	 * The phone's push subscription is saved through /notifications/phone. Sample mode pretends
@@ -171,29 +171,6 @@
 		if (!settings) return;
 		void save({ ...settings, quietFrom: on ? 22 : null, quietTo: on ? 7 : null });
 	}
-
-	async function test() {
-		if (!endpoint) return;
-		busy = true;
-		note = null;
-		try {
-			const { result } = sampleMode ? { result: 'sample' } : await call('PATCH', { endpoint });
-			note =
-				result === 'sent'
-					? 'Sent. It should arrive in a few seconds.'
-					: result === 'sample'
-						? 'Sample data sends nothing, but this is where a test would come from.'
-						: result === 'gone'
-							? 'This phone isn’t getting them any more. Turn them on again.'
-							: 'That didn’t go through. Try again in a moment.';
-			if (result === 'gone') {
-				settings = null;
-				stage = 'off';
-			}
-		} finally {
-			busy = false;
-		}
-	}
 </script>
 
 <section class="notification-settings" id="notifications" aria-labelledby="notifications-heading">
@@ -267,9 +244,6 @@
 		</ul>
 
 		<div class="actions">
-			<button class="button-secondary" type="button" disabled={busy} onclick={test}
-				>Send a test</button
-			>
 			<button class="button-quiet" type="button" disabled={busy} onclick={turnOff}
 				>Turn off on this phone</button
 			>
