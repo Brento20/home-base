@@ -282,6 +282,26 @@ export const EMPTY = {
  * When an AI helper can't do it (no answer, a timeout, a blurry photo, not a recipe), the form
  * stays right there to fill by hand. The first line is the one the household asked for.
  */
+/**
+ * What an AI helper says as a wait drags on (AssistBox), after its own "Reading your recipe…".
+ * `long` comes in after a few seconds, `escape` sits beside the button that lets you stop
+ * waiting and type it in yourself. Honest about the wait, never blaming the person.
+ */
+export const AI_WAIT = {
+	long: [
+		'Still reading. Long ones take a moment…',
+		'Getting there. Bear with me…',
+		'Nearly got it. Hold that thought…'
+	],
+	escape: [
+		'Taking ages, isn’t it? You can fill it in yourself.',
+		'This one’s a slow burn. Skip it and type it in?',
+		'Slower than a Sunday. Want to do it by hand?'
+	],
+	stop: 'I’ll do it myself',
+	stopped: 'No worries. It’s all yours below.'
+} as const;
+
 export const AI_OOPS = [
 	'Oops! I can’t work out a thing today! Enter it manually 👉👈',
 	'Hmm, that one stumped me. Mind popping it in by hand? 👉👈',

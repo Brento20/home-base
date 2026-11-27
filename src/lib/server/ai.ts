@@ -7,6 +7,7 @@
  */
 import { ANTHROPIC_API_KEY, ANTHROPIC_BASE_URL } from '$app/env/private';
 import { getRequestEvent } from '$app/server';
+import { aiLimiter } from './background.js';
 
 /** False when no key is set: the helpers hide, and every form works by hand as before. */
 export const aiConfigured = Boolean(ANTHROPIC_API_KEY);
@@ -55,7 +56,7 @@ export async function aiAllowed(): Promise<boolean> {
 		return true; // Not inside a request (a test): nothing to count against.
 	}
 	const who = event.locals.user?.id ?? event.getClientAddress();
-	const limiter = event.platform?.env?.AI_LIMITER;
+	const limiter = aiLimiter();
 	if (limiter) {
 		try {
 			return (await limiter.limit({ key: who })).success;
@@ -104,7 +105,7 @@ export async function askForJson<T>({
 				messages: [{ role: 'user', content }],
 				output_config: { format: { type: 'json_schema', schema } }
 			}),
-			signal: AbortSignal.timeout(timeoutMs)
+			signal: stopWhen(timeoutMs)
 		});
 
 		if (!response.ok) {
@@ -126,6 +127,19 @@ export async function askForJson<T>({
 	} catch (problem) {
 		console.error('[ai] no answer:', problem instanceof Error ? problem.message : problem);
 		return null;
+	}
+}
+
+/**
+ * Gives up after `timeoutMs`, or as soon as the person stops waiting (the helper's "I'll do it
+ * myself" drops the request), so nobody pays for an answer no one will see.
+ */
+function stopWhen(timeoutMs: number): AbortSignal {
+	const timeout = AbortSignal.timeout(timeoutMs);
+	try {
+		return AbortSignal.any([timeout, getRequestEvent().request.signal]);
+	} catch {
+		return timeout; // Outside a request, or no AbortSignal.any.
 	}
 }
 

@@ -4,7 +4,7 @@
  * one locked step, migration 20261129000100_recurring_bills.sql). Sample mode does the same
  * with sampleRecurring.
  */
-import { error } from '@sveltejs/kit';
+import { error, type Cookies } from '@sveltejs/kit';
 import { dbError, friendlyMessage } from '#lib/server/db.js';
 import { sampleExpenses, sampleRecurring } from '#lib/server/sample-data.js';
 import { todayISO } from '#lib/time.js';
@@ -205,6 +205,38 @@ export async function stopRecurring(locals: App.Locals, bill: RecurringBill) {
 		.eq('id', bill.id)
 		.eq('group_id', bill.groupId);
 	if (problem) dbError(problem);
+}
+
+/**
+ * The day this phone last added due bills (in the home's time zone). Bills come due by the day,
+ * so once a day is enough; the database adds each date only once, whichever phone gets there.
+ */
+export const BILLS_COOKIE = 'hb_bills';
+
+/**
+ * Whether due bills still need adding today from this phone, and if so marks them as done (the
+ * cookie is set first so a background run, which can't set cookies, still counts). Opening
+ * Today or Money used to write to the database every time, every minute's refresh included.
+ */
+export function billsDueCheck(cookies: Cookies): boolean {
+	const today = todayISO();
+	if (cookies.get(BILLS_COOKIE) === today) return false;
+	try {
+		cookies.set(BILLS_COOKIE, today, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'lax',
+			maxAge: 2 * 86_400
+		});
+	} catch {
+		return false; // Headers already sent: the next load checks.
+	}
+	return true;
+}
+
+/** After a bill changes (paused, restarted, its dates moved): check again on the next open. */
+export function forgetBillsCheck(cookies: Cookies) {
+	cookies.delete(BILLS_COOKIE, { path: '/' });
 }
 
 /**

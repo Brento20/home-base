@@ -14,6 +14,14 @@ declare global {
 			stage: import('#lib/features/account/stage.js').Stage;
 			/** The home the signed-in person belongs to, once they've built or joined one. */
 			householdId: string | null;
+			/**
+			 * That home with everyone in it, read with the profile on page loads (not form actions,
+			 * which may change it). getHousehold() uses it, or asks the database when it's null.
+			 */
+			household: {
+				household: import('#lib/types.js').Household;
+				me: import('#lib/types.js').Profile;
+			} | null;
 			/** That home's time zone and currency (src/lib/home.ts); the defaults before one. */
 			home: import('#lib/home.js').HomeSettings;
 			/** The signed-in person's display preferences (src/lib/display.ts); the defaults otherwise. */
@@ -22,12 +30,8 @@ declare global {
 		// interface Error {}
 		// interface PageData {}
 		// interface PageState {}
-		interface Platform {
-			env?: {
-				/** Cloudflare's rate limiter for AI calls (wrangler.jsonc › ratelimits). */
-				AI_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
-			};
-		}
+		// The Worker's bindings (the AI rate limiter) come from 'cloudflare:workers'
+		// (src/lib/server/background.ts): the adapter doesn't pass `platform` here.
 	}
 }
 

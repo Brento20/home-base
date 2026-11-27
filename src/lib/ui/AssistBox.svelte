@@ -18,10 +18,11 @@
 	 */
 	import { onMount, tick, untrack } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { save } from '#lib/ui/save.svelte.js';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { pick } from '#lib/copy/pick.js';
-	import { AI_OOPS } from '#lib/copy/voice.js';
+	import { AI_OOPS, AI_WAIT } from '#lib/copy/voice.js';
 	import { clearFilled, markFilled, restore, snapshot, type Snapshot } from '#lib/ui/ai-fill.js';
 	import { shrinkPhoto } from '#lib/ui/photo.js';
 	import Icon from '#lib/ui/Icon.svelte';
@@ -78,7 +79,15 @@
 
 	let text = $state(untrack(() => initial));
 	let chosen = $state<File | null>(null);
-	let busy = $state(false);
+	/** How far into a wait it is: 'long' after a few seconds, 'escape' when it's dragging. */
+	let stage = $state<'start' | 'long' | 'escape'>('start');
+	let stopped = $state(false);
+	let controller: AbortController | null = null;
+	let timers: ReturnType<typeof setTimeout>[] = [];
+	const LONG_MS = 4_000;
+	const ESCAPE_MS = 12_000;
+	const longLine = pick(AI_WAIT.long);
+	const escapeLine = pick(AI_WAIT.escape);
 	let photoProblem = $state(false);
 	let filled = $state(0);
 	let form = $state<HTMLFormElement>();
@@ -89,6 +98,56 @@
 		chosen ? photoBusyLabel : /^https?:\/\/\S+$/i.test(text.trim()) ? linkBusyLabel : busyLabel
 	);
 	const targetForm = () => document.querySelector<HTMLFormElement>(target);
+
+	function clearTimers() {
+		timers.forEach(clearTimeout);
+		timers = [];
+	}
+
+	const reading = save({
+		// The answer fills the form below through the page's `form`; nothing else reloads.
+		refresh: 'none',
+		start: ({ formData, controller: sending }) => {
+			if (!ready) return false;
+			formData.delete('photo');
+			if (chosen) formData.set('photo', chosen);
+			before = snapshot(targetForm());
+			filled = 0;
+			stopped = false;
+			stage = 'start';
+			controller = sending;
+			clearTimers();
+			timers = [
+				setTimeout(() => (stage = 'long'), LONG_MS),
+				setTimeout(() => (stage = 'escape'), ESCAPE_MS)
+			];
+		},
+		after: async (result) => {
+			clearTimers();
+			controller = null;
+			await tick();
+			if (result.type === 'success' && result.data?.assist === 'filled') {
+				text = '';
+				chosen = null;
+				filled = markFilled(targetForm(), before ?? new Map());
+			} else if (focusOnFail) {
+				document.querySelector<HTMLElement>(focusOnFail)?.focus({ preventScroll: true });
+			}
+		}
+	});
+	const busy = $derived(reading.busy);
+
+	/** Stop waiting: the answer is dropped and the form below is yours. */
+	function stop() {
+		controller?.abort();
+		controller = null;
+		clearTimers();
+		stopped = true;
+		const field = focusOnFail ?? `${target} input:not([type=hidden]), ${target} textarea`;
+		document.querySelector<HTMLElement>(field)?.focus({ preventScroll: true });
+	}
+
+	onMount(() => clearTimers);
 
 	async function choose(event: Event) {
 		const file = (event.currentTarget as HTMLInputElement).files?.[0];
@@ -128,26 +187,7 @@
 	method="POST"
 	{action}
 	enctype="multipart/form-data"
-	use:enhance={({ formData, cancel }) => {
-		if (!ready) return cancel();
-		formData.delete('photo');
-		if (chosen) formData.set('photo', chosen);
-		before = snapshot(targetForm());
-		busy = true;
-		filled = 0;
-		return async ({ result, update }) => {
-			await update({ reset: false, invalidateAll: false });
-			await tick();
-			busy = false;
-			if (result.type === 'success' && result.data?.assist === 'filled') {
-				text = '';
-				chosen = null;
-				filled = markFilled(targetForm(), before ?? new Map());
-			} else if (focusOnFail) {
-				document.querySelector<HTMLElement>(focusOnFail)?.focus({ preventScroll: true });
-			}
-		};
-	}}
+	use:enhance={reading.enhance}
 	aria-busy={busy}
 >
 	<p class="label">{label}</p>
@@ -207,7 +247,14 @@
 	</div>
 
 	<div class="status" role="status">
-		{#if photoProblem}
+		{#if busy && stage === 'long'}
+			<p>{longLine}</p>
+		{:else if busy && stage === 'escape'}
+			<p>{escapeLine}</p>
+			<button type="button" class="undo" onclick={stop}>{AI_WAIT.stop}</button>
+		{:else if stopped && !busy}
+			<p>{AI_WAIT.stopped}</p>
+		{:else if photoProblem}
 			<p>That photo couldn’t be read. Try another, or fill it in below.</p>
 		{:else if outcome === 'failed' && !busy}
 			<p>{failedNote ?? oops}</p>

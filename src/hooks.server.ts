@@ -4,6 +4,7 @@ import type { Handle } from '@sveltejs/kit/hooks';
 import { redirectFor, stageFor } from '#lib/features/account/stage.js';
 import { DEFAULT_HOME, homeFrom, setHomeSettingsSource, type HomeSettings } from '#lib/home.js';
 import { DEFAULT_DISPLAY, DISPLAY_COOKIE, parseDisplay, type DisplayPrefs } from '#lib/display.js';
+import { householdFrom, MEMBER_COLUMNS } from '#lib/features/household/members.js';
 import { getRequestEvent } from '$app/server';
 import { sampleHome } from '#lib/server/sample-home.js';
 import { RequestTiming } from '#lib/server/timing.js';
@@ -66,18 +67,15 @@ function themed(theme: ThemeChoice, home: HomeSettings, display: DisplayPrefs) {
 
 /**
  * The theme to draw with: this device's cookie, or, when it's been cleared (or it's a new
- * phone), the copy on the person's profile, put back in the cookie for next time.
+ * phone), the copy on the person's profile (read with it in the handle below), put back in the
+ * cookie for next time.
  */
-async function deviceTheme(event: Parameters<Handle>[0]['event']): Promise<ThemeChoice> {
+function deviceTheme(
+	event: Parameters<Handle>[0]['event'],
+	fromProfile: string | null | undefined
+): ThemeChoice {
 	const saved = event.cookies.get(THEME_COOKIE);
-	const { supabase, user } = event.locals;
-	if (saved || !supabase || !user) return parseTheme(saved);
-
-	// Its own small query, so a profile without the column yet (before the migration) can't
-	// break signing in; it just falls back to the default look.
-	const { data } = await supabase.from('profiles').select('theme').eq('id', user.id).maybeSingle();
-	const fromProfile = (data as { theme?: string | null } | null)?.theme;
-	if (!fromProfile) return parseTheme(null);
+	if (saved || !fromProfile) return parseTheme(saved ?? null);
 	const theme = parseTheme(fromProfile);
 	event.cookies.set(THEME_COOKIE, serialiseTheme(theme), {
 		path: '/',
@@ -102,6 +100,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	locals.supabase = supabaseConfigured ? createSupabaseServerClient(event, timing.fetch) : null;
 	locals.user = null;
 	locals.householdId = null;
+	locals.household = null;
 	locals.home = DEFAULT_HOME;
 	locals.display = DEFAULT_DISPLAY;
 
@@ -132,25 +131,42 @@ export const handle: Handle = async ({ event, resolve }) => {
 	locals.user = claims?.sub ? { id: claims.sub, email: claims.email ?? null } : null;
 
 	// One trip for everything a request needs before its page loads: whether you've made a
-	// profile, which home you're in, and that home's time zone and currency.
+	// profile, your saved theme, which home you're in, its time zone and currency, and (for
+	// page loads) its name and everyone in it, so the layout and pages don't each ask again.
+	// Form actions skip the people: an action may change them, and its own reads stay current.
 	let onboarded = false;
+	let savedTheme: string | null | undefined;
 	if (locals.user) {
 		const userId = locals.user.id;
-		const { data: profile } = await timing.span('profile', async () =>
-			supabase
+		const withPeople = event.request.method === 'GET';
+		const { data: profile } = await timing.span('profile', async () => {
+			const answer = await supabase
 				.from('profiles')
-				.select(
-					'onboarded_at, display_prefs, household_members ( household_id, households ( time_zone, currency ) )'
-				)
+				.select(profileColumns(withPeople, true))
 				.eq('id', userId)
-				.maybeSingle()
-		);
+				.maybeSingle();
+			// Before the theme migration, ask again without it rather than fail signing in.
+			if (answer.error?.code !== '42703') return answer;
+			return supabase
+				.from('profiles')
+				.select(profileColumns(withPeople, false))
+				.eq('id', userId)
+				.maybeSingle();
+		});
+		const row = profile as ProfileLookup | null;
 
-		onboarded = Boolean(profile?.onboarded_at);
-		locals.display = parseDisplay(profile?.display_prefs);
-		const membership = (profile?.household_members as unknown as Membership[] | undefined)?.[0];
+		onboarded = Boolean(row?.onboarded_at);
+		savedTheme = row?.theme;
+		locals.display = parseDisplay(row?.display_prefs);
+		const membership = row?.household_members?.[0];
 		locals.householdId = membership?.household_id ?? null;
-		if (membership?.households) locals.home = homeFrom(membership.households);
+		if (membership?.households) {
+			locals.home = homeFrom(membership.households);
+			const { id, name, household_members: people } = membership.households;
+			if (withPeople && id && name && people) {
+				locals.household = householdFrom({ id, name }, people, userId);
+			}
+		}
 	}
 
 	locals.stage = stageFor(locals.user !== null, onboarded, locals.householdId !== null);
@@ -171,7 +187,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	const response = await resolve(event, {
-		...themed(await deviceTheme(event), locals.home, locals.display),
+		...themed(deviceTheme(event, savedTheme), locals.home, locals.display),
 		filterSerializedResponseHeaders: (name) =>
 			name === 'content-range' || name === 'x-supabase-api-version'
 	});
@@ -187,7 +203,32 @@ function readDisplayCookie(value: string | undefined): DisplayPrefs {
 	}
 }
 
+/** The profile lookup's columns: with the home's people for page loads, theme once migrated. */
+const profileColumns = (withPeople: boolean, withTheme: boolean) =>
+	[
+		'onboarded_at, display_prefs',
+		withTheme ? 'theme' : null,
+		`household_members ( household_id, households ( time_zone, currency${
+			withPeople ? `, id, name, household_members ( ${MEMBER_COLUMNS} )` : ''
+		} ) )`
+	]
+		.filter(Boolean)
+		.join(', ');
+
+interface ProfileLookup {
+	onboarded_at: string | null;
+	display_prefs: unknown;
+	theme?: string | null;
+	household_members?: Membership[];
+}
+
 interface Membership {
 	household_id: string;
-	households: { time_zone: string | null; currency: string | null } | null;
+	households: {
+		time_zone: string | null;
+		currency: string | null;
+		id?: string;
+		name?: string;
+		household_members?: Parameters<typeof householdFrom>[1];
+	} | null;
 }
