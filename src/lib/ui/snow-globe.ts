@@ -102,8 +102,17 @@ const MAX_DT = 1 / 20;
 const LEDGE = '.tab-bar';
 const STRIP_ABOVE = 22;
 const STRIP_BELOW = 6;
-/** Only flakes this near land on the bar: the far ones drift on behind it. */
-const LEDGE_DEPTH = 0.6;
+/**
+ * How much snow builds up on the bar. `spacing`: pixels of bar per flake it holds. `depth`: only
+ * flakes this near land (the far ones drift on behind). `pile`: how many pixels a full bar heaps
+ * up. `rest`: seconds a flake stays. `drift`: how high (px) the soft bank under the flakes grows.
+ */
+export const LEDGE_STYLES = {
+	dusting: { spacing: 7, depth: 0.6, pile: 2.5, rest: [4, 9], drift: 0 },
+	settled: { spacing: 3, depth: 0.45, pile: 4.5, rest: [11, 20], drift: 3.5 },
+	snowed: { spacing: 1.6, depth: 0.4, pile: 7, rest: [14, 26], drift: 5.5 }
+} as const;
+export type LedgeStyle = keyof typeof LEDGE_STYLES;
 
 /** Seconds between close-up flakes (from one leaving to the next arriving), and their size. */
 const HERO_GAP = [16, 30] as const;
@@ -149,6 +158,8 @@ export class SnowGlobe {
 	private ledgeContext: CanvasRenderingContext2D | null = null;
 	private stripTop = -1;
 	private onLedge = 0;
+	/** How much builds up on the bar (LEDGE_STYLES); changeable from the console in development. */
+	ledgeStyle: LedgeStyle = 'dusting';
 	private hero: Hero | null = null;
 	private heroAt = 0;
 	private heroSprites = new Map<number, HTMLCanvasElement>();
@@ -498,7 +509,8 @@ export class SnowGlobe {
 		const spin = this.swirl * 180 * this.swirlTurn;
 		// Snow builds up on the tab bar while the phone's upright enough for its top to be "up".
 		const ledge = this.ledgeContext && down.y > 0.55 && tilt >= 0.2 ? this.ledge : null;
-		const ledgeRoom = ledge ? Math.round((ledge.right - ledge.left) / 7) : 0;
+		const style = LEDGE_STYLES[this.ledgeStyle];
+		const ledgeRoom = ledge ? Math.round((ledge.right - ledge.left) / style.spacing) : 0;
 		let onLedge = 0;
 
 		for (const flake of this.flakes) {
@@ -568,16 +580,16 @@ export class SnowGlobe {
 				flake.y >= ledge.top &&
 				flake.x > ledge.left &&
 				flake.x < ledge.right &&
-				flake.depth >= LEDGE_DEPTH &&
+				flake.depth >= style.depth &&
 				flake.depth <= 1 &&
 				this.swirl < 0.3 &&
 				onLedge < ledgeRoom
 			) {
 				const fullness = onLedge / Math.max(1, ledgeRoom);
 				flake.ledge = true;
-				flake.rest = rand(4, 9);
+				flake.rest = rand(style.rest[0], style.rest[1]);
 				// Piling up a touch as it fills, never more than a few pixels.
-				flake.lift = flake.radius * rand(0.35, 0.7) + fullness * rand(0, 2.5);
+				flake.lift = flake.radius * rand(0.35, 0.7) + fullness * rand(0, style.pile);
 				flake.y = ledge.top - flake.lift;
 				flake.vx = flake.vy = 0;
 				onLedge += 1;
@@ -764,6 +776,7 @@ export class SnowGlobe {
 		paint.globalAlpha = 1;
 		const strip = this.ledgeContext;
 		strip?.clearRect(0, 0, this.width, STRIP_ABOVE + STRIP_BELOW);
+		if (strip && this.ledge) this.drawDrift(strip);
 		for (const flake of this.flakes) {
 			if (flake.ledge && strip && this.ledge) {
 				// In front of the bar, on its own strip: the bar covers the page canvas here.
@@ -790,6 +803,54 @@ export class SnowGlobe {
 		if (strip) strip.globalAlpha = 1;
 		paint.globalAlpha = 1;
 		this.drawHero();
+	}
+
+	/**
+	 * The soft bank under the snow on the bar: higher where more flakes are lying, smoothed into
+	 * a gentle ridge, and gone where there are none (so it slides and melts with them).
+	 */
+	private drawDrift(strip: CanvasRenderingContext2D) {
+		const height = LEDGE_STYLES[this.ledgeStyle].drift;
+		const ledge = this.ledge;
+		if (!height || !ledge) return;
+		const step = 4;
+		const count = Math.ceil((ledge.right - ledge.left) / step) + 1;
+		const bins = new Float32Array(count);
+		for (const flake of this.flakes) {
+			if (!flake.ledge) continue;
+			const at = Math.round((flake.x - ledge.left) / step);
+			if (at >= 0 && at < count) bins[at] += flake.fade * (0.6 + flake.radius * 0.25);
+		}
+		// Smooth twice, so it reads as one bank rather than lumps under each flake.
+		for (let pass = 0; pass < 2; pass += 1) {
+			const copy = bins.slice();
+			for (let i = 0; i < count; i += 1)
+				bins[i] =
+					(copy[i - 2] ?? 0) * 0.1 +
+					(copy[i - 1] ?? 0) * 0.2 +
+					copy[i] * 0.4 +
+					(copy[i + 1] ?? 0) * 0.2 +
+					(copy[i + 2] ?? 0) * 0.1;
+		}
+		const base = ledge.top - this.stripTop + 1;
+		strip.beginPath();
+		strip.moveTo(ledge.left - step, base);
+		for (let i = 0; i < count; i += 1) {
+			const lift = Math.min(height, bins[i] * height * 0.9);
+			strip.lineTo(ledge.left + i * step, base - lift);
+		}
+		strip.lineTo(ledge.right + step, base);
+		strip.closePath();
+		const fill = strip.createLinearGradient(0, base - height, 0, base);
+		const rim = this.options.light ? 'rgba(116, 136, 166, 0.35)' : 'rgba(255, 255, 255, 0)';
+		fill.addColorStop(0, `rgba(255, 255, 255, ${0.75 * this.opacity})`);
+		fill.addColorStop(1, `rgba(255, 255, 255, ${0.35 * this.opacity})`);
+		strip.globalAlpha = 1;
+		strip.fillStyle = fill;
+		strip.shadowColor = this.options.light ? rim : 'rgba(255, 255, 255, 0.5)';
+		strip.shadowBlur = 4;
+		strip.fill();
+		strip.shadowBlur = 0;
 	}
 
 	/**
