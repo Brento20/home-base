@@ -25,7 +25,8 @@
 		"db:mark-applied": "node tools/mark-migrations-applied.mjs",
 		"db:status": "supabase migration list --remote",
 		"db:new": "supabase migration new",
-		"db:push": "supabase db push --remote"
+		"db:push": "supabase db push --remote",
+		"push:keys": "node tools/vapid-keys.mjs"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.5",

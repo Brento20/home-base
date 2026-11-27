@@ -1,11 +1,12 @@
 <script lang="ts">
 	/**
-	 * Preferences: how home base looks to you, and only you (your housemates keep their own).
-	 * Appearance (light or dark, the background through the day), then calmer screens and Today
-	 * (display preferences). Everything here saves as you tap.
+	 * Preferences: how home base looks and behaves for you, and only you (your housemates keep
+	 * their own). Notifications on this phone, appearance (light or dark, the background through
+	 * the day), then calmer screens and Today (display preferences). Everything saves as you tap.
 	 */
 	import AppearanceSettings from '#lib/features/account/AppearanceSettings.svelte';
 	import DisplaySettings from '#lib/features/account/DisplaySettings.svelte';
+	import NotificationSettings from '#lib/features/notifications/NotificationSettings.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import type { PageProps } from './$types';
@@ -24,6 +25,8 @@
 </PageHeader>
 
 <p class="explain">Just for you: your housemates keep their own. Changes save as you tap.</p>
+
+<NotificationSettings pushKey={data.pushKey} sampleMode={data.sampleMode} />
 
 <AppearanceSettings />
 

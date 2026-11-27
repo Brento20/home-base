@@ -2,7 +2,9 @@ import { redirect } from '@sveltejs/kit';
 import { forgetFriendLink, savedFriendLink } from '#lib/features/friends/friend-cookie.server.js';
 import type { Handle } from '@sveltejs/kit/hooks';
 import { redirectFor, stageFor } from '#lib/features/account/stage.js';
+import { deliverPushes } from '#lib/features/notifications/notifications.server.js';
 import { DEFAULT_HOME, homeFrom, setHomeSettingsSource, type HomeSettings } from '#lib/home.js';
+import { background } from '#lib/server/background.js';
 import { DEFAULT_DISPLAY, DISPLAY_COOKIE, parseDisplay, type DisplayPrefs } from '#lib/display.js';
 import { householdFrom, MEMBER_COLUMNS } from '#lib/features/household/members.js';
 import { getRequestEvent } from '$app/server';
@@ -192,6 +194,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 			name === 'content-range' || name === 'x-supabase-api-version'
 	});
 	response.headers.set('server-timing', timing.header());
+	// Anything you just did that someone should hear about goes to their phones now, after the
+	// response (src/lib/features/notifications/notifications.server.ts).
+	if (event.request.method !== 'GET' && locals.user) {
+		background('push', deliverPushes(locals));
+	}
 	return secure(response);
 };
 

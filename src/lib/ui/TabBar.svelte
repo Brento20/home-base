@@ -15,7 +15,7 @@
 	import { TABS, tabIndexFor } from './tabs.js';
 
 	interface Props {
-		/** Friend requests waiting: a dot on the Home tab. */
+		/** Notifications you haven't seen (friend requests among them): a dot on the Home tab. */
 		homeDot?: number;
 	}
 
@@ -39,7 +39,7 @@
 						<span
 							class="dot"
 							role="img"
-							aria-label="{homeDot} friend request{homeDot === 1 ? '' : 's'} waiting"
+							aria-label="{homeDot} new notification{homeDot === 1 ? '' : 's'}"
 						></span>
 					{/if}
 				</span>

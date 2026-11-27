@@ -6,12 +6,15 @@
 	import WifiCard from '#lib/features/home/WifiCard.svelte';
 	import { contactsFrom, otherNotes, wifiFrom } from '#lib/features/home/house-info.js';
 	import NoteCard from '#lib/features/notes/NoteCard.svelte';
+	import NotificationList from '#lib/features/notifications/NotificationList.svelte';
 	import Avatar from '#lib/ui/Avatar.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import { kept } from '#lib/ui/kept.svelte.js';
 	import { arrive, changed, glide, leave } from '#lib/ui/motion.js';
 	import Reveal from '#lib/ui/Reveal.svelte';
+	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -38,6 +41,21 @@
 		data.household.members.find((member) => member.id === data.me.id) ?? data.household.members[0]
 	);
 	const requests = $derived(data.requestsWaiting ?? 0);
+
+	// The notification centre: the newest few, then the rest on /notifications.
+	const SHOWN = 4;
+	const notifications = $derived(screen.current?.notifications ?? []);
+
+	// Once you've had a moment to look, they're seen: the Home tab's dot and the app icon's
+	// count clear. The dots on the rows stay for this visit, so you can see what was new.
+	onMount(() => {
+		if (!data.unread) return;
+		const timer = setTimeout(async () => {
+			const response = await fetch('/notifications/seen', { method: 'POST' }).catch(() => null);
+			if (response?.ok) await invalidate('app:unread');
+		}, 1500);
+		return () => clearTimeout(timer);
+	});
 </script>
 
 <svelte:head>
@@ -66,6 +84,21 @@
 
 <Reveal of={screen} placeholder={[374, 282, 184]} gap={40} label="Loading home">
 	{#snippet children(home)}
+		<section aria-labelledby="new-heading">
+			<div class="section-heading-row">
+				<h2 id="new-heading" class="section-label section-heading">What’s new</h2>
+				{#if notifications.length}<a class="section-heading-link" href="/notifications">See all</a
+					>{/if}
+			</div>
+			{#if notifications.length === 0}
+				<p class="empty">
+					All quiet. Friend requests, postcards, replies and invites will show up here.
+				</p>
+			{:else}
+				<NotificationList items={notifications.slice(0, SHOWN)} />
+			{/if}
+		</section>
+
 		<section aria-labelledby="jobs-heading">
 			<div class="section-heading-row">
 				<h2 id="jobs-heading" class="section-label section-heading">This week’s jobs</h2>

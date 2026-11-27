@@ -16,6 +16,18 @@
 	// already drawn the first paint with them; src/lib/display.svelte.ts).
 	$effect(() => applyDisplay(displayPrefs(data.display)));
 
+	// The app icon's count on the Home Screen: notifications you haven't seen. Only shows once
+	// notifications are allowed; the browser ignores it otherwise.
+	$effect(() => {
+		const unread = data.unread;
+		const nav = navigator as Navigator & {
+			setAppBadge?: (count: number) => Promise<void>;
+			clearAppBadge?: () => Promise<void>;
+		};
+		if (!nav.setAppBadge) return;
+		void (unread ? nav.setAppBadge(unread) : nav.clearAppBadge?.())?.catch(() => {});
+	});
+
 	// Dates and money on this phone follow the home's time zone and currency, set before any
 	// page below renders (so hydration matches the server), and again if they're changed.
 	untrack(() => setHomeSettings(data.home));
@@ -60,7 +72,7 @@
 <!-- The Christmas snow, for anyone who's switched it on (Preferences). -->
 <SnowGlobe prefs={displayPrefs(data.display)} />
 
-<TabBar homeDot={data.requestsWaiting} />
+<TabBar homeDot={data.unread} />
 <!-- Swipe between tabs, swipe right to go back, pull down to refresh. -->
 <AppGestures />
 

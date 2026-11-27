@@ -10,6 +10,8 @@
  * - Built files that load later than install (some styles do) are kept the first time they load.
  * - Form submissions and anything that changes data always go to the network.
  * - Signing out deletes every saved page, so nothing personal is left on the phone.
+ * - Phone notifications (web push, src/lib/features/notifications): it shows each one as it
+ *   arrives, sets the app icon's count, and opens the right page when one's tapped.
  */
 import { immutable, assets } from '$app/manifest';
 import { version } from '$app/env';
@@ -44,6 +46,59 @@ self.addEventListener('activate', (event) => {
 				)
 			)
 			.then(() => self.clients.claim())
+	);
+});
+
+interface PushMessage {
+	title?: string;
+	body?: string;
+	url?: string;
+	tag?: string;
+	badge?: number;
+}
+
+// A notification arriving. iOS requires every push to show one, so a message that can't be read
+// still shows something rather than nothing.
+self.addEventListener('push', (event) => {
+	let message: PushMessage = {};
+	try {
+		message = event.data?.json() ?? {};
+	} catch {
+		message = { body: event.data?.text() };
+	}
+	const count = typeof message.badge === 'number' ? message.badge : null;
+	const badge =
+		count !== null && 'setAppBadge' in self.navigator
+			? self.navigator.setAppBadge(count).catch(() => {})
+			: Promise.resolve();
+	event.waitUntil(
+		Promise.all([
+			self.registration.showNotification(message.title || 'home base', {
+				body: message.body ?? '',
+				tag: message.tag,
+				icon: '/icons/icon-192.png',
+				badge: '/icons/icon-192.png',
+				data: { url: message.url ?? '/' }
+			}),
+			badge
+		])
+	);
+});
+
+// Tapping one: back to the app if it's open (and to the page it's about), else open it there.
+self.addEventListener('notificationclick', (event) => {
+	event.notification.close();
+	const target = new URL(event.notification.data?.url ?? '/', self.location.origin);
+	if (target.origin !== self.location.origin) return;
+	event.waitUntil(
+		self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (windows) => {
+			const open = windows[0];
+			if (open) {
+				await open.focus();
+				return open.navigate(target.href);
+			}
+			return self.clients.openWindow(target.href);
+		})
 	);
 });
 

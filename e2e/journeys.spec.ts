@@ -932,3 +932,32 @@ test('Add expense: the category guesses itself until you pick one, and Save stay
 	await expect(page.locator('.expense-form button.button-primary')).toBeInViewport();
 	expect(errors).toEqual([]);
 });
+
+test('Notifications: what’s new on Home, the full list, and turning them on for this phone', async ({
+	page
+}) => {
+	const errors = watchErrors(page);
+	await open(page, '/home');
+	const centre = page.locator('section', {
+		has: page.getByRole('heading', { name: 'What’s new' })
+	});
+	await expect(centre.getByText('Chris loved your post')).toBeVisible();
+	await expect(centre.getByRole('button', { name: 'Accept' })).toBeVisible();
+
+	await centre.getByRole('link', { name: 'See all' }).click();
+	await expect(page.getByRole('heading', { name: 'Notifications', level: 1 })).toBeVisible();
+	await expect(page.getByText('Chris added Groceries')).toBeVisible();
+
+	// Tapping one goes where it's about.
+	await page.getByText('Chris added Groceries').click();
+	await expect(page).toHaveURL(/\/money\/sample-group-place/);
+
+	await open(page, '/profile/preferences');
+	await page.getByRole('button', { name: 'Turn on notifications' }).click();
+	await expect(page.getByRole('switch', { name: /Money/ })).toBeChecked();
+	await page.getByText('Quiet hours').click();
+	await expect(page.getByRole('combobox').first()).toHaveValue('22');
+	await page.getByRole('button', { name: 'Turn off on this phone' }).click();
+	await expect(page.getByRole('button', { name: 'Turn on notifications' })).toBeVisible();
+	expect(errors).toEqual([]);
+});
